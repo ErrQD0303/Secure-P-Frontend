@@ -1,4 +1,4 @@
-// import { useRouteError } from "react-router-dom";
+import { useRouteError } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import { isErrorResponse, isTypeError } from "../shared/helpers/errors";
 import { Box, Button, Typography } from "@mui/material";
