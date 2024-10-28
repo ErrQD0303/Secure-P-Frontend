@@ -10,7 +10,7 @@ declare module "@emotion/react" {
 }
 
 declare module "@mui/material/styles" {
-  interface ThemeOptions {
+  /* interface ThemeOptions {
     status: {
       danger: React.CSSProperties["color"];
     };
@@ -20,27 +20,56 @@ declare module "@mui/material/styles" {
     status: {
       danger: string;
     };
-  }
+  } */
 
   interface PaletteOptions {
-    /* neutral: {
-      main: string;
-    }; */
-    neutral?: SimplePaletteColorOptions;
+    mode?: "light" | "dark";
+    primary: SimplePaletteColorOptions;
+    secondary: SimplePaletteColorOptions;
+    tertiary: SimplePaletteColorOptions;
+    light: SimplePaletteColorOptions;
+    dark: SimplePaletteColorOptions;
+    grey: SimplePaletteColorOptions;
+    success: SimplePaletteColorOptions;
+    warning: SimplePaletteColorOptions;
+    info: SimplePaletteColorOptions;
+    error: SimplePaletteColorOptions;
   }
 
   interface Palette {
-    /* neutral: {
-      main: string;
-    }; */
-    neutral?: SimplePaletteColorOptions;
+    mode?: "light" | "dark";
+    blue: SimplePaletteColorOptions;
+    purple: SimplePaletteColorOptions;
+    yellow: SimplePaletteColorOptions;
+    grey: SimplePaletteColorOptions;
+    light: SimplePaletteColorOptions;
+    success: SimplePaletteColorOptions;
+    warning: SimplePaletteColorOptions;
+    info: SimplePaletteColorOptions;
+    error: SimplePaletteColorOptions;
   }
 
   interface SimplePaletteColorOptions {
-    darker?: string;
+    main: string;
+    dark?: string;
+    light?: string;
   }
 
   interface SimplePaletteColor {
-    darker?: string;
+    main: string;
+    dark?: string;
+    light?: string;
   }
+
+  /* interface BreakpointOverrides {
+    xs: false; // removes the `xs` breakpoint
+    sm: false;
+    md: false;
+    lg: false;
+    xl: false;
+    mobile: true; // adds the `mobile` breakpoint
+    tablet: true;
+    laptop: true;
+    desktop: true;
+  } */
 }
