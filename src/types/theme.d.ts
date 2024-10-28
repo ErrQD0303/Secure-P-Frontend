@@ -43,6 +43,7 @@ declare module "@mui/material/styles" {
     yellow: SimplePaletteColorOptions;
     grey: SimplePaletteColorOptions;
     light: SimplePaletteColorOptions;
+    dark: SimplePaletteColorOptions;
     success: SimplePaletteColorOptions;
     warning: SimplePaletteColorOptions;
     info: SimplePaletteColorOptions;
