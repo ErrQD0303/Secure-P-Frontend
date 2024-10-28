@@ -1,7 +1,8 @@
 import HomeIcon from "@mui/icons-material/Home";
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import PersonIcon from "@mui/icons-material/Person";
+import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
+import TicketIcon from "./svg-icons/Ticket";
 import { CustomBottomNavigationAction } from "./AppBottomNavigationAction";
 import { BottomNavigation, Container } from "@mui/material";
 
@@ -57,16 +58,12 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
           />
           <CustomBottomNavigationAction
             label="Subscriptions"
-            icon={
-              <img
-                src="/src/assets/Ticket.svg"
-                alt="Subscriptions"
-                width="26.79px"
-                height="24px"
-              />
-            }
+            icon={<TicketIcon />}
           />
-          <CustomBottomNavigationAction label="Profile" icon={<PersonIcon />} />
+          <CustomBottomNavigationAction
+            label="Help Center"
+            icon={<HelpIcon />}
+          />
           <CustomBottomNavigationAction
             label="Settings"
             icon={<SettingsIcon />}
