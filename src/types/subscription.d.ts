@@ -28,3 +28,12 @@ export interface ISubscriptionDetail {
 export interface ISubscriptions {
   subscriptions: ISubscription[];
 }
+
+export interface ISubscriptionCard {
+  id: string;
+  expireDate: Date;
+  licensePlate: string;
+  parkingZone: string;
+  parkingLocation: string;
+  isPaid: boolean;
+}

@@ -62,8 +62,9 @@ declare module "@mui/material/styles" {
     light?: string;
   }
 
-  /* interface BreakpointOverrides {
-    xs: false; // removes the `xs` breakpoint
+  interface BreakpointOverrides {
+    base: true;
+    /* xs: false; // removes the `xs` breakpoint
     sm: false;
     md: false;
     lg: false;
@@ -71,6 +72,6 @@ declare module "@mui/material/styles" {
     mobile: true; // adds the `mobile` breakpoint
     tablet: true;
     laptop: true;
-    desktop: true;
-  } */
+    desktop: true; */
+  }
 }

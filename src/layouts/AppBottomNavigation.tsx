@@ -2,9 +2,10 @@ import HomeIcon from "@mui/icons-material/Home";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
-import TicketIcon from "./svg-icons/Ticket";
+import TicketIcon from "../components/svg-icons/Ticket";
 import { CustomBottomNavigationAction } from "./AppBottomNavigationAction";
 import { BottomNavigation, Container } from "@mui/material";
+import { useTheme } from "@emotion/react";
 
 type Props = {
   value: number;
@@ -12,27 +13,28 @@ type Props = {
 };
 
 function AppBottomNavigation({ value, handleSetValue }: Props) {
+  const theme = useTheme();
   return (
     <Container
       component={"nav"}
       sx={{
-        height: "104px",
-        width: "100%",
+        width: "100vw",
+        height: "7rem",
         position: "fixed",
-        zIndex: 1000,
         bottom: 0,
         left: 0,
         right: 0,
         display: "flex",
         alignItems: "end",
-        padding: 0,
+        padding: "0 !important",
+        minWidth: "23.4375rem",
       }}
     >
       <Container
         component={"div"}
         sx={{
           bgcolor: "#283453",
-          height: "83px",
+          height: "5.1875rem",
           width: "100%",
           display: "flex",
           alignItems: "center",
@@ -51,17 +53,43 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
             flexWrap: "nowrap",
           }}
         >
-          <CustomBottomNavigationAction label="Recents" icon={<HomeIcon />} />
+          <CustomBottomNavigationAction label="Home" icon={<HomeIcon />} />
           <CustomBottomNavigationAction
             label="History"
             icon={<ReceiptIcon />}
           />
           <CustomBottomNavigationAction
-            label="Subscriptions"
-            icon={<TicketIcon />}
+            label="Subscription"
+            sx={{
+              content: "''",
+              clear: "both",
+              zIndex: 1, // Ensure it stays on top
+            }}
+            icon={
+              <Container
+                sx={{
+                  position: "absolute",
+                  width: "4rem",
+                  height: "4rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundImage:
+                    "radial-gradient(circle at center, #556995 0, #283453 65%)",
+                  borderRadius: "50%",
+                  top: "-35%",
+                  [theme.breakpoints.up("sm")]: {
+                    padding: 0,
+                  },
+                }}
+              >
+                <TicketIcon />
+              </Container>
+            }
           />
           <CustomBottomNavigationAction
             label="Help Center"
+            aria-label="Help Center"
             icon={<HelpIcon />}
           />
           <CustomBottomNavigationAction

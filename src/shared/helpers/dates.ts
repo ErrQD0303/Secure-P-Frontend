@@ -11,3 +11,27 @@ export const getCurrentLocalISOString = (): string => {
   const milliseconds = prependZeroToString(now.getMilliseconds().toString(), 3);
   return `${year}-${month}-${day}T${hour}:${minute}:${second}.${milliseconds}Z`;
 };
+
+export const getShortDayString = (day: Date): string => {
+  return day
+    .toLocaleDateString("en-US", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+    .replace(/,/g, "");
+};
+
+export const formatTimeLeft = (time: number): string => {
+  const day = Math.floor(time / 86400);
+  const hour = (time % 86400) / 3600;
+  const minute = (time % 3600) / 60;
+  return `${
+    day > 0
+      ? `${day}${day > 1 ? " days" : " day"}`
+      : Math.floor(hour) > 0
+      ? `${Math.trunc(hour)}${hour > 1 ? " hours" : " hour"}`
+      : `${Math.trunc(minute)}${minute > 1 ? " minutes" : " minute"}`
+  }`;
+};
