@@ -37,6 +37,9 @@ const lightThemePalette = {
   error: {
     main: red[500],
   },
+  lightBlue: {
+    main: WEB_COLORS.background,
+  },
 };
 
 // Define typography settings as constants
@@ -91,8 +94,16 @@ const theme = createTheme({
           line-height: 1;
           font-family: ${typography.fontFamily}; /* Use the fontFamily defined above */
           text-rendering: optimizeLegibility;
+          background-color: ${lightThemePalette.lightBlue.main};
         }
       `,
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundColor: lightThemePalette.lightBlue.main,
+        },
+      },
     },
   },
 });

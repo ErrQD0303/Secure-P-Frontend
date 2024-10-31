@@ -8,4 +8,5 @@ export const WEB_COLORS = {
   yellow: "#FCB034",
   lightYellow: "#FFD75C",
   white: "#EAEFF5",
+  background: "#f2f7fd",
 };

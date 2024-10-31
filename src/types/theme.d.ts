@@ -34,6 +34,7 @@ declare module "@mui/material/styles" {
     warning: SimplePaletteColorOptions;
     info: SimplePaletteColorOptions;
     error: SimplePaletteColorOptions;
+    lightBlue: SimplePaletteColorOptions;
   }
 
   interface Palette {
@@ -48,6 +49,7 @@ declare module "@mui/material/styles" {
     warning: SimplePaletteColorOptions;
     info: SimplePaletteColorOptions;
     error: SimplePaletteColorOptions;
+    lightBlue: SimplePaletteColorOptions;
   }
 
   interface SimplePaletteColorOptions {

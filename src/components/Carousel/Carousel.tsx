@@ -4,7 +4,7 @@ import clsx from "clsx";
 import React from "react";
 import useCarousel from "./useCarousel";
 import { objectsAssign } from "./shared/object";
-import { carouselClasses } from "./CarouselClasses";
+import { carouselClasses } from "./carouselClasses";
 
 // Deep merge two objects, the two object will be merged into the first one
 

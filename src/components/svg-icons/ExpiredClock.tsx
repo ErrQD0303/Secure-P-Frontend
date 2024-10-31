@@ -1,4 +1,8 @@
-const ExpiredClock = () => {
+import { SVGProps } from "react";
+
+const ExpiredClock = (
+  props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>
+) => {
   return (
     <svg
       width="13"
@@ -6,6 +10,7 @@ const ExpiredClock = () => {
       viewBox="0 0 13 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      {...props}
     >
       <g clipPath="url(#clip0_51_30)">
         <path

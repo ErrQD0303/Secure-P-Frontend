@@ -3,7 +3,7 @@ import { CarouselSettings } from "./carousel.d";
 import useMeasure from "react-use-measure";
 import React from "react";
 import clsx from "clsx";
-import { carouselClasses } from "./CarouselClasses";
+import { carouselClasses } from "./carouselClasses";
 
 function useCarousel(rows: React.ReactNode[], props: CarouselSettings) {
   const {

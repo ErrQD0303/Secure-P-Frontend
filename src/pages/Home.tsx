@@ -7,7 +7,7 @@ import MonthlyParkingCard from "../components/MonthlyParkingCard";
 import { ISubscriptionCard } from "../types/subscription";
 import { useTheme } from "@emotion/react";
 import Carousel from "../components/Carousel/Carousel";
-import { carouselClasses } from "../components/Carousel/CarouselClasses";
+import { carouselClasses } from "../components/Carousel/carouselClasses";
 import { useLoaderData } from "react-router-dom";
 import ButtonLink from "../components/ButtonLink";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -106,28 +106,30 @@ function Home() {
           spacing={0}
           autoPlay={true}
           transitionDelayTime={5000 * 1}
-          infinity={false} // prev slide animation is broken (fixed in future)
+          infinity={true} // prev slide animation is broken (fixed in future)
           // value={slide}
           // onChange={(rawSlide, slide) => console.log("slide", slide)}
           pauseOnHover
           centerMode
           disableTransition={false}
           sx={{
-            display: "flex",
-            padding: 0,
-            [`& .${carouselClasses.list}`]: {
-              // px: 3
-            },
+            [`& .${carouselClasses.list}`]: {},
             [`& .${carouselClasses.item} > *`]: {
               transition: "all 1s",
-              opacity: 100,
-              mx: 0,
-              [`$:not(.${carouselClasses.current})`]: {
-                opacity: 0,
+              transform: "scale(0.95)",
+              [theme.breakpoints.up("sm")]: {
+                transform: "scale(1)",
               },
             },
-            [`& .${carouselClasses.center} > *`]: {
-              // transform: "scale(1.2)",
+            [`& .${carouselClasses.current} > *`]: {
+              zIndex: 1,
+            },
+            [`& .${carouselClasses.item}`]: {
+              zIndex: 0,
+              position: "relative",
+            },
+            [`& .${carouselClasses.current}`]: {
+              zIndex: 1,
             },
           }}
         >
@@ -141,7 +143,10 @@ function Home() {
               <Paper
                 key={`item-${idx}`}
                 elevation={4}
-                sx={{ minWidth: "21.6875rem", maxWidth: "21.6875rem" }}
+                sx={{
+                  minWidth: "21.6875rem",
+                  maxWidth: "21.6875rem",
+                }}
               >
                 <MonthlyParkingCard {...value} />
               </Paper>

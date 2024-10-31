@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import AppBottomNavigation from "./AppBottomNavigation";
 import useViewPort from "../hooks/useViewPort";
 import { useTheme } from "@emotion/react";
+import TopNavigationBar from "./TopNavigationBar";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -20,10 +21,13 @@ function AppLayout() {
         [theme.breakpoints.between("xs", "md")]: {},
       }}
     >
+      <TopNavigationBar />
       <Container
         sx={{
           height: "100vh", // Default height
           padding: 0,
+          margin: 0,
+          pt: "4.938rem",
           [theme.breakpoints.up("xs")]: {
             height: "calc(100vh - 5.1875rem)",
           },
