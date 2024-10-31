@@ -13,75 +13,120 @@ import ButtonLink from "../components/ButtonLink";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import AddNewIcon from "../components/svg-icons/AddNew";
+import useViewPort from "../hooks/useViewPort";
 
 function Home() {
   const theme = useTheme();
+  const { viewWidth } = useViewPort();
   const FAKE_CARDS = useLoaderData() as ISubscriptionCard[];
   return (
     <>
       <img
-        src="/src/assets/mobile-banner.png"
+        src={`/src/assets/${
+          viewWidth < theme.breakpoints.values.lg
+            ? "mobile-banner.png"
+            : "bannerweb.png"
+        }`}
         style={{
-          width: "100vw",
+          width: "100%",
         }}
+        alt="Secure Parking Banner"
+        aria-label="Secure Parking Banner"
       ></img>
       <Container
         sx={{
           px: "1.437rem",
+          pb: "4.8rem",
         }}
       >
-        <ButtonLink to="/subscription" ariaLabel="My subscriptions" type="link">
-          <Typography
-            sx={{
-              textTransform: "capitalize",
-              color: "#2A2A5B",
-              fontWeight: 600,
-              fontSize: "1rem",
-              lineHeight: "1.5rem",
-              p: 0,
-            }}
-          >
-            My Subscriptions
-          </Typography>
-          <Typography
-            sx={{
-              p: 0,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            See all
-            <NavigateNextIcon
-              sx={{
-                ml: "-0.3125px",
-              }}
-            />
-          </Typography>
-        </ButtonLink>
-
-        <ButtonLink
-          to="/subscription/add"
-          ariaLabel="My subscriptions"
-          type="button"
+        <Box
           sx={{
-            my: "1.4375rem",
+            [theme.breakpoints.up("sm")]: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
           }}
         >
-          <Button
-            variant="contained"
+          <ButtonLink
+            to="/subscription"
+            ariaLabel="My subscriptions"
+            type="link"
+          >
+            <Typography
+              sx={{
+                textTransform: "capitalize",
+                color: "#2A2A5B",
+                fontWeight: 600,
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
+                p: 0,
+              }}
+            >
+              My Subscriptions
+            </Typography>
+            <Typography
+              sx={{
+                p: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                [theme.breakpoints.up("sm")]: {
+                  display: "none",
+                },
+              }}
+            >
+              See all
+              <NavigateNextIcon
+                sx={{
+                  ml: "-0.3125px",
+                }}
+              />
+            </Typography>
+          </ButtonLink>
+
+          <ButtonLink
+            to="/subscription/add"
+            ariaLabel="My subscriptions"
+            type="button"
             sx={{
-              width: "20.4375rem",
+              my: "1.4375rem",
               display: "flex",
-              gap: "0.375rem",
               alignItems: "center",
               justifyContent: "center",
+              [theme.breakpoints.up("sm")]: {
+                width: "auto",
+                flexShrink: 0,
+              },
             }}
           >
-            <AddNewIcon />
-            Add new Subscription
-          </Button>
-        </ButtonLink>
+            <Button
+              variant="contained"
+              sx={{
+                width: "100%",
+                display: "flex",
+                gap: "0.375rem",
+                p: "0.875rem",
+              }}
+            >
+              <AddNewIcon />
+              <Box component={"span"} sx={{}}>
+                Add new Subscription
+              </Box>
+            </Button>
+          </ButtonLink>
+        </Box>
+
+        {/* {viewWidth >= theme.breakpoints.values.md && (
+          <img
+            src={`/src/assets/bannerweb.png`}
+            style={{
+              width: "100%",
+            }}
+            alt="Secure Parking Banner"
+            aria-label="Secure Parking Banner"
+          ></img>
+        )} */}
 
         <Carousel
           renderDot={({ index: current, selected }) => (

@@ -26,10 +26,10 @@ function AppLayout() {
         sx={{
           height: "100vh", // Default height
           padding: 0,
-          margin: 0,
-          pt: "4.938rem",
+          pt: "3.5rem",
           [theme.breakpoints.up("xs")]: {
             height: "calc(100vh - 5.1875rem)",
+            px: 0,
           },
           [theme.breakpoints.up("md")]: {
             height: "100vh",

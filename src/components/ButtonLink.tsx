@@ -1,7 +1,7 @@
 import React from "react";
 import { Link as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
-import { useTheme, Theme } from "@mui/material/styles";
+import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 };
 
 function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
-  const theme = useTheme();
+  // const theme = useTheme();
   const linkTypes: { [key: string]: SxProps<Theme> | undefined } = {
     link: {
       display: "flex",
@@ -24,16 +24,12 @@ function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
       textDecoration: "none",
       my: "1.4375rem",
       p: 0,
-      [theme.breakpoints.up("lg")]: {
-        display: "none",
-      },
     },
     button: {
       display: "block",
       width: "100%",
     },
   };
-  console.log(linkTypes[type]);
   return (
     <Link
       component={RouterLink}
