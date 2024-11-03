@@ -14,6 +14,7 @@ function AppLayout() {
     (_event: React.SyntheticEvent, newValue: number) => setValue(newValue),
     []
   );
+
   return (
     <Paper
       sx={{

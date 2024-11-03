@@ -18,7 +18,7 @@ import useViewPort from "../hooks/useViewPort";
 function Home() {
   const theme = useTheme();
   const { viewWidth } = useViewPort();
-  const FAKE_CARDS = useLoaderData() as ISubscriptionCard[];
+  const { FAKE_CARDS } = useLoaderData() as { FAKE_CARDS: ISubscriptionCard[] };
   return (
     <>
       <img
@@ -160,6 +160,7 @@ function Home() {
           sx={{
             [`& .${carouselClasses.list}`]: {},
             [`& .${carouselClasses.item} > *`]: {
+              zIndex: 0,
               transition: "all 1s",
               transform: "scale(0.95)",
               [theme.breakpoints.up("sm")]: {

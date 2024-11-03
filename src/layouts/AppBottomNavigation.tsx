@@ -3,7 +3,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TicketIcon from "../components/svg-icons/Ticket";
-import { CustomBottomNavigationAction } from "./AppBottomNavigationAction";
+import { CustomBottomNavigationAction } from "../components/AppBottomNavigationAction";
 import { BottomNavigation, Container } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
@@ -28,6 +28,7 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
         alignItems: "end",
         padding: "0 !important",
         minWidth: "23.4375rem",
+        zIndex: 2,
       }}
     >
       <Container
@@ -63,7 +64,7 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
             sx={{
               content: "''",
               clear: "both",
-              zIndex: 1, // Ensure it stays on top
+              zIndex: 9999, // Ensure it stays on top
             }}
             icon={
               <Container

@@ -1,3 +1,4 @@
+// ../types/auth.d.ts
 export interface IAuth {
   status: "idle" | "loading" | "authenticated" | "unauthenticated" | "error";
   error: string | null;

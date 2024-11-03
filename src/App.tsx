@@ -3,10 +3,12 @@ import Error from "./pages/Error";
 import AppLayout from "./layouts/AppLayout";
 import homeLoader from "./pages/homeLoader";
 import Home from "./pages/Home";
+import appLoader from "./appLoader";
 
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
+    loader: appLoader,
     errorElement: <Error />,
     children: [
       {

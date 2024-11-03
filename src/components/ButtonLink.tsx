@@ -29,6 +29,7 @@ function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
       display: "block",
       width: "100%",
     },
+    none: {},
   };
   return (
     <Link

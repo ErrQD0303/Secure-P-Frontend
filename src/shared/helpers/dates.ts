@@ -12,15 +12,31 @@ export const getCurrentLocalISOString = (): string => {
   return `${year}-${month}-${day}T${hour}:${minute}:${second}.${milliseconds}Z`;
 };
 
-export const getShortDayString = (day: Date): string => {
-  return day
-    .toLocaleDateString("en-US", {
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    })
-    .replace(/,/g, "");
+export const getShortDayString = (
+  day: Date,
+  hasWeekDay: boolean = true
+): string => {
+  return !hasWeekDay
+    ? day.toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : day
+        .toLocaleDateString("en-US", {
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+        .replace(/,/g, "");
+};
+
+export const getNotificationDateString = (date: Date): string => {
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear().toString().slice(-2);
+  return `${day}/${month}/${year}`;
 };
 
 export const formatTimeLeft = (time: number): string => {

@@ -6,6 +6,7 @@ export interface IParkingZone {
   subscriptions: ISubscription[];
 }
 
+// ../types/parking.d.ts
 export interface IParkingRates {
   hourly: number;
   daily: number;

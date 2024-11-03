@@ -1,3 +1,4 @@
+// ../types/subscription.d.ts
 import { IProductType } from "./enum";
 import { ParkingLocation, ParkingZone } from "./parking";
 

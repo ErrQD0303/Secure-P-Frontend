@@ -1,3 +1,5 @@
+// ../types/user.d.ts
+
 import { Country } from "./country";
 
 export interface IUser {
