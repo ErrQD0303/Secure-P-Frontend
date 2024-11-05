@@ -14,29 +14,22 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import AddNewIcon from "../components/svg-icons/AddNew";
 import useViewPort from "../hooks/useViewPort";
+import Banner from "../components/Banner";
 
 function Home() {
   const theme = useTheme();
-  const { viewWidth } = useViewPort();
+  useViewPort();
   const { FAKE_CARDS } = useLoaderData() as { FAKE_CARDS: ISubscriptionCard[] };
   return (
     <>
-      <img
-        src={`/src/assets/${
-          viewWidth < theme.breakpoints.values.lg
-            ? "mobile-banner.png"
-            : "bannerweb.png"
-        }`}
-        style={{
-          width: "100%",
-        }}
-        alt="Secure Parking Banner"
-        aria-label="Secure Parking Banner"
-      ></img>
+      <Banner />
       <Container
         sx={{
           px: "1.437rem",
-          pb: "4.8rem",
+          pb: {
+            base: "6.8rem",
+            md: 0,
+          },
         }}
       >
         <Box
@@ -49,7 +42,7 @@ function Home() {
           }}
         >
           <ButtonLink
-            to="/subscription"
+            to="/subscriptions"
             ariaLabel="My subscriptions"
             type="link"
           >
@@ -86,7 +79,7 @@ function Home() {
           </ButtonLink>
 
           <ButtonLink
-            to="/subscription/add"
+            to="/subscriptions/add"
             ariaLabel="My subscriptions"
             type="button"
             sx={{
@@ -107,6 +100,7 @@ function Home() {
                 display: "flex",
                 gap: "0.375rem",
                 p: "0.875rem",
+                textTransform: "capitalize",
               }}
             >
               <AddNewIcon />

@@ -69,7 +69,7 @@ const addNotificationToDatabase = (
 ) => {
   const notificationWithTimestamp = {
     ...notification,
-    timestamp: getCurrentLocalISOString(),
+    timestamp: getCurrentLocalISOString(notification.timestamp),
     isRead: false, // Defaulting to unread
   };
 

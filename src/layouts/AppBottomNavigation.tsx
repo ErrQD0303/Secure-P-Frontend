@@ -3,7 +3,7 @@ import ReceiptIcon from "@mui/icons-material/Receipt";
 import HelpIcon from "@mui/icons-material/Help";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TicketIcon from "../components/svg-icons/Ticket";
-import { CustomBottomNavigationAction } from "../components/AppBottomNavigationAction";
+import CustomBottomNavigationAction from "../components/AppBottomNavigationAction";
 import { BottomNavigation, Container } from "@mui/material";
 import { useTheme } from "@emotion/react";
 
@@ -54,12 +54,18 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
             flexWrap: "nowrap",
           }}
         >
-          <CustomBottomNavigationAction label="Home" icon={<HomeIcon />} />
           <CustomBottomNavigationAction
+            to={"/"}
+            label="Home"
+            icon={<HomeIcon />}
+          />
+          <CustomBottomNavigationAction
+            to={"/payment-history"}
             label="History"
             icon={<ReceiptIcon />}
           />
           <CustomBottomNavigationAction
+            to={"/subscriptions/add"}
             label="Subscription"
             sx={{
               content: "''",
@@ -89,11 +95,13 @@ function AppBottomNavigation({ value, handleSetValue }: Props) {
             }
           />
           <CustomBottomNavigationAction
+            to={"/help-center"}
             label="Help Center"
             aria-label="Help Center"
             icon={<HelpIcon />}
           />
           <CustomBottomNavigationAction
+            to={"/settings"}
             label="Settings"
             icon={<SettingsIcon />}
           />

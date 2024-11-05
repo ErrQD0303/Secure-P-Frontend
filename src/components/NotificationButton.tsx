@@ -12,7 +12,7 @@ import { Tooltip } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { INotification } from "../types/notification";
 import { limitString } from "../shared/helpers/strings";
-import { getNotificationDateString } from "../shared/helpers/dates";
+import { formatNotificationTime } from "../shared/helpers/dates";
 import blue from "@mui/material/colors/blue";
 
 // type Props = {};
@@ -28,6 +28,7 @@ function NotificationButton() {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+  const [currentTime, setCurrentTime] = React.useState(new Date());
 
   const handleOpenUserMenu = React.useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -38,6 +39,14 @@ function NotificationButton() {
 
   const handleCloseUserMenu = React.useCallback(() => {
     setAnchorElUser(null);
+  }, []);
+
+  React.useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60 * 1000);
+
+    return clearInterval(intervalId);
   }, []);
 
   return (
@@ -164,13 +173,13 @@ function NotificationButton() {
                     lineHeight: "1rem",
                   }}
                 >
-                  {getNotificationDateString(notification.timestamp)}
+                  {formatNotificationTime(notification.timestamp, currentTime)}
                 </Box>
               </Box>
               <Typography
                 variant="body2"
                 sx={{
-                  fontSize: "inherit",
+                  fontSize: "0.813rem",
                   lineHeight: "inherit",
                   whiteSpace: "wrap",
                   /* whiteSpace: "nowrap",

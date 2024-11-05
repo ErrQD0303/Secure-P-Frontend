@@ -1,10 +1,10 @@
 import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { NavLink as RouterLink } from "react-router-dom";
 import Link from "@mui/material/Link";
 import { Theme } from "@mui/material/styles";
 import { SxProps } from "@mui/system";
 
-type Props = {
+export type Props = {
   children?: React.ReactNode;
   to: string;
   ariaLabel?: string;
@@ -28,6 +28,8 @@ function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
     button: {
       display: "block",
       width: "100%",
+      textTransform: "capitalize",
+      textDecoration: "none",
     },
     none: {},
   };

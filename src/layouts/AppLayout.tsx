@@ -5,6 +5,8 @@ import AppBottomNavigation from "./AppBottomNavigation";
 import useViewPort from "../hooks/useViewPort";
 import { useTheme } from "@emotion/react";
 import TopNavigationBar from "./TopNavigationBar";
+import SideBar from "./SideBar";
+import Grid from "@mui/material/Grid2";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -23,22 +25,49 @@ function AppLayout() {
       }}
     >
       <TopNavigationBar />
-      <Container
+
+      <Grid
+        container
+        spacing={0}
+        columns={24}
         sx={{
-          height: "100vh", // Default height
-          padding: 0,
-          pt: "3.5rem",
-          [theme.breakpoints.up("xs")]: {
-            height: "calc(100vh - 5.1875rem)",
-            px: 0,
-          },
-          [theme.breakpoints.up("md")]: {
-            height: "100vh",
+          pt: {
+            base: "4rem",
+            md: "5.5rem",
           },
         }}
       >
-        <Outlet />
-      </Container>
+        <Grid
+          size={{
+            base: 0,
+            md: 5,
+          }}
+        >
+          <SideBar />
+        </Grid>
+        <Grid
+          size={"grow"}
+          sx={{
+            overflow: "auto",
+          }}
+        >
+          <Container
+            sx={{
+              height: "100vh", // Default height
+              padding: 0,
+              [theme.breakpoints.up("xs")]: {
+                height: "calc(100vh - 5.1875rem)",
+                px: 0,
+              },
+              [theme.breakpoints.up("md")]: {
+                height: "calc(100vh - 5.5rem)",
+              },
+            }}
+          >
+            <Outlet />
+          </Container>
+        </Grid>
+      </Grid>
       {viewWidth >= theme.breakpoints.values.xs &&
         viewWidth <= theme.breakpoints.values.md && (
           <AppBottomNavigation value={value} handleSetValue={handleSetValue} />

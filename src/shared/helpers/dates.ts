@@ -1,7 +1,6 @@
 import { prependZeroToString } from "./strings";
 
-export const getCurrentLocalISOString = (): string => {
-  const now = new Date();
+export const getCurrentLocalISOString = (now: Date = new Date()): string => {
   const year = prependZeroToString(now.getFullYear().toString(), 4);
   const month = prependZeroToString((now.getMonth() + 1).toString(), 2);
   const day = prependZeroToString(now.getDate().toString(), 2);
@@ -50,4 +49,15 @@ export const formatTimeLeft = (time: number): string => {
       ? `${Math.trunc(hour)}${hour > 1 ? " hours" : " hour"}`
       : `${Math.trunc(minute)}${minute > 1 ? " minutes" : " minute"}`
   }`;
+};
+
+export const formatNotificationTime = (
+  date: Date,
+  currentTime: Date
+): string => {
+  const remainingTime = Math.abs(date.getTime() - currentTime.getTime()) / 1000;
+  const day = Math.floor(remainingTime / 86400);
+  if (day === 1) return "Yesterday";
+  if (day > 3) return getNotificationDateString(date);
+  return `${formatTimeLeft(remainingTime)}`;
 };
