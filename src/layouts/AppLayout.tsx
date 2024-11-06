@@ -29,7 +29,11 @@ function AppLayout() {
       <Grid
         container
         spacing={0}
-        columns={24}
+        columns={{
+          md: 16,
+          lg: 20,
+          xl: 24,
+        }}
         sx={{
           pt: {
             base: "4rem",

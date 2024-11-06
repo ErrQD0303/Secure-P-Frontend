@@ -31,6 +31,17 @@ export const getShortDayString = (
         .replace(/,/g, "");
 };
 
+export const getCasualRevenueCardDateString = (date: Date): string => {
+  const year = prependZeroToString(date.getFullYear().toString(), 4);
+  const month = date.toLocaleDateString("en-US", { month: "short" });
+  const day = prependZeroToString(date.getDate().toString(), 2);
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  const now = new Date();
+  return prependZeroToString(now.getFullYear().toString(), 4) === year
+    ? `${weekday} ${day} ${month}`
+    : `${weekday} ${day} ${month} ${year.slice(-2)}`;
+};
+
 export const getNotificationDateString = (date: Date): string => {
   const day = date.getDate().toString().padStart(2, "0");
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -60,4 +71,11 @@ export const formatNotificationTime = (
   if (day === 1) return "Yesterday";
   if (day > 3) return getNotificationDateString(date);
   return `${formatTimeLeft(remainingTime)}`;
+};
+
+export const format12HourTime = (date: Date): string => {
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+  const ampm = hour >= 12 ? "PM" : "AM";
+  return `${hour % 12 || 12}:${minute.toString().padStart(2, "0")} ${ampm}`;
 };

@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { ISubscriptions } from "../types/subscription";
+import { RootState } from "./store";
 
 const initialState: ISubscriptions = {
   subscriptions: [],
@@ -18,9 +19,11 @@ const subscriptionSlice = createSlice({
   },
 });
 
-export const { setSubcription: setUser, clearSubscription: clearUser } =
-  subscriptionSlice.actions;
+export const { setSubcription, clearSubscription } = subscriptionSlice.actions;
 
 export default subscriptionSlice.reducer;
 
-// export const getSubscriptionsDetail = (state: RootState) => state.subscription;
+export const getSubscriptionDetail = (id: string) => (state: RootState) =>
+  state.subscription.subscriptions.find(
+    ({ id: elementId }) => id === elementId
+  );

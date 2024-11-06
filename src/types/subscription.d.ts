@@ -12,6 +12,8 @@ export interface ISubscription {
   endDate: Date;
   clampingFee: number;
   changeSignageFee: number;
+  isPaid: boolean;
+  licensePlate: string;
 }
 
 export interface ISubscriptionDetail {
@@ -24,10 +26,12 @@ export interface ISubscriptionDetail {
   endDate: Date;
   clampingFee: number;
   changeSignageFee: number;
+  isPaid: boolean;
+  licensePlate: string;
 }
 
 export interface ISubscriptions {
-  subscriptions: ISubscription[];
+  subscriptions: ISubscriptionDetail[];
 }
 
 export interface ISubscriptionCard {
@@ -35,6 +39,7 @@ export interface ISubscriptionCard {
   expireDate: Date;
   licensePlate: string;
   parkingZone: string;
+  parkingLocationId: string;
   parkingLocation: string;
   isPaid: boolean;
 }

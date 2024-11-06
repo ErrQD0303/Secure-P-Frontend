@@ -4,18 +4,14 @@ import ExpiredClockIcon from "./svg-icons/ExpiredClock";
 import ClockIcon from "./svg-icons/Clock";
 import MonthlyParkingCardBody from "./MonthlyParkingCardBody";
 import { formatTimeLeft, getShortDayString } from "../shared/helpers/dates";
-import { ISubscriptionCard } from "../types/subscription";
+import { ISubscriptionDetail } from "../types/subscription";
+import ButtonLink from "./ButtonLink";
 
-type Props = ISubscriptionCard;
+type Props = ISubscriptionDetail;
 
-function MonthlyParkingCard({
-  expireDate,
-  licensePlate,
-  parkingZone,
-  parkingLocation,
-  isPaid,
-}: Props) {
-  const remainingTime = (expireDate?.getTime() - new Date().getTime()) / 1000;
+function MonthlyParkingCard(props: Props) {
+  const { endDate, licensePlate, parkingZone, parkingLocation, isPaid } = props;
+  const remainingTime = (endDate?.getTime() - new Date().getTime()) / 1000;
   const isExpired = remainingTime <= 0;
   const theme = useTheme();
   return (
@@ -29,6 +25,7 @@ function MonthlyParkingCard({
         overflowX: "hidden",
         padding: 0,
         color: "#fff",
+        borderRadius: "0.25rem",
         background: `url("/src/assets/card-background.png") right 0.3125rem center no-repeat, linear-gradient(#0093D0 0%, #0055A5 90%)`,
         // border: "0.0625rem solid #69BCDE",
         [theme.breakpoints.up("sm")]: {
@@ -59,18 +56,25 @@ function MonthlyParkingCard({
             justifyContent: "space-between",
           }}
         >
-          <Box
-            component={"span"}
-            sx={{
-              display: "flex",
-              gap: 0,
-              padding: 0,
-              alignItems: "center",
-            }}
+          <ButtonLink
+            type="none"
+            to={""}
+            state={props as unknown}
+            sx={{ color: "inherit" }}
           >
-            Monthly Parking
-            <NavigateNextIcon viewBox="3 2.5 20 20" />
-          </Box>
+            <Box
+              component={"span"}
+              sx={{
+                display: "flex",
+                gap: 0,
+                padding: 0,
+                alignItems: "center",
+              }}
+            >
+              Monthly Parking
+              <NavigateNextIcon viewBox="3 2.5 20 20" />
+            </Box>
+          </ButtonLink>
           <Box
             sx={{
               textAlign: "right",
@@ -118,10 +122,10 @@ function MonthlyParkingCard({
         </Box>
       </Box>
       <MonthlyParkingCardBody
-        expireDate={getShortDayString(expireDate)}
+        expireDate={getShortDayString(endDate)}
         licensePlate={licensePlate}
-        parkingZone={parkingZone}
-        parkingLocation={parkingLocation}
+        parkingZone={parkingZone.name}
+        parkingLocation={parkingLocation.address}
       />
       <Box
         sx={{
@@ -138,7 +142,7 @@ function MonthlyParkingCard({
             position: "absolute",
             top: "0.0625rem",
             left: 0,
-            transform: "translate(-50%, -50%)",
+            transform: "translate(-70%, -50%)",
           }}
         ></Box>
         <Box
@@ -161,7 +165,7 @@ function MonthlyParkingCard({
             position: "absolute",
             top: "0.0625rem",
             left: "100%",
-            transform: "translate(-50%, -50%)",
+            transform: "translate(-40%, -50%)",
           }}
         ></Box>
       </Box>
@@ -237,8 +241,8 @@ function MonthlyParkingCard({
               label="UNPAID"
               sx={{
                 textTransform: "uppercase",
-                color: "#0055A5",
-                bgcolor: "#FFD75C",
+                color: "#745341",
+                bgcolor: "#FB8F89",
                 height: "0.9375rem",
                 fontSize: "75%",
                 fontWeight: 500,

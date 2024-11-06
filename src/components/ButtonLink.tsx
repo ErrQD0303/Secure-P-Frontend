@@ -10,9 +10,10 @@ export type Props = {
   ariaLabel?: string;
   type: string;
   sx?: SxProps<Theme> | undefined;
+  state?: unknown;
 };
 
-function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
+function ButtonLink({ children, to, ariaLabel, type, sx, state }: Props) {
   // const theme = useTheme();
   const linkTypes: { [key: string]: SxProps<Theme> | undefined } = {
     link: {
@@ -38,6 +39,7 @@ function ButtonLink({ children, to, ariaLabel, type, sx }: Props) {
       component={RouterLink}
       aria-label={ariaLabel}
       to={to}
+      state={state}
       sx={{ ...linkTypes[type], ...sx } as SxProps<Theme>}
     >
       {children}

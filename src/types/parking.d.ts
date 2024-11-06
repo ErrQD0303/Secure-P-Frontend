@@ -4,6 +4,7 @@ export interface IParkingZone {
   id: string;
   name: string;
   subscriptions: ISubscription[];
+  parkingLocationId: string;
 }
 
 // ../types/parking.d.ts
@@ -22,6 +23,7 @@ export interface IParkingLocation {
   rates: IParkingRates;
 }
 
-export interface IParkingLocations {
+export interface IParking {
   parkingLocations: IParkingLocation[];
+  parkingZones: IParkingZone[];
 }

@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import MonthlyParkingCard from "../components/MonthlyParkingCard";
-import { ISubscriptionCard } from "../types/subscription";
+import { ISubscriptionDetail } from "../types/subscription";
 import { useTheme } from "@emotion/react";
 import Carousel from "../components/Carousel/Carousel";
 import { carouselClasses } from "../components/Carousel/carouselClasses";
@@ -15,11 +15,18 @@ import Typography from "@mui/material/Typography";
 import AddNewIcon from "../components/svg-icons/AddNew";
 import useViewPort from "../hooks/useViewPort";
 import Banner from "../components/Banner";
+import CasualRevenueCard from "../components/CasualRevenueCard";
+import Stack from "@mui/material/Stack";
+import PaymentHistoryCard from "../components/PaymentHistoryCard";
 
 function Home() {
   const theme = useTheme();
   useViewPort();
-  const { FAKE_CARDS } = useLoaderData() as { FAKE_CARDS: ISubscriptionCard[] };
+  const { cards } = useLoaderData() as { cards: ISubscriptionDetail[] };
+  const carouselCards = cards.slice(0, Math.min(cards.length - 2, 3));
+  const casualRevenueCards = cards.slice(carouselCards.length - cards.length);
+  const paymentHistoryCards = cards.filter(({ isPaid }) => isPaid).slice(0, 2);
+
   return (
     <>
       <Banner />
@@ -49,7 +56,7 @@ function Home() {
             <Typography
               sx={{
                 textTransform: "capitalize",
-                color: "#2A2A5B",
+                color: "#3D4B56",
                 fontWeight: 600,
                 fontSize: "1rem",
                 lineHeight: "1.5rem",
@@ -64,9 +71,8 @@ function Home() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                [theme.breakpoints.up("sm")]: {
-                  display: "none",
-                },
+                color: "#5E6A78",
+                [theme.breakpoints.up("sm")]: {},
               }}
             >
               See all
@@ -90,6 +96,7 @@ function Home() {
               [theme.breakpoints.up("sm")]: {
                 width: "auto",
                 flexShrink: 0,
+                display: "none",
               },
             }}
           >
@@ -139,7 +146,7 @@ function Home() {
               }}
             ></IconButton>
           )}
-          dots={true}
+          dots={carouselCards.length > 1}
           showSlides={1}
           speed={2000 * 1}
           spacing={0}
@@ -173,7 +180,7 @@ function Home() {
             },
           }}
         >
-          {FAKE_CARDS.slice(0, 3).map((value, idx) => (
+          {carouselCards.map((value, idx) => (
             <Box
               sx={{
                 display: "flex",
@@ -193,6 +200,107 @@ function Home() {
             </Box>
           ))}
         </Carousel>
+
+        <Box
+          sx={{
+            my: "1.438rem",
+          }}
+        >
+          <Stack
+            direction={"column"}
+            aria-label="Casual Revenue Cards Container"
+            spacing={"1.438rem"}
+          >
+            {casualRevenueCards.map((value) => (
+              <CasualRevenueCard key={value.id} {...value} />
+            ))}
+          </Stack>
+          <ButtonLink
+            to="/subscriptions/add"
+            ariaLabel="My subscriptions"
+            type="button"
+            sx={{
+              my: "1.4375rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              [theme.breakpoints.up("sm")]: {
+                width: "auto",
+                flexShrink: 0,
+                display: "none",
+              },
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                width: "100%",
+                display: "flex",
+                gap: "0.375rem",
+                p: "0.875rem",
+                textTransform: "capitalize",
+              }}
+            >
+              <AddNewIcon />
+              <Box component={"span"} sx={{ textTransform: "none" }}>
+                Add more subscription
+              </Box>
+            </Button>
+          </ButtonLink>
+        </Box>
+
+        <Box>
+          <Stack spacing={2}>
+            <Box
+              sx={{
+                [theme.breakpoints.up("sm")]: {
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                },
+              }}
+            >
+              <ButtonLink
+                to="/payment-history"
+                ariaLabel="Payment History"
+                type="link"
+              >
+                <Typography
+                  sx={{
+                    textTransform: "capitalize",
+                    color: "#3D4B56",
+                    fontWeight: 600,
+                    fontSize: "1rem",
+                    lineHeight: "1.5rem",
+                    p: 0,
+                  }}
+                >
+                  Payment History
+                </Typography>
+                <Typography
+                  sx={{
+                    p: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "#5E6A78",
+                    [theme.breakpoints.up("sm")]: {},
+                  }}
+                >
+                  See all
+                  <NavigateNextIcon
+                    sx={{
+                      ml: "-0.3125px",
+                    }}
+                  />
+                </Typography>
+              </ButtonLink>
+            </Box>
+            {paymentHistoryCards.map((value) => (
+              <PaymentHistoryCard {...value} />
+            ))}
+          </Stack>
+        </Box>
       </Container>
     </>
   );
