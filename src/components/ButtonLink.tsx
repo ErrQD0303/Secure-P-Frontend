@@ -14,7 +14,6 @@ export type Props = {
 };
 
 function ButtonLink({ children, to, ariaLabel, type, sx, state }: Props) {
-  // const theme = useTheme();
   const linkTypes: { [key: string]: SxProps<Theme> | undefined } = {
     link: {
       display: "flex",
@@ -34,6 +33,7 @@ function ButtonLink({ children, to, ariaLabel, type, sx, state }: Props) {
     },
     none: {},
   };
+
   return (
     <Link
       component={RouterLink}

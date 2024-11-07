@@ -1,12 +1,13 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Container, Paper } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AppBottomNavigation from "./AppBottomNavigation";
 import useViewPort from "../hooks/useViewPort";
 import { useTheme } from "@emotion/react";
 import TopNavigationBar from "./TopNavigationBar";
 import SideBar from "./SideBar";
 import Grid from "@mui/material/Grid2";
+import React from "react";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -16,6 +17,13 @@ function AppLayout() {
     (_event: React.SyntheticEvent, newValue: number) => setValue(newValue),
     []
   );
+  const mainLayoutRef = React.useRef<HTMLElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!mainLayoutRef.current) return;
+    mainLayoutRef.current.scrollTo(0, 0);
+  }, [location]);
 
   return (
     <Paper
@@ -50,10 +58,13 @@ function AppLayout() {
           <SideBar />
         </Grid>
         <Grid
+          component={"main"}
+          id="main-content"
           size={"grow"}
           sx={{
             overflow: "auto",
           }}
+          ref={mainLayoutRef}
         >
           <Container
             sx={{

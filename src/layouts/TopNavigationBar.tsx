@@ -1,5 +1,4 @@
 import AppBar from "@mui/material/AppBar";
-import { useLocation } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import {
   Box,
@@ -19,9 +18,7 @@ import NotificationButton from "../components/NotificationButton";
 // type Props = {};
 
 function TopNavigationBar() {
-  const { pathname } = useLocation();
   const theme = useTheme();
-  const isHomePage = pathname === "/";
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
@@ -71,7 +68,7 @@ function TopNavigationBar() {
           },
         }}
       >
-        {isHomePage && (
+        <ButtonLink to={"/"} type={"none"}>
           <Box
             component="img"
             src="/src/assets/logo.png"
@@ -87,7 +84,7 @@ function TopNavigationBar() {
               },
             }}
           />
-        )}
+        </ButtonLink>
         <Box
           sx={{
             display: "flex",
