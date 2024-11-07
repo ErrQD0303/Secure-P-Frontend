@@ -42,6 +42,13 @@ export const getCasualRevenueCardDateString = (date: Date): string => {
     : `${weekday} ${day} ${month} ${year.slice(-2)}`;
 };
 
+export const getDailyParkingCardDateString = (date: Date): string => {
+  const year = prependZeroToString(date.getFullYear().toString(), 4);
+  const month = date.toLocaleDateString("en-US", { month: "short" });
+  const day = date.getDate().toString();
+  return `${day} ${month} ${year}`;
+};
+
 export const getNotificationDateString = (date: Date): string => {
   const day = date.getDate().toString().padStart(2, "0");
   const month = (date.getMonth() + 1).toString().padStart(2, "0");

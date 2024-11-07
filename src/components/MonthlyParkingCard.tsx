@@ -6,11 +6,16 @@ import MonthlyParkingCardBody from "./MonthlyParkingCardBody";
 import { formatTimeLeft, getShortDayString } from "../shared/helpers/dates";
 import { ISubscriptionDetail } from "../types/subscription";
 import ButtonLink from "./ButtonLink";
+import React from "react";
 
-type Props = ISubscriptionDetail;
+type Props = {
+  subscriptionDetail: ISubscriptionDetail;
+  body?: React.ReactNode;
+};
 
-function MonthlyParkingCard(props: Props) {
-  const { endDate, licensePlate, parkingZone, parkingLocation, isPaid } = props;
+function MonthlyParkingCard({ subscriptionDetail, body }: Props) {
+  const { endDate, licensePlate, parkingZone, parkingLocation, isPaid } =
+    subscriptionDetail;
   const remainingTime = (endDate?.getTime() - new Date().getTime()) / 1000;
   const isExpired = remainingTime <= 0;
   const theme = useTheme();
@@ -59,7 +64,7 @@ function MonthlyParkingCard(props: Props) {
           <ButtonLink
             type="none"
             to={""}
-            state={props as unknown}
+            state={subscriptionDetail as unknown}
             sx={{ color: "inherit" }}
           >
             <Box
@@ -121,12 +126,14 @@ function MonthlyParkingCard(props: Props) {
           </Box>
         </Box>
       </Box>
-      <MonthlyParkingCardBody
-        expireDate={getShortDayString(endDate)}
-        licensePlate={licensePlate}
-        parkingZone={parkingZone.name}
-        parkingLocation={parkingLocation.address}
-      />
+      {body ?? (
+        <MonthlyParkingCardBody
+          expireDate={getShortDayString(endDate)}
+          licensePlate={licensePlate}
+          parkingZone={parkingZone.name}
+          parkingLocation={parkingLocation.address}
+        />
+      )}
       <Box
         sx={{
           position: "relative",

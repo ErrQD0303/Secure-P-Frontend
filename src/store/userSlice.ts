@@ -1,5 +1,5 @@
 import { IUser } from "../types/user";
-import { Country } from "../types/enum.d.ts";
+import { Country } from "../types/enum";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { toPersonalInfo } from "../shared/mappers/users";

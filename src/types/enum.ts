@@ -1,4 +1,4 @@
-// ../types/enum.d.ts
+// ../types/enum.ts
 export enum Country {
   NOT_SET = "",
   VN = "Viet Nam",

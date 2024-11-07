@@ -1,10 +1,10 @@
 import { FAKE_CARDS } from "../shared/constants/fakeCardData";
 import store from "../store/store";
-import { ISubscriptionDetail, ISubscriptions } from "../types/subscription";
+import { ISubscriptionDetail } from "../types/subscription";
 
 export const getSubscriptions = async (
   userId: string
-): Promise<ISubscriptions | null> => {
+): Promise<ISubscriptionDetail[] | null> => {
   // replace with api call after
   const subscriptions = FAKE_CARDS.filter(
     ({ userId: elementId }) => userId === elementId
@@ -33,5 +33,5 @@ export const getSubscriptions = async (
   );
   if (!subscriptionDetailData || subscriptionDetailData.length === 0)
     return null;
-  return { subscriptions: subscriptionDetailData };
+  return subscriptionDetailData;
 };

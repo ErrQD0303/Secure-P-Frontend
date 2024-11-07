@@ -1,4 +1,4 @@
-import { IProductType } from "../../types/enum.d.ts";
+import { IProductType } from "../../types/enum";
 import { ISubscription } from "../../types/subscription";
 
 export const FAKE_CARDS: ISubscription[] = [

@@ -4,25 +4,23 @@ import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import MonthlyParkingCard from "../components/MonthlyParkingCard";
-import { ISubscriptionDetail } from "../types/subscription";
 import { useTheme } from "@emotion/react";
 import Carousel from "../components/Carousel/Carousel";
 import { carouselClasses } from "../components/Carousel/carouselClasses";
-import { useLoaderData } from "react-router-dom";
 import ButtonLink from "../components/ButtonLink";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import AddNewIcon from "../components/svg-icons/AddNew";
-import useViewPort from "../hooks/useViewPort";
 import Banner from "../components/Banner";
 import CasualRevenueCard from "../components/CasualRevenueCard";
 import Stack from "@mui/material/Stack";
 import PaymentHistoryCard from "../components/PaymentHistoryCard";
+import { useSelector } from "react-redux";
+import { getAllSubscriptionDetails } from "../store/subscriptionSlice";
 
 function Home() {
   const theme = useTheme();
-  useViewPort();
-  const { cards } = useLoaderData() as { cards: ISubscriptionDetail[] };
+  const cards = useSelector(getAllSubscriptionDetails);
   const carouselCards = cards.slice(0, Math.min(cards.length - 2, 3));
   const casualRevenueCards = cards.slice(carouselCards.length - cards.length);
   const paymentHistoryCards = cards.filter(({ isPaid }) => isPaid).slice(0, 2);
@@ -195,7 +193,7 @@ function Home() {
                   maxWidth: "21.6875rem",
                 }}
               >
-                <MonthlyParkingCard {...value} />
+                <MonthlyParkingCard subscriptionDetail={value} />
               </Paper>
             </Box>
           ))}
