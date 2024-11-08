@@ -8,6 +8,9 @@ import TopNavigationBar from "./TopNavigationBar";
 import SideBar from "./SideBar";
 import Grid from "@mui/material/Grid2";
 import React from "react";
+import Banner from "../components/Banner";
+import { ROUTES } from "../shared/routes/routes";
+import { getRouteName } from "../services/routeService";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -19,10 +22,15 @@ function AppLayout() {
   );
   const mainLayoutRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
+  const [routeUrl, subPage] = location.pathname.split("/").slice(1);
+  const routeName = getRouteName(
+    `/${routeUrl}` as keyof typeof ROUTES,
+    subPage
+  );
+  const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
 
   useEffect(() => {
-    if (!mainLayoutRef.current) return;
-    mainLayoutRef.current.scrollTo(0, 0);
+    mainLayoutRef.current?.scrollTo(0, 0);
   }, [location]);
 
   return (
@@ -32,7 +40,7 @@ function AppLayout() {
         [theme.breakpoints.between("xs", "md")]: {},
       }}
     >
-      <TopNavigationBar />
+      <TopNavigationBar routeName={routeName} />
 
       <Grid
         container
@@ -47,6 +55,8 @@ function AppLayout() {
             base: "4rem",
             md: "5.5rem",
           },
+          overflowY: "hidden",
+          height: "100vh",
         }}
       >
         <Grid
@@ -55,7 +65,7 @@ function AppLayout() {
             md: 5,
           }}
         >
-          <SideBar />
+          <SideBar sx={{}} />
         </Grid>
         <Grid
           component={"main"}
@@ -63,23 +73,25 @@ function AppLayout() {
           size={"grow"}
           sx={{
             overflow: "auto",
+            height: "100vh", // Default height
+            padding: 0,
+            [theme.breakpoints.up("xs")]: {
+              height: "calc(100vh - 4rem)",
+              px: 0,
+            },
+            [theme.breakpoints.up("md")]: {
+              height: "calc(100vh - 5.5rem)",
+            },
           }}
           ref={mainLayoutRef}
         >
           <Container
             sx={{
-              height: "100vh", // Default height
-              padding: 0,
-              [theme.breakpoints.up("xs")]: {
-                height: "calc(100vh - 5.1875rem)",
-                px: 0,
-              },
-              [theme.breakpoints.up("md")]: {
-                height: "calc(100vh - 5.5rem)",
-              },
+              mb: "2rem",
             }}
           >
-            <Outlet />
+            <Banner />
+            <Outlet context={{ routeName, showBodyRouteName }} />
           </Container>
         </Grid>
       </Grid>

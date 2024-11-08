@@ -32,6 +32,9 @@ function SideBarNavigationButtonGroup() {
         onClick: () => {},
         ariaLabel: "Sign out",
         icon: "/src/assets/png-icons/log-out.png",
+        sx: {
+          px: 0,
+        },
       },
     ],
     []
@@ -41,6 +44,7 @@ function SideBarNavigationButtonGroup() {
     <StyledStack aria-label="navigation buttons group" spacing={1.5}>
       {navigationButtons.map(({ icon, ...props }) => (
         <SideBarNavigationButton
+          key={props.ariaLabel}
           {...props}
           icon={<img src={icon} alt={props.ariaLabel} />}
         />

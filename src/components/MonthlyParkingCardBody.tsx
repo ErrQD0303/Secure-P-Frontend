@@ -127,7 +127,7 @@ function MonthlyParkingCardBody({
             lineHeight: "1.125rem",
           }}
         >
-          {parkingLocation}
+          {parkingLocation.slice(0, 76)}
         </Box>
       </Box>
     </Box>

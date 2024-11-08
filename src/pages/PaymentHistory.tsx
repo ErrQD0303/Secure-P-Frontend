@@ -1,8 +1,7 @@
-import Banner from "../components/Banner";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { useTheme } from "@emotion/react";
-import { useLoaderData } from "react-router-dom";
+import { useFetcher, useLoaderData, useOutletContext } from "react-router-dom";
 import PaymentHistoryCard from "../components/PaymentHistoryCard";
 import { ISubscriptionDetail } from "../types/subscription";
 import Stack from "@mui/material/Stack";
@@ -10,21 +9,43 @@ import ButtonLink from "../components/ButtonLink";
 import Button from "@mui/material/Button";
 import AddNewIcon from "../components/svg-icons/AddNew";
 import React from "react";
+import Loader from "../components/Loader";
 
 function PaymentHistory() {
   const theme = useTheme();
-  const { paymentDetails, isNextPageAvailable } = useLoaderData() as {
-    paymentDetails: ISubscriptionDetail[];
-    isNextPageAvailable: boolean;
+  const { routeName, showBodyRouteName } = useOutletContext() as {
+    routeName: string;
+    showBodyRouteName: boolean;
   };
+  const { subscriptionDetails: details, isNextPageAvailable: isNextPageAval } =
+    useLoaderData() as {
+      subscriptionDetails: ISubscriptionDetail[];
+      isNextPageAvailable: boolean;
+    };
 
-  // Load more Logic here
-  const handleOnClick = React.useCallback(() => {
-    // console.log(location.pathname);
-  }, []);
+  const [paymentDetails, setPaymentDetails] =
+    React.useState<ISubscriptionDetail[]>(details);
+  const [pageOffset, setPageOffset] = React.useState(0);
+  const [isNextPageAvailable, setIsNextPageAvailable] =
+    React.useState<boolean>(isNextPageAval);
+
+  const fetcher = useFetcher();
+
+  const showSpinner =
+    fetcher.state === "loading" || fetcher.state === "submitting";
+
+  React.useEffect(() => {
+    if (fetcher.data) {
+      setPaymentDetails((prevDetails) => [
+        ...prevDetails,
+        ...fetcher.data.subscriptionDetails,
+      ]);
+      setIsNextPageAvailable(fetcher.data.isNextPageAvailable);
+      setPageOffset((prevOffset) => prevOffset + 1);
+    }
+  }, [fetcher.data]);
   return (
     <>
-      <Banner />
       <Container
         sx={{
           px: "1.437rem",
@@ -36,75 +57,39 @@ function PaymentHistory() {
         }}
       >
         <Stack spacing={2}>
-          <Stack
-            direction={"row"}
-            sx={{
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box
+          {showBodyRouteName && (
+            <Stack
+              direction={"row"}
               sx={{
-                textTransform: "capitalize",
-                color: "#3D4B56",
-                fontWeight: 600,
-                fontSize: "1rem",
-                lineHeight: "1.5rem",
-                p: 0,
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              Payment History
-            </Box>
-            <ButtonLink
-              to="/subscriptions/add"
-              ariaLabel="My subscriptions"
-              type="button"
-              sx={{
-                my: "1.4375rem",
-                display: "none",
-                [theme.breakpoints.up("sm")]: {
-                  width: "auto",
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              }}
-            >
-              <Button
-                variant="contained"
+              <Box
                 sx={{
-                  width: "100%",
-                  display: "flex",
-                  gap: "0.375rem",
-                  p: "0.875rem",
                   textTransform: "capitalize",
+                  color: "#3D4B56",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  lineHeight: "1.5rem",
+                  p: 0,
                 }}
               >
-                <AddNewIcon />
-                <Box component={"span"} sx={{}}>
-                  Add New Subscription
-                </Box>
-              </Button>
-            </ButtonLink>
-          </Stack>
-          <Stack spacing={2.5}>
-            {paymentDetails.map((pd) => (
-              <PaymentHistoryCard {...pd} fullDetailed />
-            ))}
-            {isNextPageAvailable && (
+                {routeName}
+              </Box>
               <ButtonLink
+                to="/subscriptions/add"
                 ariaLabel="My subscriptions"
                 type="button"
                 sx={{
                   my: "1.4375rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: "none",
                   [theme.breakpoints.up("sm")]: {
                     width: "auto",
                     flexShrink: 0,
-                    display: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   },
                 }}
               >
@@ -117,14 +102,41 @@ function PaymentHistory() {
                     p: "0.875rem",
                     textTransform: "capitalize",
                   }}
-                  onClick={handleOnClick}
                 >
+                  <AddNewIcon />
+                  <Box component={"span"} sx={{}}>
+                    Add New Subscription
+                  </Box>
+                </Button>
+              </ButtonLink>
+            </Stack>
+          )}
+          <Stack spacing={2.5}>
+            {paymentDetails.map((pd) => (
+              <PaymentHistoryCard {...pd} fullDetailed />
+            ))}
+            {isNextPageAvailable && (
+              <fetcher.Form method="POST">
+                <input type="hidden" name="pageOffset" value={pageOffset} />
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    gap: "0.375rem",
+                    p: "0.875rem",
+                    textTransform: "capitalize",
+                    position: "relative",
+                  }}
+                  type="submit"
+                >
+                  {showSpinner && <Loader />}
                   <AddNewIcon />
                   <Box component={"span"} sx={{ textTransform: "none" }}>
                     Load more
                   </Box>
                 </Button>
-              </ButtonLink>
+              </fetcher.Form>
             )}
           </Stack>
         </Stack>
