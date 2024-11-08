@@ -6,11 +6,12 @@ import { SxProps } from "@mui/system";
 
 export type Props = {
   children?: React.ReactNode;
-  to: string;
+  to?: string;
   ariaLabel?: string;
   type: string;
   sx?: SxProps<Theme> | undefined;
   state?: unknown;
+  onClick?: (event: React.MouseEvent) => void;
 };
 
 function ButtonLink({ children, to, ariaLabel, type, sx, state }: Props) {
@@ -33,6 +34,8 @@ function ButtonLink({ children, to, ariaLabel, type, sx, state }: Props) {
     },
     none: {},
   };
+
+  if (!to) return children as JSX.Element;
 
   return (
     <Link

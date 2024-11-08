@@ -94,8 +94,12 @@ function PaymentHistoryCard({
           <Box
             sx={{
               flexGrow: 1,
-              lineHeight: "1.313rem",
               fontSize: "0.875rem",
+              lineHeight: "1.313rem",
+              [theme.breakpoints.up("md")]: {
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
+              },
             }}
           >
             <Stack
@@ -113,6 +117,10 @@ function PaymentHistoryCard({
                       fontSize: "0.75rem",
                       lineHeight: "0.875rem",
                       color: "#A3B0BF",
+                      [theme.breakpoints.up("md")]: {
+                        fontSize: "0.875rem",
+                        lineHeight: "1.313rem",
+                      },
                     }}
                   >
                     {getDailyParkingCardDateString(startDate)}
@@ -123,8 +131,8 @@ function PaymentHistoryCard({
                 <Typography
                   sx={{
                     fontWeight: 600,
-                    lineHeight: "inherit",
                     fontSize: "inherit",
+                    lineHeight: "inherit",
                   }}
                 >
                   ${totalFee}
@@ -161,6 +169,10 @@ function PaymentHistoryCard({
                       "& .MuiListItemText-primary": {
                         fontSize: "0.75rem",
                         lineHeight: "1.125rem",
+                        [theme.breakpoints.up("md")]: {
+                          fontSize: "0.875rem",
+                          lineHeight: "1.313rem",
+                        },
                       },
                     }}
                   >

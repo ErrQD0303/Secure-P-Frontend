@@ -19,6 +19,13 @@ function SideBarNavigationButton({ ariaLabel, icon, ...props }: Props) {
       type="none"
       sx={{
         flex: "1 1 auto",
+        "&.active": {
+          bgcolor: "#EEF2F5",
+          " p": {
+            color: "#32336c",
+            fontWeight: 600,
+          },
+        },
       }}
     >
       <Button
@@ -27,9 +34,6 @@ function SideBarNavigationButton({ ariaLabel, icon, ...props }: Props) {
           flex: "1 1 auto",
           "&:hover": {
             bgcolor: "#EEF2F5",
-          },
-          "&:active": {
-            color: "#32336c",
           },
           justifyContent: "flex-start",
           pl: "3rem",
