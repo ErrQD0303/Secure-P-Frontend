@@ -189,6 +189,7 @@ function Home() {
                 sx={{
                   minWidth: "21.6875rem",
                   maxWidth: "21.6875rem",
+                  [theme.breakpoints.up("md")]: {},
                 }}
               >
                 <MonthlyParkingCard subscriptionDetail={value} />

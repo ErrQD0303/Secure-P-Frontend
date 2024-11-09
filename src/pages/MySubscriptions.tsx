@@ -1,4 +1,4 @@
-import { useFetcher, useLoaderData, useOutletContext } from "react-router-dom";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import { ISubscriptionDetail } from "../types/subscription";
 import MonthlyParkingCard from "../components/MonthlyParkingCard";
 import Container from "@mui/material/Container";
@@ -8,8 +8,6 @@ import { useTheme } from "@emotion/react";
 import Stack from "@mui/material/Stack";
 import React from "react";
 import Loader from "../components/Loader";
-import ButtonLink from "../components/ButtonLink";
-import AddNewIcon from "../components/svg-icons/AddNew";
 import Grid from "@mui/material/Grid2";
 
 function MySubscriptions() {
@@ -18,11 +16,6 @@ function MySubscriptions() {
       subscriptionDetails: ISubscriptionDetail[];
       isNextPageAvailable: boolean;
     };
-
-  const { routeName, showBodyRouteName } = useOutletContext() as {
-    routeName: string;
-    showBodyRouteName: boolean;
-  };
 
   const [subscriptionDetails, setSubscriptionDetails] =
     React.useState<ISubscriptionDetail[]>(details);
@@ -52,7 +45,6 @@ function MySubscriptions() {
     <>
       <Container
         sx={{
-          px: "1.437rem",
           pb: {
             base: "6.8rem",
             md: 0,
@@ -66,61 +58,27 @@ function MySubscriptions() {
           height: "auto",
         }}
       >
-        {showBodyRouteName && (
-          <Stack
-            direction={"row"}
+        <Stack
+          direction={"row"}
+          sx={{
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "start",
+          }}
+        >
+          <Box
             sx={{
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "space-between",
+              textTransform: "capitalize",
+              color: "#3D4B56",
+              fontWeight: 600,
+              fontSize: "1.25rem",
+              lineHeight: "1.875rem",
+              p: 0,
             }}
           >
-            <Box
-              sx={{
-                textTransform: "capitalize",
-                color: "#3D4B56",
-                fontWeight: 600,
-                fontSize: "1rem",
-                lineHeight: "1.5rem",
-                p: 0,
-              }}
-            >
-              {routeName}
-            </Box>
-            <ButtonLink
-              to="/subscriptions/add"
-              ariaLabel="My subscriptions"
-              type="button"
-              sx={{
-                my: "1.4375rem",
-                display: "none",
-                [theme.breakpoints.up("sm")]: {
-                  width: "auto",
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              }}
-            >
-              <Button
-                variant="contained"
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  gap: "0.375rem",
-                  p: "0.875rem",
-                  textTransform: "capitalize",
-                }}
-              >
-                <AddNewIcon />
-                <Box component={"span"} sx={{}}>
-                  Add New Subscription
-                </Box>
-              </Button>
-            </ButtonLink>
-          </Stack>
-        )}
+            Monthly Parking Subscriptions
+          </Box>
+        </Stack>
         <Grid
           container
           rowGap={2}
@@ -147,14 +105,6 @@ function MySubscriptions() {
                 sx={{
                   minWidth: "20.438rem",
                   maxWidth: "20.438rem",
-                  [theme.breakpoints.up("md")]: {
-                    minWidth: "21.6875rem",
-                    maxWidth: "21.6875rem",
-                  },
-                  [theme.breakpoints.up("lg")]: {
-                    m: 0,
-                    justifyContent: idx % 2 ? "end" : "start",
-                  },
                 }}
               />
             </Grid>

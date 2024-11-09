@@ -7,7 +7,9 @@ import { getDailyParkingCardDateString } from "../shared/helpers/dates";
 import React from "react";
 import { useTheme } from "@emotion/react";
 
-type Props = BoxProps & { subscriptionDetail: ISubscriptionDetail };
+type Props = BoxProps & {
+  subscriptionDetail: ISubscriptionDetail;
+};
 
 const StyledBox = styled(Box)(() => ({
   padding: "0.625rem 1rem",
@@ -31,6 +33,7 @@ function DetailedMonthlyParkingCardBody({
   },
   ...props
 }: Props) {
+  const theme = useTheme();
   const gridCellData = React.useMemo(
     () => [
       {
@@ -68,6 +71,11 @@ function DetailedMonthlyParkingCardBody({
               "& .MuiChip-label": {
                 px: "0.21875rem",
               },
+              [theme.breakpoints.up("md")]: {
+                bgcolor: "#664DFD",
+                color: "#DEE7EE",
+                py: "0.625rem",
+              },
             }}
           />
         ),
@@ -101,11 +109,9 @@ function DetailedMonthlyParkingCardBody({
       parkingZone.name,
       paymentDate,
       startDate,
+      theme.breakpoints,
     ]
   );
-
-  const theme = useTheme();
-
   return (
     <StyledBox {...props}>
       {gridCellData.map(({ label, value, gridRow, gridColumn }) => (
@@ -122,9 +128,11 @@ function DetailedMonthlyParkingCardBody({
               color: "#77EFFF",
               fontSize: "0.625rem",
               lineHeight: "0.9375rem",
-              textTransform: "uppercase",
+              textTransform: "capitalize",
               textAlign: "left",
-              [theme.breakpoints.up("lg")]: {
+              [theme.breakpoints.up("md")]: {
+                color: "#283453",
+                fontWeight: 600,
                 fontSize: "0.75rem",
                 lineHeight: "1.125rem",
               },

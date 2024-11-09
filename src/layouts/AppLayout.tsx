@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Container, Paper } from "@mui/material";
+import { Box, Button, Container, Paper, Stack } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import AppBottomNavigation from "./AppBottomNavigation";
 import useViewPort from "../hooks/useViewPort";
@@ -11,6 +11,8 @@ import React from "react";
 import Banner from "../components/Banner";
 import { ROUTES } from "../shared/routes/routes";
 import { getRouteName } from "../services/routeService";
+import ButtonLink from "../components/ButtonLink";
+import AddNewIcon from "../components/svg-icons/AddNew";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -88,8 +90,68 @@ function AppLayout() {
           <Container
             sx={{
               mb: "2rem",
+              px: {
+                base: 0,
+                md: "1rem",
+                xl: 0,
+              },
             }}
           >
+            {showBodyRouteName && (
+              <Stack
+                direction={"row"}
+                sx={{
+                  width: "100%",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  sx={{
+                    textTransform: "capitalize",
+                    color: "#3D4B56",
+                    fontWeight: 600,
+                    fontSize: "1.625rem",
+                    lineHeight: "2.438rem",
+                    p: 0,
+                  }}
+                >
+                  {routeName}
+                </Box>
+                <ButtonLink
+                  to="/subscriptions/add"
+                  ariaLabel="My subscriptions"
+                  type="button"
+                  sx={{
+                    my: "1.4375rem",
+                    display: "none",
+                    [theme.breakpoints.up("sm")]: {
+                      width: "auto",
+                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      gap: "0.375rem",
+                      p: "0.875rem",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    <AddNewIcon />
+                    <Box component={"span"} sx={{}}>
+                      Add New Subscription
+                    </Box>
+                  </Button>
+                </ButtonLink>
+              </Stack>
+            )}
             <Banner />
             <Outlet context={{ routeName, showBodyRouteName }} />
           </Container>
