@@ -12,6 +12,8 @@ import mySubscriptionsLoader from "./pages/mySubscriptionsLoader";
 import mySubscriptionsAction from "./pages/mySubscriptionsAction";
 import DetailedSubscription from "./pages/DetailedSubscription";
 import detailedSubscriptionLoader from "./pages/detailedSubscriptionLoader";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +54,14 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
   },
 ]);
 
