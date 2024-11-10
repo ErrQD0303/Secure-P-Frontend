@@ -30,6 +30,9 @@ function AppLayout() {
     subPage
   );
   const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
+  const showAddNewButton = ["subscriptions", "payment-history"].includes(
+    routeUrl
+  );
 
   useEffect(() => {
     mainLayoutRef.current?.scrollTo(0, 0);
@@ -114,42 +117,47 @@ function AppLayout() {
                     fontSize: "1.625rem",
                     lineHeight: "2.438rem",
                     p: 0,
+                    [theme.breakpoints.up("md")]: {
+                      py: "1.876rem",
+                    },
                   }}
                 >
                   {routeName}
                 </Box>
-                <ButtonLink
-                  to="/subscriptions/add"
-                  ariaLabel="My subscriptions"
-                  type="button"
-                  sx={{
-                    my: "1.4375rem",
-                    display: "none",
-                    [theme.breakpoints.up("sm")]: {
-                      width: "auto",
-                      flexShrink: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    },
-                  }}
-                >
-                  <Button
-                    variant="contained"
+                {showAddNewButton && (
+                  <ButtonLink
+                    to="/subscriptions/add"
+                    ariaLabel="My subscriptions"
+                    type="button"
                     sx={{
-                      width: "100%",
-                      display: "flex",
-                      gap: "0.375rem",
-                      p: "0.875rem",
-                      textTransform: "capitalize",
+                      my: "1.4375rem",
+                      display: "none",
+                      [theme.breakpoints.up("sm")]: {
+                        width: "auto",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
                     }}
                   >
-                    <AddNewIcon />
-                    <Box component={"span"} sx={{}}>
-                      Add New Subscription
-                    </Box>
-                  </Button>
-                </ButtonLink>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        gap: "0.375rem",
+                        p: "0.875rem",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      <AddNewIcon />
+                      <Box component={"span"} sx={{}}>
+                        Add New Subscription
+                      </Box>
+                    </Button>
+                  </ButtonLink>
+                )}
               </Stack>
             )}
             <Banner />

@@ -14,6 +14,7 @@ import DetailedSubscription from "./pages/DetailedSubscription";
 import detailedSubscriptionLoader from "./pages/detailedSubscriptionLoader";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import HelpCenter from "./pages/HelpCenter";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
         loader: paymentHistoryLoader,
         action: paymentHistoryAction,
         errorElement: <Error />,
+      },
+      {
+        path: "/help-center",
+        element: <HelpCenter />,
       },
       {
         path: "/subscriptions",

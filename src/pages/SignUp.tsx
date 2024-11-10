@@ -247,37 +247,43 @@ function SignUp() {
           pageText="Login to your account"
           gridColumns={{ base: 1 }}
         >
-          {formFields.map((field) => (
-            <Grid
-              key={field.name}
-              sx={{
-                flex: "1 1 auto",
-              }}
-              size={field.column}
-            >
-              {field.type === "radio" ? (
-                <FormControl sx={field.sx}>
-                  <RadioGroup {...field.radioGroup}>
-                    {field.formControlLabels?.map((formControlLabel, idx) => (
-                      <FormControlLabel
-                        {...formControlLabel}
-                        key={idx}
-                        id={field.name}
-                        name={field.name}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              ) : (
-                <TextField
-                  id={field.name}
-                  variant="outlined"
-                  placeholder={field.label}
-                  {...field}
-                />
-              )}
-            </Grid>
-          ))}
+          {formFields.map((field) => {
+            return (
+              <Grid
+                key={field.name}
+                sx={{
+                  flex: "1 1 auto",
+                }}
+                size={field.column}
+              >
+                {field.type === "radio" ? (
+                  <FormControl sx={field.sx}>
+                    <RadioGroup {...field.radioGroup}>
+                      {field.formControlLabels?.map((formControlLabel, idx) => (
+                        <FormControlLabel
+                          {...formControlLabel}
+                          key={idx}
+                          id={field.name}
+                          name={field.name}
+                        />
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                ) : (
+                  <TextField
+                    id={field.name}
+                    variant="outlined"
+                    placeholder={field.label}
+                    name={field.name}
+                    type={field.type}
+                    required={field.required}
+                    InputProps={field.slotProps?.input}
+                    sx={field.sx}
+                  />
+                )}
+              </Grid>
+            );
+          })}
           <Grid
             size={{
               base: 1,

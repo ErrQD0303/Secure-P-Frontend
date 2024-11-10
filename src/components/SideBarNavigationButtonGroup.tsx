@@ -2,10 +2,12 @@ import Stack from "@mui/material/Stack";
 import { styled } from "@mui/material/styles";
 import SideBarNavigationButton from "./SideBarNavigationButton";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const StyledStack = styled(Stack)({});
 
 function SideBarNavigationButtonGroup() {
+  const navigate = useNavigate();
   const navigationButtons = React.useMemo(
     () => [
       {
@@ -29,7 +31,9 @@ function SideBarNavigationButtonGroup() {
         icon: "/src/assets/png-icons/help-center.png",
       },
       {
-        onClick: () => {},
+        onClick: () => {
+          navigate("/login");
+        },
         ariaLabel: "Sign out",
         icon: "/src/assets/png-icons/log-out.png",
         sx: {
@@ -37,7 +41,7 @@ function SideBarNavigationButtonGroup() {
         },
       },
     ],
-    []
+    [navigate]
   );
 
   return (
