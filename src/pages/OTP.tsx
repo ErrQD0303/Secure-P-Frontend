@@ -5,10 +5,15 @@ import Typography from "@mui/material/Typography";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import React from "react";
 import { useFetcher, useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
+import Button from "@mui/material/Button";
+import zIndex from "@mui/material/styles/zIndex";
 
-type Props = StackProps;
+type Props = StackProps & {
+  data?: { phone: string };
+};
 
-export default function OTP(props: Props) {
+export default function OTP({ data, ...props }: Props) {
   const [value, setValue] = React.useState<string>("");
   const handleChange = React.useCallback((newValue: string) => {
     setValue(newValue);
@@ -21,6 +26,8 @@ export default function OTP(props: Props) {
   } | null>(null);
 
   const fetcher = useFetcher();
+  const showLoader =
+    fetcher.state === "loading" || fetcher.state === "submitting";
   const handleComplete = React.useCallback(
     (newValue: string) => {
       fetcher.submit({ type: "otp", otp: newValue }, { method: "post" });
@@ -43,7 +50,49 @@ export default function OTP(props: Props) {
     }
   }, [fetcher.data, navigate]);
   return (
-    <Stack {...props}>
+    <Stack
+      {...props}
+      spacing={2}
+      sx={{
+        mt: "0.4rem",
+        [theme.breakpoints.up("md")]: {
+          mt: "1rem",
+        },
+      }}
+    >
+      {showLoader && (
+        <Loader
+          sx={{
+            zIndex: 1,
+          }}
+        />
+      )}
+      <Typography
+        sx={{
+          fontSize: "0.875rem",
+          lineHeight: "1.313rem",
+          display: "flex",
+          flexDirection: "column",
+          mt: "1rem",
+          [theme.breakpoints.up("sm")]: {
+            flexDirection: "row",
+            gap: "0.1rem",
+          },
+        }}
+      >
+        <Box component={"span"}>Please type the code we sent to</Box>
+        <Box
+          component={"span"}
+          sx={{
+            color: "#27AE60",
+            fontSize: "inherit",
+            lineHeight: "inherit",
+            fontWeight: 600,
+          }}
+        >
+          +{data?.phone}
+        </Box>
+      </Typography>
       {response?.error && (
         <Box
           sx={{
@@ -73,15 +122,70 @@ export default function OTP(props: Props) {
         length={6}
         autoFocus
         validateChar={validateChar}
+        TextFieldsProps={{
+          placeholder: "•",
+        }}
         sx={{
+          border: "1px solid #F0F3F6",
+          boxShadow: "0px 2px 4px 0px #0000000D",
+          bgcolor: "#fff",
           "&.MuiOtpInput-Box": {
             gap: "0.625rem",
           },
           "& .MuiTextField-root": {
-            maxWidth: "56px",
+            // maxWidth: "56px",
+          },
+          "& .MuiInputBase-root": {
+            border: "none",
+            position: "relative",
+          },
+          "& input.MuiInputBase-input": {
+            fontSize: "1.25rem",
+            lineHeight: "1.875rem",
+            fontWeight: "600",
+            color: "#3D4B56",
+            "&[value='']": {
+              position: "relative",
+              "&::placeholder": {},
+            },
+          },
+          "& fieldset": {
+            border: "none",
           },
         }}
       />
+      <Box>
+        <Typography
+          sx={{
+            fontSize: "0.875rem",
+            lineHeight: "1.313rem",
+            color: "#5E6A78",
+            textAlign: "center",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.25rem",
+            mt: "0.5rem",
+          }}
+        >
+          Not get the code?
+          <Button
+            component={"span"}
+            sx={{
+              cursor: "pointer",
+              fontSize: "inherit",
+              lineHeight: "inherit",
+              color: "inherit",
+              textTransform: "none",
+              p: 0,
+              alignItems: "center",
+              justifyContent: "start",
+            }}
+          >
+            Resend
+          </Button>
+        </Typography>
+      </Box>
     </Stack>
   );
 }

@@ -37,7 +37,11 @@ const loginAction = async (data: { phone: string; password: string }) => {
     data.phone === FAKE_LOGIN_CLAMP.phone &&
     data.password === FAKE_LOGIN_CLAMP.password
   )
-    return { status: 200, message: "Credentials check successful" };
+    return {
+      status: 200,
+      message: "Credentials check successful",
+      loginData: { phone: data.phone },
+    };
 
   return {
     status: 401,
@@ -49,7 +53,10 @@ const loginAction = async (data: { phone: string; password: string }) => {
 };
 
 const otpLoginAction = async (data: { otp: string | number }) => {
-  console.log(data);
+  await new Promise(
+    (resolve, reject) =>
+      console.dir(resolve) ?? console.dir(reject) ?? setTimeout(resolve, 1500)
+  );
   if (data.otp.toString() === FAKE_LOGIN_CLAMP.otp) {
     return {
       status: 200,

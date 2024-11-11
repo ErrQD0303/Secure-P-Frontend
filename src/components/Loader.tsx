@@ -1,8 +1,9 @@
-import Box from "@mui/material/Box";
+import Box, { BoxProps } from "@mui/material/Box";
 
-function Loader() {
+function Loader({ sx, ...props }: BoxProps) {
   return (
     <Box
+      {...props}
       sx={{
         position: "absolute",
         inset: 0,
@@ -11,6 +12,7 @@ function Loader() {
         justifyContent: "center",
         backgroundColor: "rgba(108, 122, 137, 0.2)",
         backdropFilter: "blur(5px)",
+        ...sx,
       }}
     >
       <Box className="loader"></Box>

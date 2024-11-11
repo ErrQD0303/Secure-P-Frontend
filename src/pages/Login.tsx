@@ -23,6 +23,7 @@ function Login() {
     status: number;
     message: string;
     error?: { credentials: string };
+    loginData?: { phone: string };
   } | null>(null);
 
   const showSpinner =
@@ -253,7 +254,7 @@ function Login() {
               </Grid>
             </>
           ) : (
-            <OTP  />
+            <OTP data={response?.loginData} />
           )}
         </LoginSignUpLayout>
       </fetcher.Form>

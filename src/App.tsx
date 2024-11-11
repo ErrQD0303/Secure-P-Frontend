@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import loginAction from "./pages/loginAction";
 import SignUp from "./pages/SignUp";
 import HelpCenter from "./pages/HelpCenter";
+import Settings from "./pages/Settings";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
             errorElement: <Error />,
           },
         ],
+      },
+      {
+        path: "/settings",
+        element: <Settings />,
       },
     ],
   },

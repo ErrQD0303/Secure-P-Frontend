@@ -36,9 +36,10 @@ function TopNavigationBar({ routeName }: Props) {
       : true;
   const showLogo =
     viewWidth >= theme.breakpoints.values.md || location.pathname === "/";
-  const showGoBack = !["/", "/payment-history", "/subscriptions/add"].includes(
+  /* const showGoBack = !["/", "/payment-history", "/subscriptions/add"].includes(
     location.pathname
-  );
+  ); */
+  const showGoBack = true;
   const navigate = useNavigate();
 
   const handleGoBack = React.useCallback(() => {
@@ -64,7 +65,8 @@ function TopNavigationBar({ routeName }: Props) {
         component={"nav"}
         sx={{
           background: "linear-gradient(to left, #0093D0, #0055A5)",
-          paddingX: "1.844rem",
+          pl: !showLogo && showGoBack ? 0 : "1.844rem",
+          pr: "1.844rem",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "start",
