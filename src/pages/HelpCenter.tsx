@@ -22,6 +22,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 
 // type Props = {};
 const FAKE_DATA: {
@@ -42,6 +43,7 @@ const FAKE_DATA: {
         { question: "How to make parking easy and cost effective?", url: "/" },
         { question: "Can I change the date and time of my booking", url: "/" },
         { question: "Can I change my booking?", url: "/" },
+        { question: "Can I cancel my booking?", url: "/" },
       ],
       icon: <TwoArrowsIcon />,
     },
@@ -64,16 +66,24 @@ const FAKE_DATA: {
 function HelpCenter() {
   const [currentTab, setCurrentTab] = React.useState("0");
   const [currentSubTab, setCurrentSubTab] = React.useState("1");
+  const [search, setSearch] = React.useState("");
   const pageName = React.useMemo(() => "HelpCenter", []);
 
   const topics = Object.entries(FAKE_DATA)[+currentTab][1];
 
-  const issues =
-    Object.keys(topics).length > 0
-      ? Object.entries(topics)[+currentSubTab][1].questions
-      : [];
-
-  const [search, setSearch] = React.useState("");
+  const issues = React.useMemo(() => {
+    const selectedTopicIssues =
+      Object.keys(topics).length > 0
+        ? Object.entries(topics)[+currentSubTab][1].questions
+        : [];
+    console.log(selectedTopicIssues);
+    if (!search || search.trim() === "") {
+      return selectedTopicIssues;
+    }
+    return selectedTopicIssues.filter(({ question }) =>
+      question.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [currentSubTab, search, topics]);
 
   const handleTextChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +106,14 @@ function HelpCenter() {
       setCurrentSubTab(key || "0");
     },
     []
+  );
+  const navigate = useNavigate();
+
+  const handleIssueClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      navigate(event.currentTarget.getAttribute("data-url") || "/");
+    },
+    [navigate]
   );
   const theme = useTheme();
 
@@ -334,10 +352,13 @@ function HelpCenter() {
                   }}
                 >
                   <ListItemButton
+                    component="button"
                     sx={{
                       gap: "0.4rem",
                       p: 0,
                     }}
+                    onClick={handleIssueClick}
+                    data-url={issue.url}
                   >
                     <ListItemIcon
                       sx={{

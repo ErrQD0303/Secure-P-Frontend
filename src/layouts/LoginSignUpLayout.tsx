@@ -6,12 +6,14 @@ import { ResponsiveStyleValue } from "@mui/system";
 type Props = ContainerProps & {
   pageText: string;
   gridColumns?: ResponsiveStyleValue<number> | undefined;
+  showWelcomeText?: boolean;
 };
 
 function LoginSignUpLayout({
   children,
   pageText,
   gridColumns,
+  showWelcomeText = true,
   ...props
 }: Props) {
   return (
@@ -40,17 +42,19 @@ function LoginSignUpLayout({
             sx={{}}
           />
         </Grid>
-        <Grid
-          size={gridColumns}
-          className="Layout-PageText"
-          sx={{
-            fontWeight: 600,
-            fontSize: "1.25rem",
-            lineHeight: "1.875rem",
-          }}
-        >
-          Welcome,
-        </Grid>
+        {showWelcomeText && (
+          <Grid
+            size={gridColumns}
+            className="Layout-PageText"
+            sx={{
+              fontWeight: 600,
+              fontSize: "1.25rem",
+              lineHeight: "1.875rem",
+            }}
+          >
+            Welcome,
+          </Grid>
+        )}
         <Grid
           size={gridColumns}
           className="Layout-PageText"

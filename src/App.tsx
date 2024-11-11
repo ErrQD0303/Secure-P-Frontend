@@ -13,6 +13,7 @@ import mySubscriptionsAction from "./pages/mySubscriptionsAction";
 import DetailedSubscription from "./pages/DetailedSubscription";
 import detailedSubscriptionLoader from "./pages/detailedSubscriptionLoader";
 import Login from "./pages/Login";
+import loginAction from "./pages/loginAction";
 import SignUp from "./pages/SignUp";
 import HelpCenter from "./pages/HelpCenter";
 
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+    action: loginAction,
   },
   {
     path: "/signup",

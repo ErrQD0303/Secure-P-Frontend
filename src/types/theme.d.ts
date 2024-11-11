@@ -57,12 +57,18 @@ declare module "@mui/material/styles" {
     main: string;
     dark?: string;
     light?: string;
+    color?: string;
+    bgcolor?: string;
+    borderColor?: string;
   }
 
   interface SimplePaletteColor {
     main: string;
     dark?: string;
     light?: string;
+    color?: string;
+    bgcolor?: string;
+    borderColor?: string;
   }
 
   interface BreakpointOverrides {

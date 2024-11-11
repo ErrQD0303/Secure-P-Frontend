@@ -1,5 +1,5 @@
 import LoginSignUpLayout from "../layouts/LoginSignUpLayout";
-import { Form } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid2";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -11,9 +11,32 @@ import ButtonLink from "../components/ButtonLink";
 import Stack from "@mui/material/Stack";
 import { useTheme } from "@emotion/react";
 import Box from "@mui/material/Box";
+import React from "react";
+import Loader from "../components/Loader";
+import OTP from "./OTP";
+import { SimplePaletteColor } from "@mui/material/styles";
 
 function Login() {
   const theme = useTheme();
+  const fetcher = useFetcher();
+  const [response, setResponse] = React.useState<{
+    status: number;
+    message: string;
+    error?: { credentials: string };
+  } | null>(null);
+
+  const showSpinner =
+    fetcher.state === "loading" || fetcher.state === "submitting";
+
+  const showOtpPage = response?.status.toString() === "200";
+
+  const [pageText, showWelcomeText] = React.useMemo(
+    () =>
+      !showOtpPage
+        ? ["Login to your account", true]
+        : ["Enter your code", false],
+    [showOtpPage]
+  );
   const formFields = [
     {
       name: "phone",
@@ -38,6 +61,11 @@ function Login() {
         width: "100%",
         mt: "2.1rem",
         mb: "1.5rem",
+        "& input.MuiInputBase-input": {
+          ["-webkit-box-shadow"]: "initial",
+          ["-webkit-text-fill-color"]: "initial",
+          caretColor: "red",
+        },
       },
     },
     {
@@ -58,11 +86,25 @@ function Login() {
         width: "100%",
       },
     },
+    {
+      name: "type",
+      type: "hidden",
+      value: "login",
+      sx: {
+        display: "none",
+      },
+    },
   ];
+
+  React.useEffect(() => {
+    if (fetcher.data) {
+      setResponse(fetcher.data);
+    }
+  }, [fetcher.data, response]);
 
   return (
     <>
-      <Form method="POST">
+      <fetcher.Form method="POST">
         <LoginSignUpLayout
           sx={{
             color: "#3D4B56",
@@ -70,132 +112,167 @@ function Login() {
               my: "4rem",
             },
           }}
-          pageText="Login to your account"
+          pageText={pageText}
+          showWelcomeText={showWelcomeText}
           gridColumns={{ base: 1 }}
         >
-          {formFields.map((field) => (
-            <Grid
-              key={field.name}
-              sx={{
-                flex: "1 1 auto",
-              }}
-              size={1}
-            >
-              <TextField
-                id={field.name}
-                variant="outlined"
-                placeholder={field.label}
-                {...field}
-              />
-            </Grid>
-          ))}
-          <Grid
-            size={{
-              base: 1,
-            }}
-            sx={{
-              mt: "0.4rem",
-            }}
-          >
-            <ButtonLink
-              type="none"
-              to="/password-reset"
-              sx={{
-                textAlign: "right",
-                display: "block",
-                width: "100%",
-                textDecoration: "none",
-                color: "#3D4B56",
-                fontSize: "0.75rem",
-                lineHeight: "1.125rem",
-              }}
-            >
-              Forgot password?
-            </ButtonLink>
-          </Grid>
-          <Grid
-            size={{
-              base: 1,
-            }}
-            sx={{
-              my: "1.5rem",
-              [theme.breakpoints.up("sm")]: {
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              },
-            }}
-          >
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                width: "100%",
-                py: "0.84rem",
-                textTransform: "capitalize",
-                borderRadius: "0.25rem",
-                [theme.breakpoints.up("sm")]: {
-                  width: "180px",
-                  height: "44px",
-                },
-              }}
-            >
-              Login
-            </Button>
-          </Grid>
-          <Grid
-            size={{
-              base: 1,
-            }}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Stack
-              direction="row"
-              sx={{
-                width: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              spacing={0.5}
-            >
-              <Typography component={"h3"} sx={{ flex: "0 0 auto" }}>
-                Don't have an account?
-              </Typography>
-              <ButtonLink
-                to="/signup"
-                type="link"
+          {!showOtpPage ? (
+            <>
+              {response?.error && (
+                <Grid
+                  size={{
+                    base: 1,
+                  }}
+                  sx={{
+                    mt: "0.4rem",
+                    p: "1rem 2rem",
+                    bgcolor: (theme.palette.error as SimplePaletteColor)
+                      .bgcolor,
+                    borderRadius: "0.25rem",
+                    borderColor: (theme.palette.error as SimplePaletteColor)
+                      .borderColor,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: (theme.palette.error as SimplePaletteColor).color,
+                      fontSize: "1rem",
+                      lineHeight: "1.5rem",
+                    }}
+                  >
+                    {response?.error.credentials}
+                  </Typography>
+                </Grid>
+              )}
+              {formFields.map((field) => (
+                <Grid
+                  key={field.name}
+                  sx={{
+                    flex: "1 1 auto",
+                  }}
+                  size={1}
+                >
+                  <TextField
+                    id={field.name}
+                    variant="outlined"
+                    placeholder={field.label}
+                    {...field}
+                  />
+                </Grid>
+              ))}
+              <Grid
+                size={{
+                  base: 1,
+                }}
                 sx={{
-                  color: theme.palette.primary.main,
-                  textDecoration: "none",
-                  fontWeight: 600,
-                  flex: "0 1 auto",
-                  width: "auto",
+                  mt: "0.4rem",
                 }}
               >
-                Sign up
-              </ButtonLink>
-            </Stack>
-          </Grid>
+                <ButtonLink
+                  type="none"
+                  to="/password-reset"
+                  sx={{
+                    textAlign: "right",
+                    display: "block",
+                    width: "100%",
+                    textDecoration: "none",
+                    color: "#3D4B56",
+                    fontSize: "0.75rem",
+                    lineHeight: "1.125rem",
+                  }}
+                >
+                  Forgot password?
+                </ButtonLink>
+              </Grid>
+              <Grid
+                size={{
+                  base: 1,
+                }}
+                sx={{
+                  my: "1.5rem",
+                  [theme.breakpoints.up("sm")]: {
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    width: "100%",
+                    py: "0.84rem",
+                    textTransform: "capitalize",
+                    borderRadius: "0.25rem",
+                    [theme.breakpoints.up("sm")]: {
+                      width: "180px",
+                      height: "44px",
+                    },
+                  }}
+                >
+                  {showSpinner ? <Loader /> : "Login"}
+                </Button>
+              </Grid>
+              <Grid
+                size={{
+                  base: 1,
+                }}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Stack
+                  direction="row"
+                  sx={{
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  spacing={0.5}
+                >
+                  <Typography component={"h3"} sx={{ flex: "0 0 auto" }}>
+                    Don't have an account?
+                  </Typography>
+                  <ButtonLink
+                    to="/signup"
+                    type="link"
+                    sx={{
+                      color: theme.palette.primary.main,
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      flex: "0 1 auto",
+                      width: "auto",
+                    }}
+                  >
+                    Sign up
+                  </ButtonLink>
+                </Stack>
+              </Grid>
+            </>
+          ) : (
+            <OTP  />
+          )}
         </LoginSignUpLayout>
-      </Form>
-      <Stack
-        sx={{
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          component={"img"}
-          src="/src/assets/loginPng.png"
+      </fetcher.Form>
+      {showOtpPage || (
+        <Stack
           sx={{
-            maxWidth: "375px",
+            justifyContent: "center",
+            alignItems: "center",
           }}
-        ></Box>
-      </Stack>
+        >
+          <Box
+            component={"img"}
+            src="/src/assets/loginPng.png"
+            sx={{
+              maxWidth: "375px",
+            }}
+          ></Box>
+        </Stack>
+      )}
     </>
   );
 }

@@ -36,6 +36,9 @@ const lightThemePalette = {
   },
   error: {
     main: red[500],
+    color: red[900],
+    bgcolor: red[50],
+    borderColor: red[100],
   },
   lightBlue: {
     main: WEB_COLORS.background,
