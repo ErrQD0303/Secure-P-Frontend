@@ -105,8 +105,8 @@ function Profiles() {
             },
             sx: {
               mt: "2rem",
-              [theme.breakpoints.up("lg")]: {
-                mt: 0,
+              [theme.breakpoints.up("md")]: {
+                mt: "1rem",
               },
             },
           },
