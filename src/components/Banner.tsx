@@ -1,14 +1,15 @@
 import { useTheme } from "@emotion/react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import mobileBanner from "/mobile-banner.png";
+import webBanner from "/bannerweb.png";
 
 function Banner() {
   const theme = useTheme();
   return (
     <Container
       sx={{
-        background:
-          "url('/public/mobile-banner.png') top right no-repeat, linear-gradient(to right, #513393, #513393)",
+        background: `url('${mobileBanner}') top right no-repeat, linear-gradient(to right, #513393, #513393)`,
         height: "160px",
         display: "flex",
         flexDirection: "column",
@@ -18,7 +19,7 @@ function Banner() {
         color: "#fff",
         [theme.breakpoints.up("md")]: {
           color: "#2A2A5B",
-          background: "url('/public/bannerweb.png') top right no-repeat",
+          background: `url('${webBanner}') top right no-repeat`,
           fontFamily: "inherit",
           px: "2.125rem",
         },
