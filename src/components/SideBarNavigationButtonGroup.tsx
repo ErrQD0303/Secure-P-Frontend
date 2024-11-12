@@ -3,6 +3,11 @@ import { styled } from "@mui/material/styles";
 import SideBarNavigationButton from "./SideBarNavigationButton";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import mySubscriptionsImage from "/png-icons/my-subscriptions.png";
+import paymentHistoryImage from "/png-icons/payment-history.png";
+import addNewImage from "/png-icons/add-new.png";
+import helpCenterImage from "/png-icons/help-center.png";
+import logOutImage from "/png-icons/log-out.png";
 
 const StyledStack = styled(Stack)({});
 
@@ -13,29 +18,29 @@ function SideBarNavigationButtonGroup() {
       {
         to: "/subscriptions",
         ariaLabel: "My subscriptions",
-        icon: "../assets/png-icons/my-subscriptions.png",
+        icon: mySubscriptionsImage,
       },
       {
         to: "/payment-history",
         ariaLabel: "Payment history",
-        icon: "../assets/png-icons/payment-history.png",
+        icon: paymentHistoryImage,
       },
       {
         to: "/subscriptions/add",
         ariaLabel: "Add New Subscription",
-        icon: "../assets/png-icons/add-new.png",
+        icon: addNewImage,
       },
       {
         to: "/help-center",
         ariaLabel: "Help-center",
-        icon: "../assets/png-icons/help-center.png",
+        icon: helpCenterImage,
       },
       {
         onClick: () => {
           navigate("/login");
         },
         ariaLabel: "Sign out",
-        icon: "../assets/png-icons/log-out.png",
+        icon: logOutImage,
         sx: {
           px: 0,
         },

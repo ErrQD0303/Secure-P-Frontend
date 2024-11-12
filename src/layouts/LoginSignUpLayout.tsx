@@ -2,6 +2,7 @@ import Container, { ContainerProps } from "@mui/material/Container";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import { ResponsiveStyleValue } from "@mui/system";
+import loginLogo from "/LoginLogo.png";
 
 type Props = ContainerProps & {
   pageText: string;
@@ -36,7 +37,7 @@ function LoginSignUpLayout({
         >
           <Box
             component="img"
-            src="../assets/LoginLogo.png"
+            src={loginLogo}
             alt="Secure Parking Logo"
             aria-label="To Homepage"
             sx={{}}

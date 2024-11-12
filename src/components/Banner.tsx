@@ -8,7 +8,7 @@ function Banner() {
     <Container
       sx={{
         background:
-          "url(/src/assets/mobile-banner.png) top right no-repeat, linear-gradient(to right, #513393, #513393)",
+          "url('/public/mobile-banner.png') top right no-repeat, linear-gradient(to right, #513393, #513393)",
         height: "160px",
         display: "flex",
         flexDirection: "column",
@@ -18,7 +18,7 @@ function Banner() {
         color: "#fff",
         [theme.breakpoints.up("md")]: {
           color: "#2A2A5B",
-          background: "url(/src/assets/bannerweb.png) top right no-repeat",
+          background: "url('/public/bannerweb.png') top right no-repeat",
           fontFamily: "inherit",
           px: "2.125rem",
         },

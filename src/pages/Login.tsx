@@ -15,6 +15,7 @@ import React from "react";
 import Loader from "../components/Loader";
 import OTP from "./OTP";
 import { SimplePaletteColor } from "@mui/material/styles";
+import logoPng from "/public/logo.png";
 
 function Login() {
   const theme = useTheme();
@@ -267,7 +268,7 @@ function Login() {
         >
           <Box
             component={"img"}
-            src="../assets/loginPng.png"
+            src={logoPng}
             sx={{
               maxWidth: "375px",
             }}

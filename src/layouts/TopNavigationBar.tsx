@@ -18,6 +18,7 @@ import NotificationButton from "../components/NotificationButton";
 import { useNavigate } from "react-router-dom";
 import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import logoImage from "/logo.png";
 
 type Props = {
   routeName: string;
@@ -99,7 +100,7 @@ function TopNavigationBar({ routeName }: Props) {
             <ButtonLink to={"/"} type={"none"}>
               <Box
                 component="img"
-                src="../assets/logo.png"
+                src={logoImage}
                 alt="Secure Parking Logo"
                 aria-label="To Homepage"
                 sx={{

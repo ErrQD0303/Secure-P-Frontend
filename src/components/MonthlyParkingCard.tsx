@@ -27,6 +27,7 @@ import DetailedMonthlyParkingCardBody from "./DetailedMonthlyParkingCardBody";
 import { getParkingType } from "../shared/helpers/parkings";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import cardBackground from "/public/card-background.png";
 
 type Props = ContainerProps & {
   subscriptionDetail: ISubscriptionDetail;
@@ -64,7 +65,7 @@ function MonthlyParkingCard({
       padding: 0,
       color: "#fff",
       borderRadius: "0.25rem",
-      background: `url("../assets/card-background.png") right 0.3125rem center no-repeat, linear-gradient(#0093D0 0%, #0055A5 90%)`,
+      background: `url("${cardBackground}") right 0.3125rem center no-repeat, linear-gradient(#0093D0 0%, #0055A5 90%)`,
       // border: "0.0625rem solid #69BCDE",
       minWidth: "21.6875rem",
       maxWidth: "21.6875rem",
