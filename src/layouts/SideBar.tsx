@@ -7,6 +7,7 @@ import SideBarNavigationButtonGroup from "../components/SideBarNavigationButtonG
 import { useTheme } from "@emotion/react";
 import ButtonLink from "../components/ButtonLink";
 import Button from "@mui/material/Button";
+import sideBarImage1 from "/sidebar-image1.png";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   display: "none",
@@ -62,7 +63,7 @@ function SideBar(props: ContainerProps) {
               }}
             >
               <img
-                src="/src/assets/sidebar-image1.png"
+                src={sideBarImage1}
                 alt="Sidebar Image"
                 aria-label="Sidebar Image"
               />

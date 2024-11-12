@@ -19,20 +19,32 @@ function SideBarNavigationButton({ ariaLabel, icon, ...props }: Props) {
       type="none"
       sx={{
         flex: "1 1 auto",
+        "&:hover": {
+          bgcolor: "#EEF2F5",
+          " p": {
+            color: "#32336c",
+            fontWeight: 600,
+          },
+        },
+        "&.active": {
+          bgcolor: "#EEF2F5",
+          " p": {
+            color: "#32336c",
+            fontWeight: 600,
+          },
+        },
       }}
     >
       <Button
+        disableTouchRipple
         sx={{
+          pl: {
+            md: "2.5rem",
+            lg: "3rem",
+          },
           color: "#A3B0BF",
           flex: "1 1 auto",
-          "&:hover": {
-            bgcolor: "#EEF2F5",
-          },
-          "&:active": {
-            color: "#32336c",
-          },
           justifyContent: "flex-start",
-          pl: "3rem",
           width: "100%",
         }}
       >

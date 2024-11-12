@@ -26,9 +26,10 @@ function CasualRevenueCard(props: Props) {
     clampingFee,
     changeSignageFee,
     startDate,
+    subscriptionFee,
   } = props;
   const isActive = isPaid && endDate?.getTime() > new Date().getTime();
-  const totalFee = clampingFee + changeSignageFee;
+  const totalFee = subscriptionFee + clampingFee + changeSignageFee;
   return (
     <Container
       sx={{
@@ -50,7 +51,7 @@ function CasualRevenueCard(props: Props) {
             }}
           >
             <ButtonLink
-              to="/"
+              to={"/"}
               type="link"
               sx={{
                 fontWeight: "inherit",
@@ -74,6 +75,10 @@ function CasualRevenueCard(props: Props) {
                     fontSize: "0.875rem",
                     lineHeight: "1.313rem",
                     fontWeight: "inherit",
+                    [theme.breakpoints.up("md")]: {
+                      fontSize: "1rem",
+                      lineHeight: "1.5rem",
+                    },
                   }}
                 >
                   Casual Revenue
@@ -108,7 +113,17 @@ function CasualRevenueCard(props: Props) {
             </Typography>
           </Stack>
         </Box>
-        <Box sx={{ color: "#202042", fontSize: "0.75rem", lineHeight: "1rem" }}>
+        <Box
+          sx={{
+            color: "#202042",
+            fontSize: "0.75rem",
+            lineHeight: "1rem",
+            [theme.breakpoints.up("md")]: {
+              fontSize: "0.875rem",
+              lineHeight: "1.313rem",
+            },
+          }}
+        >
           <Stack spacing={1}>
             <Box>
               <Stack>
@@ -161,10 +176,21 @@ function CasualRevenueCard(props: Props) {
                   justifyContent: "space-between",
                   fontSize: "0.75rem",
                   lineHeight: "1.125rem",
+                  [theme.breakpoints.up("md")]: {
+                    fontSize: "0.875rem",
+                    lineHeight: "1.313rem",
+                  },
                 }}
                 spacing={2}
               >
-                <Box sx={{ flexBasis: "7rem" }}>
+                <Box
+                  sx={{
+                    flexBasis: {
+                      base: "7rem",
+                      md: "9rem",
+                    },
+                  }}
+                >
                   <Stack>
                     <Box>
                       <Stack direction={"row"} sx={{}}>
@@ -205,7 +231,14 @@ function CasualRevenueCard(props: Props) {
                   </Stack>
                 </Box>
                 <ArrowForwardIcon />
-                <Box sx={{ flexBasis: "7rem" }}>
+                <Box
+                  sx={{
+                    flexBasis: {
+                      base: "7rem",
+                      md: "9rem",
+                    },
+                  }}
+                >
                   <Stack>
                     <Box>
                       <Typography
@@ -254,9 +287,9 @@ function CasualRevenueCard(props: Props) {
                         px: "0.21875rem",
                         textTransform: "capitalize",
                       },
-                      [theme.breakpoints.up("md")]: {
-                        fontSize: "0.75rem",
-                        lineHeight: "1.125rem",
+                      [theme.breakpoints.up("sm")]: {
+                        fontSize: "0.875rem",
+                        lineHeight: "1.313rem",
                       },
                     }}
                   />
@@ -280,9 +313,9 @@ function CasualRevenueCard(props: Props) {
                         px: "0.21875rem",
                         textTransform: "capitalize",
                       },
-                      [theme.breakpoints.up("md")]: {
-                        fontSize: "0.75rem",
-                        lineHeight: "1.125rem",
+                      [theme.breakpoints.up("sm")]: {
+                        fontSize: "0.875rem",
+                        lineHeight: "1.313rem",
                       },
                     }}
                   />

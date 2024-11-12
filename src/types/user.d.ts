@@ -19,6 +19,7 @@ export interface IUser {
 
 export interface IPersonalInfo {
   id: string;
+  username: string | undefined;
   email: string;
   mobileNumber: string;
   dayOfBirth: Date | undefined;

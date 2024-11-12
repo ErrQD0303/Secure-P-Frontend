@@ -36,6 +36,9 @@ const lightThemePalette = {
   },
   error: {
     main: red[500],
+    color: red[900],
+    bgcolor: red[50],
+    borderColor: red[100],
   },
   lightBlue: {
     main: WEB_COLORS.background,
@@ -95,6 +98,47 @@ const theme = createTheme({
           font-family: ${typography.fontFamily}; /* Use the fontFamily defined above */
           text-rendering: optimizeLegibility;
           background-color: ${lightThemePalette.lightBlue.main};
+        }
+
+        /* https://dev.to/afif/i-made-100-css-loaders-for-your-next-project-4eje */
+        .loader {
+          width: 45px;
+          aspect-ratio: 0.75;
+          --c: no-repeat linear-gradient(#01579b 0 0);
+          background:
+            var(--c) 0% 50%,
+            var(--c) 50% 50%,
+            var(--c) 100% 50%;
+          background-size: 20% 50%;
+          animation: loading 1s infinite linear;
+          z-index: 9999;
+        }
+
+        @keyframes loading {
+          20% {
+            background-position:
+              0% 0%,
+              50% 50%,
+              100% 50%;
+          }
+          40% {
+            background-position:
+              0% 100%,
+              50% 0%,
+              100% 50%;
+          }
+          60% {
+            background-position:
+              0% 50%,
+              50% 100%,
+              100% 0%;
+          }
+          80% {
+            background-position:
+              0% 50%,
+              50% 50%,
+              100% 100%;
+          }
         }
       `,
     },

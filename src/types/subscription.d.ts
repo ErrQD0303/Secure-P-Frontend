@@ -10,10 +10,12 @@ export interface ISubscription {
   productType: IProductType;
   startDate: Date;
   endDate: Date;
+  subscriptionFee: number;
   clampingFee: number;
   changeSignageFee: number;
   isPaid: boolean;
   licensePlate: string;
+  paymentDate?: Date;
 }
 
 export interface ISubscriptionDetail {
@@ -24,10 +26,12 @@ export interface ISubscriptionDetail {
   productType: IProductType;
   startDate: Date;
   endDate: Date;
+  subscriptionFee: number;
   clampingFee: number;
   changeSignageFee: number;
   isPaid: boolean;
   licensePlate: string;
+  paymentDate?: Date;
 }
 
 export interface ISubscriptions {

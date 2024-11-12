@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { IProductType } from "../types/enum";
 import { ISubscriptionDetail } from "../types/subscription";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import styled from "@emotion/styled";
@@ -18,6 +17,7 @@ import { getDailyParkingCardDateString } from "../shared/helpers/dates";
 import PlaceIcon from "@mui/icons-material/Place";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import React from "react";
+import { getParkingType } from "../shared/helpers/parkings";
 
 type Props = ISubscriptionDetail & { fullDetailed?: boolean };
 
@@ -35,11 +35,12 @@ function PaymentHistoryCard({
   endDate,
   parkingLocation,
   licensePlate,
+  subscriptionFee,
   fullDetailed = false,
 }: Props) {
   const theme = useTheme();
-  const totalFee = clampingFee + changeSignageFee;
-  const parkingType = productType === IProductType.Tenant ? "Monthly" : "Daily";
+  const totalFee = subscriptionFee + clampingFee + changeSignageFee;
+  const parkingType = getParkingType(productType);
   const listItems = [
     {
       name: "Duration",
@@ -94,8 +95,12 @@ function PaymentHistoryCard({
           <Box
             sx={{
               flexGrow: 1,
-              lineHeight: "1.313rem",
               fontSize: "0.875rem",
+              lineHeight: "1.313rem",
+              [theme.breakpoints.up("md")]: {
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
+              },
             }}
           >
             <Stack
@@ -113,6 +118,10 @@ function PaymentHistoryCard({
                       fontSize: "0.75rem",
                       lineHeight: "0.875rem",
                       color: "#A3B0BF",
+                      [theme.breakpoints.up("md")]: {
+                        fontSize: "0.875rem",
+                        lineHeight: "1.313rem",
+                      },
                     }}
                   >
                     {getDailyParkingCardDateString(startDate)}
@@ -123,8 +132,8 @@ function PaymentHistoryCard({
                 <Typography
                   sx={{
                     fontWeight: 600,
-                    lineHeight: "inherit",
                     fontSize: "inherit",
+                    lineHeight: "inherit",
                   }}
                 >
                   ${totalFee}
@@ -161,6 +170,10 @@ function PaymentHistoryCard({
                       "& .MuiListItemText-primary": {
                         fontSize: "0.75rem",
                         lineHeight: "1.125rem",
+                        [theme.breakpoints.up("md")]: {
+                          fontSize: "0.875rem",
+                          lineHeight: "1.313rem",
+                        },
                       },
                     }}
                   >

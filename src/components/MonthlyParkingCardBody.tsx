@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 
 type Props = {
   expireDate: string;
@@ -13,6 +13,7 @@ function MonthlyParkingCardBody({
   parkingZone,
   parkingLocation,
 }: Props) {
+  const theme = useTheme();
   return (
     <Box
       sx={{
@@ -39,6 +40,13 @@ function MonthlyParkingCardBody({
             lineHeight: "0.9375rem",
             textTransform: "uppercase",
             textAlign: "left",
+            [theme.breakpoints.up("md")]: {
+              color: "#283453",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              textTransform: "capitalize",
+            },
           }}
         >
           Expiration Date
@@ -65,6 +73,13 @@ function MonthlyParkingCardBody({
             lineHeight: "0.9375rem",
             textTransform: "uppercase",
             textAlign: "left",
+            [theme.breakpoints.up("md")]: {
+              color: "#283453",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              textTransform: "capitalize",
+            },
           }}
         >
           License plate
@@ -91,6 +106,13 @@ function MonthlyParkingCardBody({
             lineHeight: "0.9375rem",
             textTransform: "uppercase",
             textAlign: "left",
+            [theme.breakpoints.up("md")]: {
+              color: "#283453",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              textTransform: "capitalize",
+            },
           }}
         >
           Parking zone
@@ -117,6 +139,13 @@ function MonthlyParkingCardBody({
             lineHeight: "0.9375rem",
             textTransform: "uppercase",
             textAlign: "left",
+            [theme.breakpoints.up("md")]: {
+              color: "#283453",
+              fontWeight: 600,
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              textTransform: "capitalize",
+            },
           }}
         >
           Parking Location
@@ -127,7 +156,7 @@ function MonthlyParkingCardBody({
             lineHeight: "1.125rem",
           }}
         >
-          {parkingLocation}
+          {parkingLocation.slice(0, 76)}
         </Box>
       </Box>
     </Box>

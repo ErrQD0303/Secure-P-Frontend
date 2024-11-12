@@ -11,7 +11,6 @@ import ButtonLink from "../components/ButtonLink";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Typography from "@mui/material/Typography";
 import AddNewIcon from "../components/svg-icons/AddNew";
-import Banner from "../components/Banner";
 import CasualRevenueCard from "../components/CasualRevenueCard";
 import Stack from "@mui/material/Stack";
 import PaymentHistoryCard from "../components/PaymentHistoryCard";
@@ -27,7 +26,6 @@ function Home() {
 
   return (
     <>
-      <Banner />
       <Container
         sx={{
           px: "1.437rem",
@@ -191,6 +189,7 @@ function Home() {
                 sx={{
                   minWidth: "21.6875rem",
                   maxWidth: "21.6875rem",
+                  [theme.breakpoints.up("md")]: {},
                 }}
               >
                 <MonthlyParkingCard subscriptionDetail={value} />

@@ -1,24 +1,44 @@
-import Banner from "../components/Banner";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { useTheme } from "@emotion/react";
-import { useLoaderData } from "react-router-dom";
+import { useFetcher, useLoaderData } from "react-router-dom";
 import PaymentHistoryCard from "../components/PaymentHistoryCard";
 import { ISubscriptionDetail } from "../types/subscription";
 import Stack from "@mui/material/Stack";
-import ButtonLink from "../components/ButtonLink";
 import Button from "@mui/material/Button";
 import AddNewIcon from "../components/svg-icons/AddNew";
+import React from "react";
+import Loader from "../components/Loader";
 
 function PaymentHistory() {
-  const theme = useTheme();
-  const { paymentDetails, isNextPageAvailable } = useLoaderData() as {
-    paymentDetails: ISubscriptionDetail[];
-    isNextPageAvailable: boolean;
-  };
+  const { subscriptionDetails: details, isNextPageAvailable: isNextPageAval } =
+    useLoaderData() as {
+      subscriptionDetails: ISubscriptionDetail[];
+      isNextPageAvailable: boolean;
+    };
+
+  const [paymentDetails, setPaymentDetails] =
+    React.useState<ISubscriptionDetail[]>(details);
+  const [pageOffset, setPageOffset] = React.useState(0);
+  const [isNextPageAvailable, setIsNextPageAvailable] =
+    React.useState<boolean>(isNextPageAval);
+
+  const fetcher = useFetcher();
+
+  const showSpinner =
+    fetcher.state === "loading" || fetcher.state === "submitting";
+
+  React.useEffect(() => {
+    if (fetcher.data) {
+      setPaymentDetails((prevDetails) => [
+        ...prevDetails,
+        ...fetcher.data.subscriptionDetails,
+      ]);
+      setIsNextPageAvailable(fetcher.data.isNextPageAvailable);
+      setPageOffset((prevOffset) => prevOffset + 1);
+    }
+  }, [fetcher.data]);
   return (
     <>
-      <Banner />
       <Container
         sx={{
           px: "1.437rem",
@@ -30,39 +50,13 @@ function PaymentHistory() {
         }}
       >
         <Stack spacing={2}>
-          <Box
-            sx={{
-              textTransform: "capitalize",
-              color: "#3D4B56",
-              fontWeight: 600,
-              fontSize: "1rem",
-              lineHeight: "1.5rem",
-              p: 0,
-            }}
-          >
-            Payment History
-          </Box>
           <Stack spacing={2.5}>
             {paymentDetails.map((pd) => (
               <PaymentHistoryCard {...pd} fullDetailed />
             ))}
             {isNextPageAvailable && (
-              <ButtonLink
-                to="/subscriptions/add"
-                ariaLabel="My subscriptions"
-                type="button"
-                sx={{
-                  my: "1.4375rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  [theme.breakpoints.up("sm")]: {
-                    width: "auto",
-                    flexShrink: 0,
-                    display: "none",
-                  },
-                }}
-              >
+              <fetcher.Form method="POST">
+                <input type="hidden" name="pageOffset" value={pageOffset} />
                 <Button
                   variant="contained"
                   sx={{
@@ -71,14 +65,17 @@ function PaymentHistory() {
                     gap: "0.375rem",
                     p: "0.875rem",
                     textTransform: "capitalize",
+                    position: "relative",
                   }}
+                  type="submit"
                 >
+                  {showSpinner && <Loader />}
                   <AddNewIcon />
                   <Box component={"span"} sx={{ textTransform: "none" }}>
                     Load more
                   </Box>
                 </Button>
-              </ButtonLink>
+              </fetcher.Form>
             )}
           </Stack>
         </Stack>
