@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import logoImage from "/logo.png";
+import avatarImage from "/avatar.png";
 
 type Props = {
   routeName: string;
@@ -216,7 +217,7 @@ function TopNavigationBar({ routeName }: Props) {
                     sx={{
                       borderRadius: "50%",
                       p: "1.5rem",
-                      background: "url('/src/assets/avatar.png')",
+                      background: `url(${avatarImage})`,
                       cursor: "pointer",
                     }}
                   ></Box>

@@ -18,6 +18,7 @@ import { useTheme } from "@emotion/react";
 import AppDatePicker from "../components/AppDatePicker";
 import useViewPort from "../hooks/useViewPort";
 import dayjs from "dayjs";
+import avatarImage from "/avatar.png";
 
 function Profiles() {
   const theme = useTheme();
@@ -382,7 +383,7 @@ function Profiles() {
                   width: "72px",
                   height: "69px",
                   borderRadius: "50%",
-                  background: "url('/src/assets/avatar.png') center/cover",
+                  background: `url('${avatarImage}') center/cover`,
                   [theme.breakpoints.up("lg")]: {
                     width: "144px",
                     height: "138px",
