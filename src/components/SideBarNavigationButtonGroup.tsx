@@ -13,29 +13,29 @@ function SideBarNavigationButtonGroup() {
       {
         to: "/subscriptions",
         ariaLabel: "My subscriptions",
-        icon: "/src/assets/png-icons/my-subscriptions.png",
+        icon: "../assets/png-icons/my-subscriptions.png",
       },
       {
         to: "/payment-history",
         ariaLabel: "Payment history",
-        icon: "/src/assets/png-icons/payment-history.png",
+        icon: "../assets/png-icons/payment-history.png",
       },
       {
         to: "/subscriptions/add",
         ariaLabel: "Add New Subscription",
-        icon: "/src/assets/png-icons/add-new.png",
+        icon: "../assets/png-icons/add-new.png",
       },
       {
         to: "/help-center",
         ariaLabel: "Help-center",
-        icon: "/src/assets/png-icons/help-center.png",
+        icon: "../assets/png-icons/help-center.png",
       },
       {
         onClick: () => {
           navigate("/login");
         },
         ariaLabel: "Sign out",
-        icon: "/src/assets/png-icons/log-out.png",
+        icon: "../assets/png-icons/log-out.png",
         sx: {
           px: 0,
         },

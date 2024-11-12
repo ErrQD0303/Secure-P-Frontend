@@ -99,7 +99,7 @@ function TopNavigationBar({ routeName }: Props) {
             <ButtonLink to={"/"} type={"none"}>
               <Box
                 component="img"
-                src="/src/assets/logo.png"
+                src="../assets/logo.png"
                 alt="Secure Parking Logo"
                 aria-label="To Homepage"
                 sx={{
@@ -209,7 +209,7 @@ function TopNavigationBar({ routeName }: Props) {
                 borderRight: "0.125rem solid #EAEFF5",
               }}
             >
-              <ButtonLink to={"profile"} type="none">
+              <ButtonLink to={"profiles"} type="none">
                 <Tooltip title="My Profile">
                   <Box
                     sx={{
@@ -275,7 +275,7 @@ function TopNavigationBar({ routeName }: Props) {
               >
                 <MenuItem key={"profile"}>
                   <ButtonLink
-                    to="/profile"
+                    to="/profiles"
                     ariaLabel="My Profile"
                     type="link"
                     sx={{
@@ -297,7 +297,7 @@ function TopNavigationBar({ routeName }: Props) {
                 </MenuItem>
                 <MenuItem key={"logout"} onClick={handleCloseUserMenu}>
                   <ButtonLink
-                    to="/"
+                    to="/login"
                     ariaLabel="Log out"
                     type="link"
                     sx={{

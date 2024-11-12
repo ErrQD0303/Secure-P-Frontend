@@ -4,4 +4,5 @@ export const ROUTES = {
   "/subscriptions": "Subscriptions",
   "/help-center": "Help Center",
   "/settings": "Settings",
+  "/profiles": "Profiles",
 };

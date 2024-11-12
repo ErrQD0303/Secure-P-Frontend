@@ -13,6 +13,8 @@ import { ROUTES } from "../shared/routes/routes";
 import { getRouteName } from "../services/routeService";
 import ButtonLink from "../components/ButtonLink";
 import AddNewIcon from "../components/svg-icons/AddNew";
+import { useSelector } from "react-redux";
+import { getUserInfo } from "../store/userSlice";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -34,9 +36,15 @@ function AppLayout() {
     routeUrl
   );
 
+  const selector = useSelector(getUserInfo);
+
   useEffect(() => {
     mainLayoutRef.current?.scrollTo(0, 0);
   }, [location]);
+
+  useEffect(() => {
+    localStorage.setItem("userInfo", JSON.stringify(selector));
+  });
 
   return (
     <Paper

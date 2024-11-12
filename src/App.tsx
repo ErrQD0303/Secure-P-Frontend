@@ -17,6 +17,9 @@ import loginAction from "./pages/loginAction";
 import SignUp from "./pages/SignUp";
 import HelpCenter from "./pages/HelpCenter";
 import Settings from "./pages/Settings";
+import Profiles from "./pages/Profiles";
+import updateProfilePersonalInfoAction from "./pages/updateProfilePersonalInfoAction";
+import updateProfilePasswordAction from "./pages/updatePasswordAction";
 
 const router = createBrowserRouter([
   {
@@ -63,6 +66,23 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <Settings />,
+      },
+      {
+        path: "/profiles",
+        element: <Profiles />,
+        errorElement: <Error />,
+        children: [
+          {
+            path: "update-personal-info",
+            action: updateProfilePersonalInfoAction,
+            errorElement: <Error />,
+          },
+          {
+            path: "update-password",
+            action: updateProfilePasswordAction,
+            errorElement: <Error />,
+          },
+        ],
       },
     ],
   },

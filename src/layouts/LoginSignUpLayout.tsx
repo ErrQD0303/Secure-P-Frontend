@@ -36,7 +36,7 @@ function LoginSignUpLayout({
         >
           <Box
             component="img"
-            src="/src/assets/LoginLogo.png"
+            src="../assets/LoginLogo.png"
             alt="Secure Parking Logo"
             aria-label="To Homepage"
             sx={{}}

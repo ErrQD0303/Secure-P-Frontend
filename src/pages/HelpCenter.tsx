@@ -180,7 +180,7 @@ function HelpCenter() {
               label={name}
               key={index}
               value={index.toString()}
-              {...a11yProps(0, pageName)}
+              {...a11yProps(index, pageName)}
             ></Tab>
           ))}
         </Tabs>

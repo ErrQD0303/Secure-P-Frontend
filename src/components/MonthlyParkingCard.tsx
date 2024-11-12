@@ -64,7 +64,7 @@ function MonthlyParkingCard({
       padding: 0,
       color: "#fff",
       borderRadius: "0.25rem",
-      background: `url("/src/assets/card-background.png") right 0.3125rem center no-repeat, linear-gradient(#0093D0 0%, #0055A5 90%)`,
+      background: `url("../assets/card-background.png") right 0.3125rem center no-repeat, linear-gradient(#0093D0 0%, #0055A5 90%)`,
       // border: "0.0625rem solid #69BCDE",
       minWidth: "21.6875rem",
       maxWidth: "21.6875rem",

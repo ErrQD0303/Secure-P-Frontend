@@ -18,15 +18,13 @@ import {
 type Props = ContainerProps;
 
 function Settings(props: Props) {
-  const links: [
-    {
-      name: string;
-      icon: JSX.Element;
-      to: string;
-      endAdornment?: JSX.Element;
-      sx?: object;
-    }
-  ] = React.useMemo(
+  const links: Array<{
+    name: string;
+    icon: JSX.Element;
+    to: string;
+    endAdornment?: JSX.Element;
+    sx?: object;
+  }> = React.useMemo(
     () => [
       {
         name: "My Account",

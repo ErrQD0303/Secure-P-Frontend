@@ -62,7 +62,7 @@ function SideBar(props: ContainerProps) {
               }}
             >
               <img
-                src="/src/assets/sidebar-image1.png"
+                src="../assets/sidebar-image1.png"
                 alt="Sidebar Image"
                 aria-label="Sidebar Image"
               />

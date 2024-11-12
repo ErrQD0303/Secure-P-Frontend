@@ -267,7 +267,7 @@ function Login() {
         >
           <Box
             component={"img"}
-            src="/src/assets/loginPng.png"
+            src="../assets/loginPng.png"
             sx={{
               maxWidth: "375px",
             }}
