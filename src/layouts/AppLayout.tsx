@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLoaderData, useLocation } from "react-router-dom";
 import { Box, Button, Container, Paper, Stack } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import AppBottomNavigation from "./AppBottomNavigation";
@@ -9,7 +9,6 @@ import SideBar from "./SideBar";
 import Grid from "@mui/material/Grid2";
 import React from "react";
 import Banner from "../components/Banner";
-import { ROUTES } from "../shared/routes/routes";
 import { getRouteName } from "../services/routeService";
 import ButtonLink from "../components/ButtonLink";
 import AddNewIcon from "../components/svg-icons/AddNew";
@@ -20,17 +19,17 @@ function AppLayout() {
   const [value, setValue] = useState(0);
   const theme = useTheme();
   const { viewWidth } = useViewPort();
+  const { routeName: defaultRouteName } = useLoaderData() as {
+    routeName: string;
+  };
+  const [routeName, setRouteName] = useState(defaultRouteName);
   const handleSetValue = useCallback(
     (_event: React.SyntheticEvent, newValue: number) => setValue(newValue),
     []
   );
   const mainLayoutRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
-  const [routeUrl, subPage] = location.pathname.split("/").slice(1);
-  const routeName = getRouteName(
-    `/${routeUrl}` as keyof typeof ROUTES,
-    subPage
-  );
+  const [routeUrl] = location.pathname.split("/").slice(1);
   const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
   const showAddNewButton = ["subscriptions", "payment-history"].includes(
     routeUrl
@@ -44,7 +43,13 @@ function AppLayout() {
 
   useEffect(() => {
     localStorage.setItem("userInfo", JSON.stringify(selector));
-  });
+  }, [selector]);
+
+  useEffect(() => {
+    getRouteName(location.pathname).then((name) => {
+      setRouteName(name ?? "");
+    });
+  }, [location.pathname]);
 
   return (
     <Paper
@@ -53,7 +58,7 @@ function AppLayout() {
         [theme.breakpoints.between("xs", "md")]: {},
       }}
     >
-      <TopNavigationBar routeName={routeName} />
+      <TopNavigationBar routeName={routeName ?? ""} />
 
       <Grid
         container

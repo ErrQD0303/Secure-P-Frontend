@@ -76,7 +76,6 @@ function HelpCenter() {
       Object.keys(topics).length > 0
         ? Object.entries(topics)[+currentSubTab][1].questions
         : [];
-    console.log(selectedTopicIssues);
     if (!search || search.trim() === "") {
       return selectedTopicIssues;
     }

@@ -464,7 +464,6 @@ function Profiles() {
                             {
                               type,
                               label,
-                              // eslint-disable-next-line @typescript-eslint/no-unused-vars
                               name,
                               sx,
                               placeholder,
@@ -572,12 +571,9 @@ function Profiles() {
                               {
                                 type,
                                 label,
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                 name,
                                 sx,
                                 placeholder,
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                value,
                                 defaultValue,
                                 buttonProps,
                                 ...subValue
@@ -692,12 +688,9 @@ function Profiles() {
                               {
                                 type,
                                 label,
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                 name,
                                 sx,
                                 placeholder,
-                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                value,
                                 defaultValue,
                                 buttonProps,
                                 ...subValue

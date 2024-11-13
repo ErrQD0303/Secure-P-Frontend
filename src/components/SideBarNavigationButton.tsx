@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack";
 import ButtonLink from "../components/ButtonLink";
 import { BoxProps, Typography } from "@mui/material";
 import { Props as ButtonLinkProps } from "../components/ButtonLink";
+import { useLocation } from "react-router-dom";
 
 type Props = Omit<ButtonLinkProps, "type" | "sx"> & {
   type?: "string";
@@ -12,6 +13,7 @@ type Props = Omit<ButtonLinkProps, "type" | "sx"> & {
 };
 
 function SideBarNavigationButton({ ariaLabel, icon, ...props }: Props) {
+  const routeUrl = useLocation().pathname;
   return (
     <ButtonLink
       {...props}
@@ -26,7 +28,7 @@ function SideBarNavigationButton({ ariaLabel, icon, ...props }: Props) {
             fontWeight: 600,
           },
         },
-        "&.active": {
+        [`&.active[href="${routeUrl}"]`]: {
           bgcolor: "#EEF2F5",
           " p": {
             color: "#32336c",
