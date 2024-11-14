@@ -19,6 +19,7 @@ import AppDatePicker from "../components/AppDatePicker";
 import useViewPort from "../hooks/useViewPort";
 import dayjs from "dayjs";
 import avatarImage from "/avatar.png";
+import Loader from "../components/Loader";
 
 function Profiles() {
   const theme = useTheme();
@@ -28,6 +29,9 @@ function Profiles() {
   );
   const { routeName } = useOutletContext() as { routeName: string };
   const { viewWidth } = useViewPort();
+
+  const isLoading =
+    fetcher.state === "submitting" || fetcher.state === "loading";
 
   const tabs: {
     [key: string]: {
@@ -351,6 +355,7 @@ function Profiles() {
         }}
         ref={mainComponentRef}
       >
+        {isLoading && <Loader />}
         <Container
           sx={{
             px: 0,

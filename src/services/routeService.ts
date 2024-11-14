@@ -32,7 +32,7 @@ export const getRouteName = async (
     const nextCurrentRoute = path?.children as Array<
       RouteObject & { name?: string }
     >;
-    if (!nextCurrentRoute) {
+    if (!routeName && !nextCurrentRoute) {
       routeName = currentRoute?.find((route) =>
         route.path?.startsWith(":")
       )?.name;

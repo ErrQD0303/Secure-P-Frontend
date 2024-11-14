@@ -9,6 +9,7 @@ import detailedSubscriptionLoader from "../pages/detailedSubscriptionLoader";
 import loginAction from "../pages/loginAction";
 import updateProfilePersonalInfoAction from "../pages/updateProfilePersonalInfoAction";
 import updateProfilePasswordAction from "../pages/updatePasswordAction";
+import addNewSubscriptionLoader from "../pages/addNewSubscriptionLoader";
 import {
   AppLayout,
   Error,
@@ -66,6 +67,7 @@ export const routes = [
             path: "add",
             element: <AddNewSubscription />,
             name: "Add New Subscription",
+            loader: addNewSubscriptionLoader,
             errorElement: <Error />,
           },
           {

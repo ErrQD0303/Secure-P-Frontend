@@ -15,7 +15,7 @@ import React from "react";
 import Loader from "../components/Loader";
 import OTP from "./OTP";
 import { SimplePaletteColor } from "@mui/material/styles";
-import logoPng from "/public/logo.png";
+import logoPng from "/logo.png";
 
 function Login() {
   const theme = useTheme();

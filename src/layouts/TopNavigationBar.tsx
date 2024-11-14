@@ -120,9 +120,10 @@ function TopNavigationBar({ routeName }: Props) {
               {showGoBack && (
                 <ButtonLink
                   onClick={handleGoBack}
-                  type={"link"}
+                  type={"none"}
                   sx={{
                     flexBasis: 1,
+                    p: 0,
                   }}
                 >
                   <ChevronLeftIcon sx={{ fontSize: "2rem", color: "#fff" }} />

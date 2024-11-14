@@ -23,6 +23,10 @@ export interface IParkingLocation {
   rates: IParkingRates;
 }
 
+export interface IParkingLocationWithZones extends IParkingLocation {
+  currentParkingZone?: IParkingZone;
+}
+
 export interface IParking {
   parkingLocations: IParkingLocation[];
   parkingZones: IParkingZone[];

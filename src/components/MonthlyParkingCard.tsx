@@ -27,7 +27,7 @@ import DetailedMonthlyParkingCardBody from "./DetailedMonthlyParkingCardBody";
 import { getParkingType } from "../shared/helpers/parkings";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import cardBackground from "/public/card-background.png";
+import cardBackground from "/card-background.png";
 
 type Props = ContainerProps & {
   subscriptionDetail: ISubscriptionDetail;
