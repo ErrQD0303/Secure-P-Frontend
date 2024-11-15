@@ -1,6 +1,6 @@
 import Container, { ContainerProps } from "@mui/material/Container";
 import { styled, useTheme } from "@mui/material/styles";
-import { useLoaderData, useOutletContext } from "react-router-dom";
+import { useFetcher, useLoaderData, useOutletContext } from "react-router-dom";
 import { NewSubscriptionAdditionalProps } from "./addNewSubscriptionLoader";
 import { useRenderInput } from "../hooks/useRenderInput";
 import Grid from "@mui/material/Grid2";
@@ -17,6 +17,9 @@ import {
   fetchUpdatedParkingZones,
 } from "../services/parkingService";
 import { AutocompleteChangeReason } from "@mui/material/Autocomplete";
+import dayjs, { Dayjs } from "dayjs";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
 // import React from "react";
 
 // StyledContainer with base styles
@@ -38,11 +41,17 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 // AddNewSubscription component accepts sx and merges it with default styles
 function AddNewSubscription({ sx, ...props }: ContainerProps) {
   const theme = useTheme();
-  const { formInputs, parkingLocations: defaultParkingLocations } =
-    useLoaderData() as {
-      formInputs: Array<NewSubscriptionAdditionalProps>;
-      parkingLocations: IParkingLocation[];
-    };
+  const {
+    formInputs,
+    parkingLocations: defaultParkingLocations,
+    changeSignageFee,
+    clampingFee,
+  } = useLoaderData() as {
+    formInputs: Array<NewSubscriptionAdditionalProps>;
+    parkingLocations: IParkingLocation[];
+    changeSignageFee: number;
+    clampingFee: number;
+  };
   const [parkingLocations, setParkingLocations] = React.useState<
     IParkingLocation[]
   >(defaultParkingLocations ?? []);
@@ -61,6 +70,8 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     },
     []
   );
+  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs());
+  const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs());
 
   const handleParkingLocationHightLightChange = React.useCallback(
     async (
@@ -221,6 +232,179 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     }
   }
 
+  const handleFromTimeChange = React.useCallback((date: Dayjs | null) => {
+    setStartDate(date);
+  }, []);
+
+  const handleToTimeChange = React.useCallback((date: Dayjs | null) => {
+    setEndDate(date);
+  }, []);
+
+  const dateRangeGridBox = React.useMemo(() => {
+    return formInputs.find((input) => input.name === "duration");
+  }, [formInputs]);
+  if (dateRangeGridBox) {
+    if (dateRangeGridBox.fromDateProps) {
+      dateRangeGridBox.fromDateProps.value = startDate;
+      dateRangeGridBox.fromDateProps.onChange = handleFromTimeChange;
+    }
+    if (dateRangeGridBox.toDateProps) {
+      dateRangeGridBox.toDateProps.value = endDate;
+      dateRangeGridBox.toDateProps.onChange = handleToTimeChange;
+    }
+  }
+  const [haveChangeSignage, setHaveChangeSignage] =
+    React.useState<boolean>(true);
+  const [haveClamping, setHaveClamping] = React.useState<boolean>(true);
+
+  const otherChargeGrid = React.useMemo(() => {
+    return formInputs.find((input) => input.name === "other-charge");
+  }, [formInputs]);
+
+  const handleChangeSignageFee = React.useCallback(() => {
+    setHaveChangeSignage((prev) => !prev);
+  }, []);
+
+  const handleChangeClampingFee = React.useCallback(() => {
+    setHaveClamping((prev) => !prev);
+  }, []);
+
+  if (otherChargeGrid) {
+    const changeSignageCheckbox = otherChargeGrid.values?.find(
+      (oc) => oc.name === "changeSignageFee"
+    );
+    if (changeSignageCheckbox) {
+      changeSignageCheckbox.value = haveChangeSignage;
+      changeSignageCheckbox.onChange = handleChangeSignageFee;
+    }
+    const clampingCheckbox = otherChargeGrid.values?.find(
+      (oc) => oc.name === "clampingFee"
+    );
+    if (clampingCheckbox) {
+      clampingCheckbox.value = haveClamping;
+      clampingCheckbox.onChange = handleChangeClampingFee;
+    }
+  }
+
+  const { totalFee, subscriptionFee } = React.useMemo(() => {
+    let subscriptionFee = 0;
+    if (
+      !currentParkingLocationWithZone ||
+      !currentParkingLocationWithZone.currentParkingZone ||
+      !endDate ||
+      !startDate
+    ) {
+      return {
+        totalFee: 0,
+        subscriptionFee,
+      };
+    }
+    let totalFee = 0;
+    if (haveChangeSignage) totalFee += changeSignageFee;
+    if (haveClamping) totalFee += clampingFee;
+    const daysDiff = endDate.diff(startDate) / (24 * 60 * 60 * 1000);
+    if (daysDiff < 1) {
+      subscriptionFee =
+        currentParkingLocationWithZone.rates.hourly * Math.ceil(daysDiff * 24);
+    } else if (daysDiff < 30) {
+      subscriptionFee =
+        currentParkingLocationWithZone.rates.daily * Math.ceil(daysDiff);
+    } else
+      subscriptionFee =
+        currentParkingLocationWithZone.rates.monthly * Math.ceil(daysDiff / 30);
+    totalFee += subscriptionFee;
+    return { totalFee, subscriptionFee };
+  }, [
+    changeSignageFee,
+    clampingFee,
+    currentParkingLocationWithZone,
+    endDate,
+    haveChangeSignage,
+    haveClamping,
+    startDate,
+  ]);
+
+  const outputFeeData = React.useMemo(
+    () => [
+      {
+        name: "Subscription Fee",
+        type: "box",
+        parentElementProps: {
+          direction: "row",
+          sx: {
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          },
+        },
+        value: <Box className="Mui-Fee-Box">{`$${subscriptionFee}`}</Box>,
+      },
+      {
+        name: "Clamping Fee",
+        type: "box",
+        parentElementProps: {
+          direction: "row",
+          sx: {
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          },
+        },
+        value: <Box className="Mui-Fee-Box">{`$${clampingFee}`}</Box>,
+      },
+      {
+        name: "Change Signage Fee",
+        type: "box",
+        parentElementProps: {
+          direction: "row",
+          sx: {
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          },
+        },
+        value: <Box className="Mui-Fee-Box">{`$${changeSignageFee}`}</Box>,
+      },
+      {
+        name: "Total Amount",
+        type: "box",
+        parentElementProps: {
+          direction: "row",
+          sx: {
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          },
+        },
+        value: (
+          <Stack
+            direction={"row"}
+            sx={{
+              alignItems: "end",
+              justifyContent: "end",
+            }}
+          >
+            <Box component={"span"} className="Mui-DollarSign-Box">
+              $
+            </Box>
+            <Box className="Mui-TotalFee-Box">{`${totalFee}`}</Box>
+          </Stack>
+        ),
+      },
+    ],
+    [subscriptionFee, clampingFee, changeSignageFee, totalFee]
+  );
+
+  const feeDataGridBox = React.useMemo(() => {
+    return formInputs.find((input) => input.name === "fee-data");
+  }, [formInputs]);
+
+  if (feeDataGridBox) {
+    feeDataGridBox.values = outputFeeData;
+  }
+
+  const fetcher = useFetcher();
+
   const { renderInput } = useRenderInput();
   const { routeName } = useOutletContext() as { routeName: string };
   return (
@@ -230,36 +414,68 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
       }}
       {...props}
     >
-      <Box
-        component={"img"}
-        src={addNewSubscriptionImage}
-        aria-label="Header Image"
+      <Paper
         sx={{
+          border: 0,
+          boxShadow: 0,
           [theme.breakpoints.up("md")]: {
-            display: "none",
+            border: "1px solid #D8E0ED",
+            boxShadow: "0px 4px 4px 0px #B8C5D033",
+            bgcolor: "#FFFFFF",
           },
         }}
-      />
-      <Grid
-        container
-        sx={{
-          width: "100%",
-        }}
-        columns={{
-          base: 12,
-        }}
-        rowGap={2.25}
       >
-        {formInputs.map((input) =>
-          renderInput({
-            input,
-            routeName,
-            wrapper: (children: React.ReactNode, props) => (
-              <Grid {...props}>{children}</Grid>
-            ),
-          })
-        )}
-      </Grid>
+        <Container
+          sx={{
+            p: 0,
+            [theme.breakpoints.up("md")]: {
+              p: 6,
+            },
+          }}
+        >
+          <Stack
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Box
+              component={"img"}
+              src={addNewSubscriptionImage}
+              aria-label="Header Image"
+              sx={{
+                [theme.breakpoints.up("md")]: {
+                  display: "none",
+                },
+              }}
+            />
+          </Stack>
+          <fetcher.Form method="POST">
+            <Grid
+              container
+              sx={{
+                width: "100%",
+              }}
+              columns={{
+                base: 12,
+              }}
+              rowGap={{
+                base: 3,
+              }}
+            >
+              {formInputs.map((input) =>
+                renderInput({
+                  input,
+                  routeName,
+                  wrapper: (children: React.ReactNode, props) => (
+                    <Grid {...props}>{children}</Grid>
+                  ),
+                })
+              )}
+            </Grid>
+          </fetcher.Form>
+        </Container>
+      </Paper>
     </StyledContainer>
   );
 }

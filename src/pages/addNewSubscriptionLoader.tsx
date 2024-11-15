@@ -4,7 +4,7 @@ import { FormControlProps } from "@mui/material/FormControl";
 import { SelectProps } from "@mui/material/Select";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import { FAKE_PARKING_LOCATIONS } from "../shared/constants/fakeParkingLocation";
-import { CheckboxProps } from "@mui/material/Checkbox";
+import Checkbox, { CheckboxProps } from "@mui/material/Checkbox";
 import { MenuProps } from "@mui/material/Menu";
 import { AutocompleteProps } from "@mui/material/Autocomplete";
 import { IParkingLocation, IParkingZone } from "../types/parking";
@@ -13,6 +13,12 @@ import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
 import ListItem, { ListItemProps } from "@mui/material/ListItem";
+import { DateTimePickerProps } from "@mui/x-date-pickers/DateTimePicker/DateTimePicker.types";
+import { Dayjs } from "dayjs";
+import { BoxProps } from "@mui/material/Box";
+import { ButtonProps, Paper, PaperProps, StackProps } from "@mui/material";
+import EastIcon from "@mui/icons-material/East";
+import theme from "../styles/theme";
 export type NewSubscriptionAdditionalProps = {
   label?: string;
   name?: string;
@@ -36,6 +42,17 @@ export type NewSubscriptionAdditionalProps = {
   icon?: JSX.Element;
   resetStateKey?: boolean;
   isShown?: boolean;
+  fromDateProps?: DateTimePickerProps<Dayjs, boolean>;
+  toDateProps?: DateTimePickerProps<Dayjs, boolean>;
+  timeRangeIconProps?: BoxProps;
+  dateTimeRangeProps?: unknown;
+  fromDateGridProps?: Grid2Props;
+  timeRangeGridProps?: Grid2Props;
+  toDateGridProps?: Grid2Props;
+  checkBoxProps?: CheckboxProps;
+  control?: JSX.Element;
+  buttonType?: "submit" | "reset" | "button";
+  buttonElementProps?: ButtonProps;
   wrapper?: (children: React.ReactNode, props: Grid2Props) => JSX.Element;
 };
 
@@ -71,6 +88,7 @@ const loader = async () => {
         name: "product-type",
         defaultValue: "",
         displayEmpty: true,
+        required: true,
         renderValue: (selected: string) => {
           if (!selected || selected?.length === 0 || selected === "") {
             return <em>--- Choose Products ---</em>;
@@ -112,7 +130,7 @@ const loader = async () => {
         },
       },
       autoCompleteProps: {
-        options: FAKE_PARKING_LOCATIONS,
+        options: [],
         freeSolo: true,
         autoComplete: true,
         disablePortal: false,
@@ -126,7 +144,7 @@ const loader = async () => {
         getOptionKey: (option: IParkingLocation) => option.id,
         getOptionLabel: (option: IParkingLocation) => option.name,
         renderInput: (params) => (
-          <TextField {...params} label="Choose an option" />
+          <TextField {...params} label="Choose an option" required />
         ),
       } as AutocompleteProps<
         IParkingLocation | IParkingZone,
@@ -168,7 +186,7 @@ const loader = async () => {
         getOptionKey: (option: IParkingLocation) => option.id,
         getOptionLabel: (option: IParkingLocation) => option.name,
         renderInput: (params) => (
-          <TextField {...params} label="Choose an option" />
+          <TextField {...params} label="Choose an option" required />
         ),
       } as AutocompleteProps<
         IParkingLocation | IParkingZone,
@@ -307,6 +325,7 @@ const loader = async () => {
           p: 0,
           "& .MuiListItemIcon-root": {
             minWidth: "auto",
+            mr: "0.5rem",
           },
         },
       },
@@ -319,33 +338,224 @@ const loader = async () => {
       name: "duration",
       type: "date-time-range",
       placeholder: "Choose a date",
+      label: "Duration",
+      icon: <EastIcon />,
+      size: { base: 12, lg: 9 },
+      labelProps: {
+        sx: {
+          fontWeight: 600,
+          fontSize: "1rem",
+          lineHeight: "1.5rem",
+          alignSelf: "start",
+        },
+      },
+      parentElementProps: {
+        sx: {
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        gap: { base: 1 },
+      } as StackProps,
+      dateTimeRangeProps: {
+        columns: {
+          base: 11,
+          lg: 18,
+        },
+        direction: "row",
+        sx: {
+          width: "100%",
+        },
+      },
+      fromDateGridProps: {
+        size: {
+          base: 5,
+          lg: 8,
+        },
+      },
+      timeRangeGridProps: {
+        size: {
+          base: 1,
+          lg: 2,
+        },
+        offset: {
+          base: 0,
+        },
+        sx: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      },
+      toDateGridProps: {
+        size: {
+          base: 5,
+          lg: 8,
+        },
+        offset: {
+          base: 0,
+        },
+      },
+      fromDateProps: {
+        name: "startDate",
+        disablePast: true,
+        label: "Start",
+        format: "DD/MM/YYYY HH:mm",
+        sx: {
+          width: "100%",
+        },
+      },
+      toDateProps: {
+        name: "endDate",
+        disablePast: true,
+        label: "End",
+        format: "DD/MM/YYYY HH:mm",
+        sx: {
+          width: "100%",
+        },
+      },
+      timeRangeIconProps: {
+        sx: {
+          fontSize: "1.5rem",
+          color: "#3D4B56",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      },
       sx: {},
     },
     {
       name: "other-charge",
-      type: "box",
-      placeholder: "Other Charge",
-      sx: {},
+      type: "form-group",
+      label: "Other Charge",
+      size: { base: 12, lg: 9 },
+      labelProps: {
+        sx: {
+          fontWeight: 600,
+          fontSize: "1rem",
+          lineHeight: "1.5rem",
+          alignSelf: "start",
+        },
+      },
+      parentElementProps: {
+        sx: {
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+        },
+        gap: { base: 1 },
+      } as StackProps,
+      sx: {
+        fontSize: "0.75rem",
+        lineHeight: "1.125rem",
+        display: "flex",
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        [theme.breakpoints.up("lg")]: {
+          justifyContent: "flex-start",
+          gap: "9.625rem",
+        },
+      },
       values: [
         {
-          label: "Clamping Fee",
           name: "clampingFee",
           type: "checkbox",
           sx: {},
+          control: <Checkbox defaultChecked />,
+          label: "Clamping Fee",
         },
         {
-          label: "Change Signage Fee",
           name: "changeSignageFee",
           type: "checkbox",
           sx: {},
+          control: <Checkbox defaultChecked />,
+          label: "Change Signage Fee",
         },
       ] as Array<CheckboxProps & NewSubscriptionAdditionalProps>,
+    },
+    {
+      name: "fee-data",
+      type: "box",
+      size: { base: 12, lg: 9 },
+      parentElementProps: {
+        sx: {
+          alignItems: "start",
+          justifyContent: "center",
+        },
+      },
+      wrapper: (children: React.ReactNode, props) => (
+        <Paper
+          {...(props as PaperProps)}
+          sx={{
+            bgcolor: "#fff",
+            boxShadow: "0px 2px 4px 0px #0000000D",
+            p: "1rem",
+            [theme.breakpoints.up("md")]: {
+              bgcolor: "#F2F7FD",
+            },
+            "& .Mui-Fee-Box": {
+              fontSize: "0.75rem",
+              lineHeight: "1.5rem",
+              fontWeight: 500,
+            },
+            "& .MuiStack-root:has(.Mui-Fee-Box)": {
+              "&:last-child": {
+                fontWeight: 600,
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
+                "& >.Mui-Fee-Box": {
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  lineHeight: "1.5rem",
+                },
+              },
+            },
+            "& .Mui-DollarSign-Box": {
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+            },
+            "& .Mui-TotalFee-Box": {
+              fontWeight: 700,
+              fontSize: "1.5rem",
+              lineHeight: "1.875rem",
+            },
+          }}
+        >
+          {children}
+        </Paper>
+      ),
+    },
+    {
+      name: "pay-now",
+      type: "button",
+      label: "pay now",
+      size: { base: 12, lg: 9 },
+      parentElementProps: {
+        sx: {
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+        },
+      },
+      buttonElementProps: {
+        type: "submit",
+        variant: "contained",
+        sx: {
+          width: "100%",
+          maxWidth: "20.4375rem",
+        },
+      },
     },
   ];
 
   const parkingLocations = FAKE_PARKING_LOCATIONS;
+  const changeSignageFee = 10;
+  const clampingFee = 20;
 
-  return { formInputs, parkingLocations };
+  return { formInputs, parkingLocations, changeSignageFee, clampingFee };
 };
 
 export default loader;

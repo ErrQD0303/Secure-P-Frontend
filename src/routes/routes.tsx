@@ -24,6 +24,7 @@ import {
   SignUp,
   AddNewSubscription,
 } from "../LazyComponents";
+import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 
 export const routes = [
   {
@@ -69,6 +70,7 @@ export const routes = [
             name: "Add New Subscription",
             loader: addNewSubscriptionLoader,
             errorElement: <Error />,
+            action: addNewSubscriptionAction,
           },
           {
             path: ":id",

@@ -1,21 +1,28 @@
 import { useCallback } from "react";
 import { isAddNewSubscriptionPropsType } from "../shared/helpers/inputs";
-import { Grid2Props } from "@mui/material/Grid2";
+import Grid, { Grid2Props } from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Stack, { StackProps } from "@mui/material/Stack";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 import SearchIcon from "@mui/icons-material/Search";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import {
   Autocomplete,
   AutocompleteProps,
+  Box,
+  Button,
+  FormControlLabel,
+  FormControlLabelProps,
+  FormGroup,
   InputAdornment,
   ListItemIcon,
   ListItemText,
   TextField,
 } from "@mui/material";
 import { IParkingLocation } from "../types/parking";
+import React from "react";
 
 const addNewSubscriptionRenderInput = (
   input: unknown,
@@ -39,6 +46,14 @@ const addNewSubscriptionRenderInput = (
     textFieldProps,
     autoCompleteProps,
     isShown,
+    fromDateProps,
+    toDateProps,
+    timeRangeIconProps,
+    dateTimeRangeProps,
+    fromDateGridProps,
+    timeRangeGridProps,
+    toDateGridProps,
+    buttonElementProps,
     ...props
   } = input;
 
@@ -144,9 +159,12 @@ const addNewSubscriptionRenderInput = (
                           </Typography>
                         ) : (
                           values?.map(
-                            (val) =>
+                            (val, index) =>
                               addNewSubscriptionRenderInput(val, (children) => {
-                                return children as JSX.Element;
+                                return React.cloneElement(
+                                  children as JSX.Element,
+                                  { key: index }
+                                );
                               }) as JSX.Element
                           )
                         )
@@ -199,14 +217,110 @@ const addNewSubscriptionRenderInput = (
             )
           : null;
       }
+      case "date-time-range":
+        return (
+          <Stack key={name} {...(parentElementProps as StackProps)}>
+            <Typography {...(labelProps as TypographyProps)}>
+              {label}
+            </Typography>
+            <Grid container {...(dateTimeRangeProps as Grid2Props)}>
+              <Grid {...fromDateGridProps}>
+                <DateTimePicker {...fromDateProps} />
+              </Grid>
+              <Grid {...timeRangeGridProps}>
+                <Box {...timeRangeIconProps}>{props.icon ?? "-"}</Box>
+              </Grid>
+              <Grid {...toDateGridProps}>
+                <DateTimePicker {...toDateProps} />
+              </Grid>
+            </Grid>
+          </Stack>
+        );
+      case "form-group":
+        return (
+          <Stack key={name} {...(parentElementProps as StackProps)}>
+            <Typography {...(labelProps as TypographyProps)}>
+              {label}
+            </Typography>
+            <FormGroup {...props}>
+              {values?.map(
+                (val, index) =>
+                  addNewSubscriptionRenderInput(val, (children) => {
+                    return React.cloneElement(children as JSX.Element, {
+                      key: index,
+                    });
+                  }) as JSX.Element
+              )}
+            </FormGroup>
+          </Stack>
+        );
+      case "checkbox":
+        return (
+          <FormControlLabel
+            name={name}
+            {...(props as FormControlLabelProps)}
+            label={label}
+          />
+        );
+      case "button":
+        return (
+          <Stack {...(parentElementProps as StackProps)}>
+            <Button {...buttonElementProps}>{label ?? "Submit"}</Button>
+          </Stack>
+        );
       case "box":
-        return "box";
+        if (value) {
+          return props.wrapper ? (
+            props.wrapper(
+              <Stack key={name} {...(parentElementProps as StackProps)}>
+                <Box>{name}</Box>
+                <Box>{value as React.ReactNode}</Box>
+              </Stack>,
+              parentElementProps as Grid2Props
+            )
+          ) : (
+            <Stack key={name} {...(parentElementProps as StackProps)}>
+              <Box className="Mui-Fee-Box">{name}</Box>
+              <Box>{value as React.ReactNode}</Box>
+            </Stack>
+          );
+        }
+        if (values) {
+          return props.wrapper ? (
+            props.wrapper(
+              <Stack key={name} {...(parentElementProps as StackProps)}>
+                {values.map(
+                  (val, index) =>
+                    addNewSubscriptionRenderInput(val, (children) => {
+                      return React.cloneElement(children as JSX.Element, {
+                        key: index,
+                      });
+                    }) as JSX.Element
+                )}
+              </Stack>,
+              parentElementProps as Grid2Props
+            )
+          ) : (
+            <Stack key={name} {...(parentElementProps as StackProps)}>
+              {values.map(
+                (val, index) =>
+                  addNewSubscriptionRenderInput(val, (children) => {
+                    return React.cloneElement(children as JSX.Element, {
+                      key: index,
+                    });
+                  }) as JSX.Element
+              )}
+            </Stack>
+          );
+        }
+        return null;
       default:
         return null;
     }
   };
 
-  return wrapper(switchValue(), props);
+  const returnValue = switchValue();
+  return returnValue !== null ? wrapper(returnValue, props) : null;
 };
 
 export interface RenderInputParams {
