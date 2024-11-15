@@ -46,7 +46,8 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
   const [parkingLocations, setParkingLocations] = React.useState<
     IParkingLocation[]
   >(defaultParkingLocations ?? []);
-  const ref = React.useRef<HTMLDivElement | null>(null);
+  const [resetParkingZoneKey, setResetParkingZoneKey] =
+    React.useState<boolean>(true);
   const [currentParkingLocationWithZone, setCurrentParkingLocationWithZone] =
     React.useState<IParkingLocationWithZones | null>(null);
   const parkingLocationInput = React.useMemo(
@@ -82,14 +83,7 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
       if (reason !== "clear") return;
       setCurrentParkingLocationWithZone(null);
       setParkingZone([]);
-      if (ref.current) {
-        const input = ref.current.querySelector("input");
-        console.log(input);
-        if (input) {
-          input.value = "";
-          input.setAttribute("value", "");
-        }
-      }
+      setResetParkingZoneKey((prev) => !prev);
     },
     []
   );
@@ -108,16 +102,14 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
 
   const handleParkingZoneInputChange = React.useCallback(
     async (_event: React.SyntheticEvent, value: string) => {
-      const parkingLocationId = document
-        .querySelector("[name=parking-location]")
-        ?.getAttribute("value");
+      const parkingLocationId = currentParkingLocationWithZone?.id;
       const updatedParkingZone = await fetchUpdatedParkingZones(
         parkingLocationId,
         value
       );
       setParkingZone(updatedParkingZone);
     },
-    []
+    [currentParkingLocationWithZone?.id]
   );
 
   const handleParkingZoneHightLightChange = React.useCallback(
@@ -143,6 +135,7 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
       reason: AutocompleteChangeReason
     ) => {
       if (reason !== "clear") return;
+      console.log("Clearing parking zone");
       setCurrentParkingLocationWithZone((prev) => {
         if (!prev) return null;
         return {
@@ -150,21 +143,14 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
           currentParkingZone: undefined,
         };
       });
-      const parkingLocationName = document
-        .querySelector("[name=parking-location]")
-        ?.getAttribute("value");
-      const parkingLocationId = parkingLocations.find(
-        (pl) =>
-          console.log(parkingLocationName, parkingLocationName) ??
-          pl.name === parkingLocationName
-      )?.id;
+      const parkingLocationId = currentParkingLocationWithZone?.id;
       const updatedParkingZone = await fetchUpdatedParkingZones(
         parkingLocationId,
         null
       );
       setParkingZone(updatedParkingZone);
     },
-    [parkingLocations]
+    [currentParkingLocationWithZone?.id]
   );
 
   const parkingZoneInput = React.useMemo(
@@ -179,7 +165,60 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     parkingZoneInput.autoCompleteProps.onHighlightChange =
       handleParkingZoneHightLightChange;
     parkingZoneInput.autoCompleteProps.onChange = handleParkingZoneChange;
-    parkingZoneInput.ref = ref;
+    parkingZoneInput.autoCompleteProps.resetStateKey = resetParkingZoneKey;
+  }
+
+  const parkingInfoGridBox = React.useMemo(() => {
+    return formInputs.find((input) => input.name === "parking-info");
+  }, [formInputs]);
+
+  if (parkingInfoGridBox) {
+    parkingInfoGridBox.isShown = !!currentParkingLocationWithZone;
+    const parkingLocationMetaInfo = parkingInfoGridBox.values?.find(
+      (pi) => pi.name === "parking-location-meta-info"
+    );
+    if (parkingLocationMetaInfo) {
+      const parkingLocationNameText = parkingLocationMetaInfo.values?.find(
+        (plmi) => plmi.name === "parking-location-name"
+      );
+      if (parkingLocationNameText)
+        parkingLocationNameText.value =
+          currentParkingLocationWithZone?.name?.slice(0, -8);
+      const parkingLocationAddressText = parkingLocationMetaInfo.values?.find(
+        (plmi) => plmi.name === "parking-location-address"
+      );
+      if (parkingLocationAddressText)
+        parkingLocationAddressText.value =
+          currentParkingLocationWithZone?.address;
+    }
+    const parkingLocationAdditionalInfo = parkingInfoGridBox.values?.find(
+      (pi) => pi.name === "parking-location-additional-info"
+    );
+    if (parkingLocationAdditionalInfo) {
+      const parkingLocationAvailableSpacesText =
+        parkingLocationAdditionalInfo.values?.find(
+          (pi) => pi.name === "parking-location-available-spaces"
+        );
+      if (parkingLocationAvailableSpacesText) {
+        const slotText =
+          currentParkingLocationWithZone?.availableSpaces &&
+          currentParkingLocationWithZone?.availableSpaces > 1
+            ? "slots"
+            : "slot";
+        parkingLocationAvailableSpacesText.value =
+          currentParkingLocationWithZone?.availableSpaces &&
+          `${currentParkingLocationWithZone?.availableSpaces} ${slotText} available`;
+      }
+
+      const parkingZoneNameText = parkingLocationAdditionalInfo.values?.find(
+        (pi) => pi.name === "parking-zone-name"
+      );
+      if (parkingZoneNameText) {
+        parkingZoneNameText.value =
+          currentParkingLocationWithZone?.currentParkingZone?.name &&
+          `Parking Zone ${currentParkingLocationWithZone?.currentParkingZone?.name}`;
+      }
+    }
   }
 
   const { renderInput } = useRenderInput();
@@ -209,6 +248,7 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
         columns={{
           base: 12,
         }}
+        rowGap={2.25}
       >
         {formInputs.map((input) =>
           renderInput({

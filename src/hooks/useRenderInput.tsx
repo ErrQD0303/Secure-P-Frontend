@@ -11,6 +11,8 @@ import {
   Autocomplete,
   AutocompleteProps,
   InputAdornment,
+  ListItemIcon,
+  ListItemText,
   TextField,
 } from "@mui/material";
 import { IParkingLocation } from "../types/parking";
@@ -36,7 +38,7 @@ const addNewSubscriptionRenderInput = (
     parentElementProps,
     textFieldProps,
     autoCompleteProps,
-    ref,
+    isShown,
     ...props
   } = input;
 
@@ -69,6 +71,9 @@ const addNewSubscriptionRenderInput = (
               {label}
             </Typography>
             <Autocomplete
+              key={
+                autoCompleteProps?.resetStateKey as React.Key | null | undefined
+              }
               {...(autoCompleteProps as AutocompleteProps<
                 IParkingLocation,
                 boolean | undefined,
@@ -80,7 +85,6 @@ const addNewSubscriptionRenderInput = (
                   {...params}
                   name={name}
                   placeholder={placeholder}
-                  ref={ref}
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (
@@ -102,6 +106,99 @@ const addNewSubscriptionRenderInput = (
             {label}
           </MenuItem>
         );
+      case "list":
+        if (!isShown) return null;
+        return (
+          <Stack key={name} {...(parentElementProps as StackProps)}>
+            <Typography {...(labelProps as TypographyProps)}>
+              {label}
+            </Typography>
+            {props.wrapper
+              ? props.wrapper(
+                  values?.map(
+                    (val) =>
+                      addNewSubscriptionRenderInput(val, (children) => {
+                        return children as JSX.Element;
+                      }) as JSX.Element
+                  ),
+                  props as Grid2Props
+                )
+              : null}
+          </Stack>
+        );
+      case "list-item":
+        return props.wrapper
+          ? props.wrapper(
+              <>
+                {(value ||
+                  (values && values.filter((val) => val.value).length > 0)) && (
+                  <>
+                    {props.icon && <ListItemIcon>{props.icon}</ListItemIcon>}
+                    <ListItemText
+                      primary={
+                        value ? (
+                          <Typography
+                            {...(parentElementProps as TypographyProps)}
+                          >
+                            {value as string}
+                          </Typography>
+                        ) : (
+                          values?.map(
+                            (val) =>
+                              addNewSubscriptionRenderInput(val, (children) => {
+                                return children as JSX.Element;
+                              }) as JSX.Element
+                          )
+                        )
+                      }
+                    />
+                  </>
+                )}
+              </>,
+              parentElementProps as Grid2Props
+            )
+          : null;
+      case "list-item-text":
+        return (value as string) ? (
+          <Typography key={name} {...(parentElementProps as TypographyProps)}>
+            {value as string}
+          </Typography>
+        ) : null;
+      case "list-item-box": {
+        return props.wrapper
+          ? props.wrapper(
+              <>
+                {(value ||
+                  (values && values.filter((val) => val.value).length > 0)) && (
+                  <>
+                    {props.icon && (value || values) && (
+                      <ListItemIcon>{props.icon}</ListItemIcon>
+                    )}
+                    <ListItemText
+                      primary={
+                        (value as string) ? (
+                          <Typography
+                            {...(parentElementProps as TypographyProps)}
+                          >
+                            {value as string}
+                          </Typography>
+                        ) : (
+                          values?.map(
+                            (val) =>
+                              addNewSubscriptionRenderInput(val, (children) => {
+                                return children as JSX.Element;
+                              }) as JSX.Element
+                          )
+                        )
+                      }
+                    />
+                  </>
+                )}
+              </>,
+              parentElementProps as Grid2Props
+            )
+          : null;
+      }
       case "box":
         return "box";
       default:

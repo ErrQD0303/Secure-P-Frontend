@@ -1,16 +1,18 @@
 import { Grid2Props } from "@mui/material/Grid2";
 import { IProductType } from "../types/enum";
-import SearchIcon from "@mui/icons-material/Search";
 import { FormControlProps } from "@mui/material/FormControl";
 import { SelectProps } from "@mui/material/Select";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
 import { FAKE_PARKING_LOCATIONS } from "../shared/constants/fakeParkingLocation";
 import { CheckboxProps } from "@mui/material/Checkbox";
 import { MenuProps } from "@mui/material/Menu";
 import { AutocompleteProps } from "@mui/material/Autocomplete";
 import { IParkingLocation, IParkingZone } from "../types/parking";
+import PlaceIcon from "@mui/icons-material/Place";
+import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
+import Grid from "@mui/material/Grid2";
 import List from "@mui/material/List";
+import ListItem, { ListItemProps } from "@mui/material/ListItem";
 export type NewSubscriptionAdditionalProps = {
   label?: string;
   name?: string;
@@ -29,10 +31,12 @@ export type NewSubscriptionAdditionalProps = {
     boolean | undefined,
     boolean | undefined,
     boolean | undefined
-  >;
+  > & { resetStateKey?: boolean };
   onChange?: () => void;
   icon?: JSX.Element;
-  ref?: React.MutableRefObject<HTMLDivElement | null>;
+  resetStateKey?: boolean;
+  isShown?: boolean;
+  wrapper?: (children: React.ReactNode, props: Grid2Props) => JSX.Element;
 };
 
 const loader = async () => {
@@ -56,7 +60,7 @@ const loader = async () => {
       },
       sx: {},
       parentElementProps: {
-        gap: "1rem",
+        gap: { base: 1 },
       },
       formControlProps: {
         sx: { width: "100%" },
@@ -75,11 +79,11 @@ const loader = async () => {
           return selected;
         },
         inputProps: { "aria-label": "Without label" },
-        startAdornment: (
+        /* startAdornment: (
           <InputAdornment position="start" sx={{ color: "#3D4B56" }}>
             <SearchIcon />
           </InputAdornment>
-        ),
+        ), */
       } as SelectProps,
       labelProps: {
         sx: {
@@ -97,7 +101,9 @@ const loader = async () => {
       offset: { base: 0 },
       size: { base: 12, lg: 4 },
       sx: {},
-      parentElementProps: {},
+      parentElementProps: {
+        gap: { base: 1 },
+      },
       labelProps: {
         sx: {
           fontWeight: 600,
@@ -107,6 +113,7 @@ const loader = async () => {
       },
       autoCompleteProps: {
         options: FAKE_PARKING_LOCATIONS,
+        freeSolo: true,
         autoComplete: true,
         disablePortal: false,
         noOptionsText: "Type another location",
@@ -136,7 +143,9 @@ const loader = async () => {
       size: { base: 12, lg: 4 },
       offset: { base: 0, lg: 1 },
       sx: {},
-      parentElementProps: {},
+      parentElementProps: {
+        gap: { base: 1 },
+      },
       labelProps: {
         sx: {
           fontWeight: 600,
@@ -146,6 +155,7 @@ const loader = async () => {
       },
       autoCompleteProps: {
         options: FAKE_PARKING_LOCATIONS,
+        freeSolo: true,
         autoComplete: true,
         disablePortal: false,
         noOptionsText: "Please choose the parking location first",
@@ -169,15 +179,141 @@ const loader = async () => {
     },
     {
       name: "parking-info",
+      label: "Parking Info",
       type: "list",
       offset: { base: 0 },
-      values: [],
-      size: { base: 12, lg: 9 },
-      sx: {},
-      parentElementProps: {
-        gap: "1rem",
+      labelProps: {
+        sx: {
+          fontWeight: 600,
+          fontSize: "1rem",
+          lineHeight: "1.5rem",
+        },
       },
       component: List,
+      container: true,
+      // gap: "1rem",
+      columns: {
+        base: 12,
+      },
+      values: [
+        {
+          type: "list-item",
+          name: "parking-location-meta-info",
+          icon: <PlaceIcon />,
+          parentElementProps: {
+            component: ListItem,
+            size: {
+              base: 12,
+              lg: 5,
+            },
+            offset: { base: 0 },
+            sx: {
+              alignItems: "start",
+              justifyContent: "center",
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              fontWeight: 400,
+            },
+          },
+          values: [
+            {
+              type: "list-item-text",
+              name: "parking-location-name",
+              parentElementProps: {
+                sx: {
+                  color: "#3D4B56",
+                  fontSize: "0.75rem",
+                  lineHeight: "1.125rem",
+                  fontWeight: 600,
+                },
+              },
+            },
+            {
+              type: "list-item-text",
+              name: "parking-location-address",
+              parentElementProps: {
+                sx: {
+                  color: "#3D4B56",
+                  fontSize: "0.75rem",
+                  lineHeight: "1.125rem",
+                  fontWeight: 400,
+                },
+              },
+            },
+          ],
+          wrapper: (children: React.ReactNode, props) => (
+            <Grid {...props}>{children}</Grid>
+          ),
+        },
+        {
+          type: "list-item",
+          name: "parking-location-additional-info",
+          parentElementProps: {
+            size: {
+              base: 12,
+              lg: 5,
+            },
+            offset: { base: 0, lg: 2 },
+            sx: {
+              fontSize: "0.75rem",
+              lineHeight: "1.125rem",
+              fontWeight: 600,
+              color: "#3D4B56",
+            },
+          },
+          values: [
+            {
+              type: "list-item-box",
+              name: "parking-location-available-spaces",
+              icon: <DirectionsCarFilledIcon />,
+              parentElementProps: {
+                sx: {
+                  fontSize: "0.75rem",
+                  lineHeight: "1.125rem",
+                  fontWeight: 600,
+                  color: "#3D4B56",
+                },
+              },
+              wrapper: (children: React.ReactNode, props: ListItemProps) => (
+                <ListItem {...{ props }}>{children}</ListItem>
+              ),
+            },
+            {
+              type: "list-item-box",
+              name: "parking-zone-name",
+              icon: <DirectionsCarFilledIcon />,
+              parentElementProps: {
+                sx: {
+                  fontSize: "0.75rem",
+                  lineHeight: "1.125rem",
+                  fontWeight: 600,
+                  color: "#3D4B56",
+                  mt: "0.3rem",
+                },
+              },
+              wrapper: (children: React.ReactNode, props: ListItemProps) => (
+                <ListItem {...{ props }}>{children}</ListItem>
+              ),
+            },
+          ] as Array<Grid2Props & NewSubscriptionAdditionalProps>,
+          wrapper: (children: React.ReactNode, props) => (
+            <Grid {...props}>{children}</Grid>
+          ),
+        },
+      ] as Array<Grid2Props & NewSubscriptionAdditionalProps>,
+      size: { base: 12, lg: 9 },
+      sx: {
+        "& .MuiListItem-root": {
+          p: 0,
+          "& .MuiListItemIcon-root": {
+            minWidth: "auto",
+          },
+        },
+      },
+      parentElementProps: {},
+      wrapper: (children: React.ReactNode, props) => (
+        <Grid {...props}>{children}</Grid>
+      ),
     },
     {
       name: "duration",
