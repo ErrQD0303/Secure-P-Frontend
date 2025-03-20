@@ -5,6 +5,8 @@ export interface IParkingZone {
   name: string;
   subscriptions: ISubscription[];
   parkingLocationId: string;
+  capacity?: number;
+  availableSpaces?: number;
 }
 
 // ../types/parking.d.ts
