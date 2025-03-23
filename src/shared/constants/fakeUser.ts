@@ -12,7 +12,7 @@ export const FAKE_USER: IUser = {
   postCode: "700000",
   addressLine1: "123 Đường ABC",
   addressLine2: "",
-  licensePlateNumber: "51A-12345",
+  licensePlateNumber: ["51A-12345"],
 };
 
 export const FAKER_USER_PASSWORD = "Admin@123";

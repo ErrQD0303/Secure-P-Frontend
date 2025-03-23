@@ -16,21 +16,22 @@ import Loader from "../components/Loader";
 import OTP from "./OTP";
 import { SimplePaletteColor } from "@mui/material/styles";
 import logoPng from "/logo.png";
+import { ILoginError } from "../services/userService";
 
 function Login() {
   const theme = useTheme();
   const fetcher = useFetcher();
   const [response, setResponse] = React.useState<{
-    status: number;
+    statusCode: number;
     message: string;
-    error?: { credentials: string };
-    loginData?: { phone: string };
+    errors: ILoginError;
+    loginData?: { email: string };
   } | null>(null);
 
   const showSpinner =
     fetcher.state === "loading" || fetcher.state === "submitting";
 
-  const showOtpPage = response?.status.toString() === "200";
+  const showOtpPage = response?.statusCode.toString() === "200";
 
   const [pageText, showWelcomeText] = React.useMemo(
     () =>
@@ -41,10 +42,11 @@ function Login() {
   );
   const formFields = [
     {
-      name: "phone",
-      type: "phone",
-      label: "Phone number",
+      name: "email",
+      type: "email",
+      label: "Email",
       required: true,
+      registerError: response?.errors?.email,
       slotProps: {
         input: {
           /* sx: {
@@ -74,6 +76,7 @@ function Login() {
       name: "password",
       type: "password",
       label: "Password",
+      registerError: response?.errors?.password,
       required: true,
       slotProps: {
         input: {
@@ -120,7 +123,7 @@ function Login() {
         >
           {!showOtpPage ? (
             <>
-              {response?.error && (
+              {response?.errors && (
                 <Grid
                   size={{
                     base: 1,
@@ -142,7 +145,7 @@ function Login() {
                       lineHeight: "1.5rem",
                     }}
                   >
-                    {response?.error.credentials}
+                    {response?.errors.summary}
                   </Typography>
                 </Grid>
               )}
@@ -158,6 +161,8 @@ function Login() {
                     id={field.name}
                     variant="outlined"
                     placeholder={field.label}
+                    error={Boolean(field.registerError)}
+                    helperText={field?.registerError}
                     {...field}
                   />
                 </Grid>

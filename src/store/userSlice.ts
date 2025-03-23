@@ -16,7 +16,7 @@ const initialState: IUser = {
   addressLine1: "",
   addressLine2: "",
   postCode: "",
-  licensePlateNumber: "",
+  licensePlateNumber: [],
 };
 
 const userSlice = createSlice({

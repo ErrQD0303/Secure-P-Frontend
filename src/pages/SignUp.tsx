@@ -71,7 +71,7 @@ function SignUp() {
       ],
     },
     {
-      name: "name",
+      name: "fullName",
       type: "text",
       label: "Your name",
       required: true,
@@ -125,7 +125,7 @@ function SignUp() {
       },
     },
     {
-      name: "phone",
+      name: "phoneNumber",
       type: "phone",
       label: "Phone number",
       required: true,

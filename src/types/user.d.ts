@@ -14,7 +14,11 @@ export interface IUser {
   addressLine1: string;
   addressLine2: string;
   postCode: string;
-  licensePlateNumber: string;
+  licensePlateNumber: string[];
+}
+
+export interface IRegisterUser extends Omit<IUser, "id"> {
+  password: string;
 }
 
 export interface IPersonalInfo {

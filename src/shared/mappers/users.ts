@@ -2,7 +2,7 @@ import { IBillingAddress, IPersonalInfo, IUser } from "../../types/user";
 
 export const toPersonalInfo = (user: IUser): IPersonalInfo => ({
   id: user.id,
-  username: user.username,
+  userName: user.username,
   email: user.email,
   mobileNumber: user.mobileNumber,
   dayOfBirth: user.dayOfBirth,
@@ -16,5 +16,5 @@ export const toBillingAddress = (user: IUser): IBillingAddress => ({
   addressLine1: user.addressLine1,
   addressLine2: user.addressLine2,
   postCode: user.postCode,
-  licensePlateNumber: user.licensePlateNumber,
+  licensePlateNumber: user.licensePlateNumber[0],
 });

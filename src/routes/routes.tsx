@@ -10,6 +10,7 @@ import loginAction from "../pages/loginAction";
 import updateProfilePersonalInfoAction from "../pages/updateProfilePersonalInfoAction";
 import updateProfilePasswordAction from "../pages/updatePasswordAction";
 import addNewSubscriptionLoader from "../pages/addNewSubscriptionLoader";
+import signUpAction from "../pages/signUpAction";
 import {
   AppLayout,
   Error,
@@ -116,6 +117,7 @@ export const routes = [
     path: "/signup",
     name: "Sign Up",
     element: <SignUp />,
+    action: signUpAction,
   },
 ];
 

@@ -1,74 +1,119 @@
 import { ActionFunctionArgs } from "react-router-dom";
+import { login, otpLogin } from "../services/userService";
 
-const FAKE_LOGIN_CLAMP = {
-  phone: "0339482105",
+/* const FAKE_LOGIN_CLAMP = {
+  email: "datvipcrvn@gmail.com",
   password: "123456",
   otp: "123456",
-};
+}; */
 
 export default async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const { type } = Object.fromEntries(formData) as unknown as {
     type: string;
   };
+
   if (type === "login")
     return await loginAction(
       Object.fromEntries(formData) as {
-        phone: string;
+        email: string;
         password: string;
       }
     );
+
   if (type === "otp")
     return await otpLoginAction(
-      Object.fromEntries(formData) as { otp: string }
+      Object.fromEntries(formData) as { otp: string | number; email: string }
     );
 
   return {
-    status: 401,
+    statusCode: 400,
     message: "Login failed",
-    error: {
-      credentials: "Invalid Login Type",
+    errors: {
+      summary: "Invalid Login Type",
     },
   };
 }
 
-const loginAction = async (data: { phone: string; password: string }) => {
-  if (
-    data.phone === FAKE_LOGIN_CLAMP.phone &&
-    data.password === FAKE_LOGIN_CLAMP.password
-  )
-    return {
-      status: 200,
-      message: "Credentials check successful",
-      loginData: { phone: data.phone },
-    };
-
-  return {
-    status: 401,
-    message: "Login failed",
-    error: {
-      credentials: "Invalid phone number or password",
-    },
-  };
-};
-
-const otpLoginAction = async (data: { otp: string | number }) => {
-  await new Promise(
-    (resolve, reject) =>
-      console.dir(resolve) ?? console.dir(reject) ?? setTimeout(resolve, 1500)
+const loginAction = async (data: { email: string; password: string }) => {
+  const loginResult = await login(
+    data.email,
+    undefined,
+    undefined,
+    data.password
   );
-  if (data.otp.toString() === FAKE_LOGIN_CLAMP.otp) {
+  console.log(loginResult);
+
+  if (!loginResult) {
     return {
-      status: 200,
-      message: "OTP check successful",
+      statusCode: 401,
+      message: "Login failed",
+      errors: {
+        summary: "Invalid email or password",
+      },
+    };
+  }
+
+  if (typeof loginResult === "object" && loginResult !== null) {
+    return {
+      statusCode: loginResult.statusCode,
+      message: loginResult.message,
+      errors: loginResult.errors,
+      loginData: loginResult.user,
     };
   }
 
   return {
-    status: 401,
-    message: "Login failed",
-    error: {
-      credentials: "Invalid OTP",
+    statusCode: 500,
+    message: "Unexpected login result",
+    errors: {
+      summary: "An unexpected error occurred",
+    },
+  };
+};
+
+const otpLoginAction = async (data: {
+  otp: string | number;
+  email: string;
+}) => {
+  // await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  if (!data.email) {
+    return {
+      statusCode: 400,
+      message: "Login failed",
+      errors: {
+        summary: "Email cookie is missing",
+      },
+    };
+  }
+
+  const loginResult = await otpLogin(data);
+
+  if (!loginResult) {
+    return {
+      statusCode: 401,
+      message: "Login failed",
+      errors: {
+        summary: "Invalid email or password",
+      },
+    };
+  }
+
+  if (typeof loginResult === "object" && loginResult !== null) {
+    return {
+      statusCode: loginResult.statusCode,
+      message: loginResult.message,
+      errors: loginResult.errors,
+      user: loginResult.user,
+    };
+  }
+
+  return {
+    statusCode: 500,
+    message: "Unexpected login result",
+    errors: {
+      summary: "An unexpected error occurred",
     },
   };
 };

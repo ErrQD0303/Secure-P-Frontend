@@ -9,6 +9,7 @@ import store from "./store/store.ts";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/vi";
+import { CookiesProvider } from "react-cookie";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -16,7 +17,9 @@ createRoot(document.getElementById("root")!).render(
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Provider store={store}>
-          <App />
+          <CookiesProvider>
+            <App />
+          </CookiesProvider>
         </Provider>
       </ThemeProvider>
     </LocalizationProvider>

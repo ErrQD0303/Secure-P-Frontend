@@ -24,9 +24,12 @@ import Loader from "../components/Loader";
 function Profiles() {
   const theme = useTheme();
   const fetcher = useFetcher();
-  const { username, mobileNumber, dayOfBirth, email } = useSelector(
-    getProfilesPersonalInfo
-  );
+  const {
+    userName: username,
+    mobileNumber,
+    dayOfBirth,
+    email,
+  } = useSelector(getProfilesPersonalInfo);
   const { routeName } = useOutletContext() as { routeName: string };
   const { viewWidth } = useViewPort();
 

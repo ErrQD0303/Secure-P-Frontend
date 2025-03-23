@@ -7,31 +7,48 @@ import React from "react";
 import { useFetcher, useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import Button from "@mui/material/Button";
+import { useCookies } from "react-cookie";
+import CookieName from "../shared/constants/cookieName";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
+import { setUser } from "../store/userSlice";
 
 type Props = StackProps & {
-  data?: { phone: string };
+  data?: { email: string };
 };
 
 export default function OTP({ data, ...props }: Props) {
   const [value, setValue] = React.useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+
   const handleChange = React.useCallback((newValue: string) => {
     setValue(newValue);
   }, []);
+
   const theme = useTheme();
+  const [cookies] = useCookies(["SecureP-OTP-Email"]);
   const [response, setResponse] = React.useState<{
-    status: number;
+    statusCode: number;
     message: string;
-    error?: { credentials: string };
+    error?: { summary: string };
   } | null>(null);
 
   const fetcher = useFetcher();
   const showLoader =
     fetcher.state === "loading" || fetcher.state === "submitting";
+
   const handleComplete = React.useCallback(
     (newValue: string) => {
-      fetcher.submit({ type: "otp", otp: newValue }, { method: "post" });
+      fetcher.submit(
+        {
+          type: "otp",
+          otp: newValue,
+          email: cookies[CookieName.TEMPORARY_EMAIL],
+        },
+        { method: "post" }
+      );
     },
-    [fetcher]
+    [cookies, fetcher]
   );
   const validateChar = React.useCallback(
     (/* _character: string, _index: number */) => true,
@@ -41,13 +58,16 @@ export default function OTP({ data, ...props }: Props) {
 
   React.useEffect(() => {
     if (fetcher.data) {
-      if (fetcher.data.status === 200) {
+      if (fetcher.data.statusCode === 200) {
+        if (fetcher.data.user) {
+          dispatch(setUser(fetcher.data.user));
+        }
         navigate("/");
         return;
       }
       setResponse(fetcher.data);
     }
-  }, [fetcher.data, navigate]);
+  }, [dispatch, fetcher.data, navigate]);
   return (
     <Stack
       {...props}
@@ -79,6 +99,28 @@ export default function OTP({ data, ...props }: Props) {
           },
         }}
       >
+        {response?.error && (
+          <Box
+            sx={{
+              mt: "0.4rem",
+              p: "1rem 2rem",
+              bgcolor: (theme.palette.warning as SimplePaletteColor).bgcolor,
+              borderRadius: "0.25rem",
+              borderColor: (theme.palette.warning as SimplePaletteColor)
+                .borderColor,
+            }}
+          >
+            <Typography
+              sx={{
+                color: (theme.palette.warning as SimplePaletteColor).color,
+                fontSize: "1rem",
+                lineHeight: "1.5rem",
+              }}
+            >
+              {response?.error.summary}
+            </Typography>
+          </Box>
+        )}
         <Box component={"span"}>Please type the code we sent to</Box>
         <Box
           component={"span"}
@@ -89,7 +131,7 @@ export default function OTP({ data, ...props }: Props) {
             fontWeight: 600,
           }}
         >
-          +{data?.phone}
+          {data?.email}
         </Box>
       </Typography>
       {response?.error && (
@@ -110,7 +152,7 @@ export default function OTP({ data, ...props }: Props) {
               lineHeight: "1.5rem",
             }}
           >
-            {response?.error.credentials}
+            {response?.error.summary}
           </Typography>
         </Box>
       )}
