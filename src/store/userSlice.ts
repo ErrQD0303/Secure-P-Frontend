@@ -42,6 +42,8 @@ export const getUsername = (state: RootState) => state.user.username;
 
 export const getEmail = (state: RootState) => state.user.email;
 
+export const getFullName = (state: RootState) => state.user.fullName;
+
 export const getUserPersonal = (state: RootState) => toPersonalInfo(state.user);
 
 export const getProfilesPersonalInfo = createSelector([getUserInfo], (user) =>
@@ -50,3 +52,5 @@ export const getProfilesPersonalInfo = createSelector([getUserInfo], (user) =>
 
 export const getBillingAddress = (state: RootState) =>
   toPersonalInfo(state.user);
+
+export const isAuthenticated = (state: RootState) => !!state.user.id;

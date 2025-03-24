@@ -17,13 +17,19 @@ export interface IUser {
   licensePlateNumber: string[];
 }
 
-export interface IRegisterUser extends Omit<IUser, "id"> {
+export interface IRegisterUser {
+  mobileNumber: string;
+  fullName: string;
+  email: string;
+  country: Country;
   password: string;
+  confirmPassword: string;
 }
 
 export interface IPersonalInfo {
   id: string;
   username: string | undefined;
+  fullName: string;
   email: string;
   mobileNumber: string;
   dayOfBirth: Date | undefined;

@@ -1,5 +1,5 @@
 import LoginSignUpLayout from "../layouts/LoginSignUpLayout";
-import { Form } from "react-router-dom";
+import { Form, useActionData } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid2";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -17,9 +17,11 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import { IRegisterError } from "../services/userService";
 
 function SignUp() {
   const theme = useTheme();
+  const errors = useActionData() as IRegisterError;
   const formFields = [
     {
       name: "accountType",
@@ -73,6 +75,7 @@ function SignUp() {
     {
       name: "fullName",
       type: "text",
+      error: errors?.FullName,
       label: "Your name",
       required: true,
       column: {
@@ -127,6 +130,7 @@ function SignUp() {
     {
       name: "phoneNumber",
       type: "phone",
+      error: errors?.PhoneNumber,
       label: "Phone number",
       required: true,
       column: {
@@ -154,6 +158,7 @@ function SignUp() {
     {
       name: "country",
       type: "text",
+      error: errors?.Country,
       label: "Nationality",
       required: true,
       column: {
@@ -181,6 +186,7 @@ function SignUp() {
     {
       name: "password",
       type: "password",
+      error: errors?.Password,
       label: "Password",
       required: true,
       column: {
@@ -208,6 +214,7 @@ function SignUp() {
     {
       name: "confirmPassword",
       type: "password",
+      errors: errors?.ConfirmPassword,
       label: "Re-enter password",
       required: true,
       column: {
@@ -244,9 +251,30 @@ function SignUp() {
               my: "1rem",
             },
           }}
-          pageText="Login to your account"
+          pageText="Sign up your new account"
           gridColumns={{ base: 1 }}
         >
+          {errors?.summary && (
+            <Grid
+              size={{
+                base: 1,
+              }}
+              sx={{
+                mb: "1rem",
+                color: theme.palette.error.main,
+                textAlign: "center",
+              }}
+            >
+              <Typography component="p" variant="body2">
+                {Object.values(errors).map((error, idx) => (
+                  <span key={idx}>
+                    {error}
+                    <br />
+                  </span>
+                ))}
+              </Typography>
+            </Grid>
+          )}
           {formFields.map((field) => {
             return (
               <Grid
@@ -278,6 +306,8 @@ function SignUp() {
                     type={field.type}
                     required={field.required}
                     InputProps={field.slotProps?.input}
+                    error={Boolean(field.error)}
+                    helperText={field.error}
                     sx={field.sx}
                   />
                 )}

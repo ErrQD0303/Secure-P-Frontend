@@ -17,3 +17,5 @@ export const Profiles = lazy(() => import("./pages/Profiles"));
 export const AddNewSubscription = lazy(
   () => import("./pages/AddNewSubscription")
 );
+export const ProtectedRoute = lazy(() => import("./pages/ProtectedRoute"));
+export const Logout = lazy(() => import("./pages/Logout"));

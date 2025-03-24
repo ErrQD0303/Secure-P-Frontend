@@ -6,6 +6,7 @@ import paymentHistoryAction from "../pages/paymentHistoryAction";
 import mySubscriptionsLoader from "../pages/mySubscriptionsLoader";
 import mySubscriptionsAction from "../pages/mySubscriptionsAction";
 import detailedSubscriptionLoader from "../pages/detailedSubscriptionLoader";
+import loginLoader from "../pages/loginLoader";
 import loginAction from "../pages/loginAction";
 import updateProfilePersonalInfoAction from "../pages/updateProfilePersonalInfoAction";
 import updateProfilePasswordAction from "../pages/updatePasswordAction";
@@ -24,84 +25,91 @@ import {
   Login,
   SignUp,
   AddNewSubscription,
+  ProtectedRoute,
+  Logout,
 } from "../LazyComponents";
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 
 export const routes = [
   {
-    element: <AppLayout />,
-    loader: appLoader,
-    errorElement: <Error />,
+    element: <ProtectedRoute redirectPath="/login" />,
     children: [
       {
-        path: "/",
-        element: <Home />,
-        name: "Home",
-        loader: homeLoader,
-        errorElement: <Error />,
-      },
-      {
-        path: "/payment-history",
-        element: <PaymentHistory />,
-        name: "Payment History",
-        loader: paymentHistoryLoader,
-        action: paymentHistoryAction,
-        errorElement: <Error />,
-      },
-      {
-        path: "/help-center",
-        name: "Help Center",
-        element: <HelpCenter />,
-      },
-      {
-        path: "/subscriptions",
+        element: <AppLayout />,
+        loader: appLoader,
         errorElement: <Error />,
         children: [
           {
-            index: true,
-            element: <MySubscriptions />,
-            name: "My Subscriptions",
-            loader: mySubscriptionsLoader,
-            action: mySubscriptionsAction,
+            path: "/",
+            element: <Home />,
+            name: "Home",
+            loader: homeLoader,
             errorElement: <Error />,
           },
           {
-            path: "add",
-            element: <AddNewSubscription />,
-            name: "Add New Subscription",
-            loader: addNewSubscriptionLoader,
-            errorElement: <Error />,
-            action: addNewSubscriptionAction,
-          },
-          {
-            path: ":id",
-            element: <DetailedSubscription />,
-            name: "Detailed Subscription",
-            loader: detailedSubscriptionLoader,
-            errorElement: <Error />,
-          },
-        ],
-      },
-      {
-        path: "/settings",
-        element: <Settings />,
-        name: "Settings",
-      },
-      {
-        path: "/profiles",
-        element: <Profiles />,
-        name: "Profiles",
-        errorElement: <Error />,
-        children: [
-          {
-            path: "update-personal-info",
-            action: updateProfilePersonalInfoAction,
+            path: "/payment-history",
+            element: <PaymentHistory />,
+            name: "Payment History",
+            loader: paymentHistoryLoader,
+            action: paymentHistoryAction,
             errorElement: <Error />,
           },
           {
-            path: "update-password",
-            action: updateProfilePasswordAction,
+            path: "/help-center",
+            name: "Help Center",
+            element: <HelpCenter />,
+          },
+          {
+            path: "/subscriptions",
             errorElement: <Error />,
+            children: [
+              {
+                index: true,
+                element: <MySubscriptions />,
+                name: "My Subscriptions",
+                loader: mySubscriptionsLoader,
+                action: mySubscriptionsAction,
+                errorElement: <Error />,
+              },
+              {
+                path: "add",
+                element: <AddNewSubscription />,
+                name: "Add New Subscription",
+                loader: addNewSubscriptionLoader,
+                errorElement: <Error />,
+                action: addNewSubscriptionAction,
+              },
+              {
+                path: ":id",
+                element: <DetailedSubscription />,
+                name: "Detailed Subscription",
+                loader: detailedSubscriptionLoader,
+                errorElement: <Error />,
+              },
+            ],
+          },
+          {
+            path: "/settings",
+            element: <Settings />,
+            name: "Settings",
+          },
+          {
+            path: "/profiles",
+            element: <Profiles />,
+            name: "Profiles",
+            errorElement: <Error />,
+            children: [
+              {
+                path: "update-personal-info",
+                action: updateProfilePersonalInfoAction,
+                errorElement: <Error />,
+              },
+              {
+                path: "update-password",
+                action: updateProfilePasswordAction,
+                errorElement: <Error />,
+              },
+            ],
           },
         ],
       },
@@ -111,6 +119,7 @@ export const routes = [
     path: "/login",
     name: "Login",
     element: <Login />,
+    loader: loginLoader,
     action: loginAction,
   },
   {
@@ -118,6 +127,12 @@ export const routes = [
     name: "Sign Up",
     element: <SignUp />,
     action: signUpAction,
+  },
+  {
+    path: "/logout",
+    element: <Logout />,
+    name: "Logout",
+    errorElement: <Error />,
   },
 ];
 

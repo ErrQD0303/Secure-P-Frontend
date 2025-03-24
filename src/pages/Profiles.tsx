@@ -25,9 +25,10 @@ function Profiles() {
   const theme = useTheme();
   const fetcher = useFetcher();
   const {
-    userName: username,
+    username: username,
     mobileNumber,
     dayOfBirth,
+    fullName,
     email,
   } = useSelector(getProfilesPersonalInfo);
   const { routeName } = useOutletContext() as { routeName: string };
@@ -406,7 +407,7 @@ function Profiles() {
                     fontWeight: 600,
                   }}
                 >
-                  {username}
+                  {fullName}
                 </Typography>
                 <Typography
                   sx={{

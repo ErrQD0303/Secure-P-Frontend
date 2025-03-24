@@ -20,6 +20,8 @@ import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import logoImage from "/logo.png";
 import avatarImage from "/avatar.png";
+import { useSelector } from "react-redux";
+import { getFullName } from "../store/userSlice";
 
 type Props = {
   routeName: string;
@@ -43,6 +45,7 @@ function TopNavigationBar({ routeName }: Props) {
   ); */
   const showGoBack = true;
   const navigate = useNavigate();
+  const fullName = useSelector(getFullName);
 
   const handleGoBack = React.useCallback(() => {
     console.log("OK");
@@ -247,7 +250,7 @@ function TopNavigationBar({ routeName }: Props) {
                       letterSpacing: "inherit",
                     }}
                   >
-                    datvipcrvn
+                    {fullName}
                   </Typography>
                   <KeyboardArrowDownIcon
                     sx={{

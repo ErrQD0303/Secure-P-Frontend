@@ -2,33 +2,33 @@ import axios from "axios";
 import { IRegisterUser, IUser } from "../types/user";
 import CookieName from "../shared/constants/cookieName";
 
-export const register = async (user: IRegisterUser): Promise<IUser> => {
+export const register = async (
+  user: IRegisterUser
+): Promise<IRegisterResponse> => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const registerUrl = backendUrl + import.meta.env.VITE_USER_REGISTER_URL;
 
   const registerRequest = {
-    email: user.email,
-    password: user.password,
-    phone_number: user.mobileNumber,
-    username: user.username,
     full_name: user.fullName,
-    address_line1: user.addressLine1 ?? "",
-    address_line2: user.addressLine2,
-    city: user.city ?? "",
+    email: user.email,
+    phone_number: user.mobileNumber,
     country: user.country,
-    day_of_birth: user.dayOfBirth ?? "",
-    post_code: user.postCode,
-    license_plates: user.licensePlateNumber,
+    day_of_birth: new Date(),
+    password: user.password,
   };
 
-  const response = await axios.post(registerUrl, registerRequest);
+  let response;
 
-  if (response.status !== 201) {
-    console.error(response);
-    throw new Error("Failed to register");
+  try {
+    response = await axios.post(registerUrl, registerRequest);
+
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    }
+    throw new Error("Unknown error occurred");
   }
-
-  return response.data;
 };
 
 export const login = async (
@@ -140,18 +140,22 @@ export const otpLogin = async (loginRequest: {
   return response!.data;
 };
 
+const getAccessTokenFromCookie = (): string | undefined => {
+  return `Bearer ${
+    document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(CookieName.ACCESS_TOKEN))
+      ?.split("=")[1]
+  }`;
+};
+
 export const getUserInfoFromDB = async (): Promise<IUser> => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const userInfoUrl = backendUrl + import.meta.env.VITE_USER_INFO_URL;
 
   let response;
   try {
-    const tokens = `Bearer ${
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(CookieName.ACCESS_TOKEN))
-        ?.split("=")[1]
-    }`;
+    const tokens = getAccessTokenFromCookie();
     response = await axios.get(userInfoUrl, {
       withCredentials: true,
       headers: {
@@ -160,12 +164,76 @@ export const getUserInfoFromDB = async (): Promise<IUser> => {
     });
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
+      const refreshToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(CookieName.REFRESH_TOKEN))
+        ?.split("=")[1];
+
+      if (refreshToken) {
+        if (await getNewAccessToken(refreshToken)) {
+          return getUserInfoFromDB();
+        }
+      }
+
       return error.response?.data.user;
     }
     throw error;
   }
 
   return response!.data.user;
+};
+
+export const getNewAccessToken = async (
+  refreshToken: string
+): Promise<boolean> => {
+  if (!refreshToken) {
+    throw new Error("No refresh token found");
+  }
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const refreshUrl = backendUrl + import.meta.env.VITE_TOKEN_REFRESH_URL;
+
+  try {
+    await axios.post(
+      refreshUrl,
+      {
+        refresh_token: refreshToken,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    return true;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return false;
+    }
+    throw error;
+  }
+};
+
+export const logOut = async (): Promise<boolean> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const logoutUrl = backendUrl + import.meta.env.VITE_USER_LOGOUT_URL;
+
+  try {
+    await axios.post(
+      logoutUrl,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: getAccessTokenFromCookie(),
+        },
+      }
+    );
+    return true;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return false;
+    }
+    throw error;
+  }
 };
 
 enum LoginType {
@@ -182,8 +250,32 @@ export interface ILoginResponse {
   user: IUser;
 }
 
+export interface IRegisterResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IRegisterError;
+  user: IUser;
+}
+
+export interface IRegisterError {
+  summary?: string;
+  FullName?: string;
+  Email?: string;
+  PhoneNumber?: string;
+  Country?: string;
+  Password?: string;
+  ConfirmPassword?: string;
+}
+
 export interface ILoginError {
   summary?: string;
   email?: string;
   password?: string;
+}
+
+export interface ITokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
 }

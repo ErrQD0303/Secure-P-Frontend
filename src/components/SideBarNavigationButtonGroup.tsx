@@ -37,7 +37,7 @@ function SideBarNavigationButtonGroup() {
       },
       {
         onClick: () => {
-          navigate("/login");
+          navigate("/logout");
         },
         ariaLabel: "Sign out",
         icon: logOutImage,

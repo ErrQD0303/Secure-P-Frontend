@@ -1,5 +1,5 @@
 import LoginSignUpLayout from "../layouts/LoginSignUpLayout";
-import { useFetcher } from "react-router-dom";
+import { redirect, useFetcher } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid2";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -17,6 +17,8 @@ import OTP from "./OTP";
 import { SimplePaletteColor } from "@mui/material/styles";
 import logoPng from "/logo.png";
 import { ILoginError } from "../services/userService";
+import { useSelector } from "react-redux";
+import { isAuthenticated } from "../store/userSlice";
 
 function Login() {
   const theme = useTheme();
@@ -27,6 +29,8 @@ function Login() {
     errors: ILoginError;
     loginData?: { email: string };
   } | null>(null);
+
+  const isAuth = useSelector(isAuthenticated);
 
   const showSpinner =
     fetcher.state === "loading" || fetcher.state === "submitting";
@@ -100,6 +104,12 @@ function Login() {
       },
     },
   ];
+
+  React.useEffect(() => {
+    if (isAuth) {
+      redirect("/");
+    }
+  }, [isAuth]);
 
   React.useEffect(() => {
     if (fetcher.data) {
