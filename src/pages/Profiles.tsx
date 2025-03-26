@@ -2,7 +2,7 @@ import Container from "@mui/material/Container";
 import Grid, { Grid2Props } from "@mui/material/Grid2";
 import React from "react";
 import { useSelector } from "react-redux";
-import { getProfilesPersonalInfo } from "../store/userSlice";
+import { getAvatar, getProfilesPersonalInfo } from "../store/userSlice";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
@@ -18,8 +18,9 @@ import { useTheme } from "@emotion/react";
 import AppDatePicker from "../components/AppDatePicker";
 import useViewPort from "../hooks/useViewPort";
 import dayjs from "dayjs";
-import avatarImage from "/avatar.png";
 import Loader from "../components/Loader";
+import { StaticFileUrl } from "../shared/constants/staticFileUrl";
+import UploadImageModal from "../components/UploadImageModal";
 
 function Profiles() {
   const theme = useTheme();
@@ -34,9 +35,35 @@ function Profiles() {
   const { routeName } = useOutletContext() as { routeName: string };
   const { viewWidth } = useViewPort();
 
+  const avatar = import.meta.env.VITE_BACKEND_URL + useSelector(getAvatar);
+  const [showUploadImageModal, setShowUploadImageModal] = React.useState(false);
+
+  const [showChangeProfileImage, setShowChangeProfileImage] =
+    React.useState(false);
+
   const isLoading =
     fetcher.state === "submitting" || fetcher.state === "loading";
 
+  const handleProfileImageClick = React.useCallback(() => {
+    setShowUploadImageModal(true);
+  }, []);
+
+  const handleProfileImageMouseOver = React.useCallback(() => {
+    // Add logic here if needed, or remove this callback if unused
+    setShowChangeProfileImage(true);
+    const profileImage = document.getElementById("profileImage");
+    if (!profileImage) return;
+    profileImage.style.transform = "scale(1.1)";
+    profileImage.style.transition = "transform 0.3s ease-in-out";
+  }, []);
+
+  const handleProfileImageMouseOut = React.useCallback(() => {
+    setShowChangeProfileImage(false);
+    const profileImage = document.getElementById("profileImage");
+    if (!profileImage) return;
+    profileImage.style.transform = "scale(1)";
+    profileImage.style.transition = "transform 0.3s ease-in-out";
+  }, []);
   const tabs: {
     [key: string]: {
       name: string;
@@ -358,6 +385,9 @@ function Profiles() {
         }}
         ref={mainComponentRef}
       >
+        {showUploadImageModal && (
+          <UploadImageModal setShowModal={setShowUploadImageModal} />
+        )}
         {isLoading && <Loader />}
         <Container
           sx={{
@@ -387,17 +417,66 @@ function Profiles() {
             >
               <Box
                 aria-label="profile images"
+                onClick={handleProfileImageClick}
+                onMouseOver={handleProfileImageMouseOver}
+                onMouseOut={handleProfileImageMouseOut}
                 sx={{
                   width: "72px",
                   height: "69px",
                   borderRadius: "50%",
-                  background: `url('${avatarImage}') center/cover`,
+                  cursor: "pointer",
+                  position: "relative",
                   [theme.breakpoints.up("lg")]: {
                     width: "144px",
                     height: "138px",
                   },
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "hidden",
                 }}
-              ></Box>
+              >
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    background: `url('${
+                      avatar || StaticFileUrl.DEFAULT_AVATAR
+                    }') center/cover`,
+                  }}
+                  id="profileImage"
+                ></Box>
+                <Box
+                  sx={{
+                    display: "none",
+                    [theme.breakpoints.up("lg")]: {
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "50%",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      display: showChangeProfileImage ? "flex" : "none",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.8s",
+                    },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: "#FFFFFF",
+                      fontSize: "1.25rem",
+                      lineHeight: "1.875rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Change
+                  </Typography>
+                </Box>
+              </Box>
               <Stack>
                 <Typography
                   sx={{

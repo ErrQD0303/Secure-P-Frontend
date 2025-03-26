@@ -19,9 +19,9 @@ import { useNavigate } from "react-router-dom";
 import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import logoImage from "/logo.png";
-import avatarImage from "/avatar.png";
 import { useSelector } from "react-redux";
-import { getFullName } from "../store/userSlice";
+import { getAvatar, getFullName } from "../store/userSlice";
+import { StaticFileUrl } from "../shared/constants/staticFileUrl";
 
 type Props = {
   routeName: string;
@@ -46,9 +46,9 @@ function TopNavigationBar({ routeName }: Props) {
   const showGoBack = true;
   const navigate = useNavigate();
   const fullName = useSelector(getFullName);
+  const avatar = import.meta.env.VITE_BACKEND_URL + useSelector(getAvatar);
 
   const handleGoBack = React.useCallback(() => {
-    console.log("OK");
     navigate(-1);
     return null;
   }, [navigate]);
@@ -221,7 +221,9 @@ function TopNavigationBar({ routeName }: Props) {
                     sx={{
                       borderRadius: "50%",
                       p: "1.5rem",
-                      background: `url(${avatarImage})`,
+                      background: `url("${
+                        avatar || StaticFileUrl.DEFAULT_AVATAR
+                      }") center center / cover no-repeat`,
                       cursor: "pointer",
                     }}
                   ></Box>

@@ -16,6 +16,7 @@ export interface IUser {
   addressLine2: string;
   postCode: string;
   licensePlateNumber: string[];
+  avatar: string | null;
 }
 
 export interface IRegisterUser {
@@ -34,6 +35,7 @@ export interface IPersonalInfo {
   email: string;
   mobileNumber: string;
   dayOfBirth: Date | undefined;
+  avatar: string | null;
 }
 
 export interface IBillingAddress {

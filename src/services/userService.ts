@@ -140,7 +140,7 @@ export const otpLogin = async (loginRequest: {
   return response!.data;
 };
 
-const getAccessTokenFromCookie = (): string | undefined => {
+export const getAccessTokenFromCookie = (): string | undefined => {
   return `Bearer ${
     document.cookie
       .split("; ")

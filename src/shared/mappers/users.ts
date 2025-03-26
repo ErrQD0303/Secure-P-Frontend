@@ -7,6 +7,7 @@ export const toPersonalInfo = (user: IUser): IPersonalInfo => ({
   email: user.email,
   mobileNumber: user.mobileNumber,
   dayOfBirth: user.dayOfBirth,
+  avatar: user.avatar,
 });
 
 export const toBillingAddress = (user: IUser): IBillingAddress => ({

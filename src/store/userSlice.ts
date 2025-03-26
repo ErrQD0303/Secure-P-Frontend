@@ -18,6 +18,7 @@ const initialState: IUser = {
   addressLine2: "",
   postCode: "",
   licensePlateNumber: [],
+  avatar: null,
 };
 
 const userSlice = createSlice({
@@ -50,6 +51,8 @@ export const getUserPersonal = (state: RootState) => toPersonalInfo(state.user);
 export const getProfilesPersonalInfo = createSelector([getUserInfo], (user) =>
   toPersonalInfo(user)
 );
+
+export const getAvatar = (state: RootState) => state.user.avatar;
 
 export const getBillingAddress = (state: RootState) =>
   toPersonalInfo(state.user);
