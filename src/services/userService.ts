@@ -236,6 +236,34 @@ export const logOut = async (): Promise<boolean> => {
   }
 };
 
+export const resendEmailConfirmation = async (
+  email: string
+): Promise<IEmailConfirmationError | null> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const resendUrl =
+    backendUrl + import.meta.env.VITE_USER_RESEND_CONFIRMATION_EMAIL_URL;
+
+  try {
+    axios.post(
+      resendUrl,
+      { email },
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: getAccessTokenFromCookie(),
+        },
+      }
+    );
+
+    return null;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    }
+    throw error;
+  }
+};
+
 enum LoginType {
   Email = 0,
   Username = 1,
@@ -266,6 +294,11 @@ export interface IRegisterError {
   Country?: string;
   Password?: string;
   ConfirmPassword?: string;
+}
+
+export interface IEmailConfirmationError {
+  summary?: string;
+  email?: string;
 }
 
 export interface ILoginError {

@@ -84,7 +84,7 @@ function Settings(props: Props) {
       {
         name: "Log out",
         icon: <ExitIcon />,
-        to: "/login",
+        to: "/logout",
         sx: {
           mt: "1.75rem",
           mb: 0,

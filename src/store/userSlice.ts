@@ -10,6 +10,7 @@ const initialState: IUser = {
   mobileNumber: "",
   fullName: "",
   email: "",
+  emailConfirmed: true,
   country: Country.NOT_SET,
   dayOfBirth: undefined,
   city: "",
@@ -54,3 +55,5 @@ export const getBillingAddress = (state: RootState) =>
   toPersonalInfo(state.user);
 
 export const isAuthenticated = (state: RootState) => !!state.user.id;
+
+export const isEmailConfirmed = (state: RootState) => state.user.emailConfirmed;

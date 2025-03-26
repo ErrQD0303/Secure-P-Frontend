@@ -304,7 +304,6 @@ function Profiles() {
       console.log(event);
       if (submitAction === "savePersonalInfo") {
         const formData = new FormData(event.currentTarget as HTMLFormElement);
-        console.log(Object.fromEntries(formData));
         const filterFields = ["email", "phone", "dayOfBirth"];
         const data = Object.fromEntries(
           Array.from(formData.entries()).filter(([key]) =>

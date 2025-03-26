@@ -12,6 +12,7 @@ import updateProfilePersonalInfoAction from "../pages/updateProfilePersonalInfoA
 import updateProfilePasswordAction from "../pages/updatePasswordAction";
 import addNewSubscriptionLoader from "../pages/addNewSubscriptionLoader";
 import signUpAction from "../pages/signUpAction";
+import resendEmailConfirmationAction from "../pages/resendEmailConfirmationAction";
 import {
   AppLayout,
   Error,
@@ -27,12 +28,14 @@ import {
   AddNewSubscription,
   ProtectedRoute,
   Logout,
+  ResendEmailConfirmation,
 } from "../LazyComponents";
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 
 export const routes = [
   {
     element: <ProtectedRoute redirectPath="/login" />,
+    name: "ProtectedRoute",
     children: [
       {
         element: <AppLayout />,
@@ -110,6 +113,13 @@ export const routes = [
                 errorElement: <Error />,
               },
             ],
+          },
+          {
+            path: "/resend-email-confirmation",
+            element: <ResendEmailConfirmation />,
+            name: "Resend Email Confirmation",
+            action: resendEmailConfirmationAction,
+            errorElement: <Error />,
           },
         ],
       },

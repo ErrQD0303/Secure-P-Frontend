@@ -19,3 +19,6 @@ export const AddNewSubscription = lazy(
 );
 export const ProtectedRoute = lazy(() => import("./pages/ProtectedRoute"));
 export const Logout = lazy(() => import("./pages/Logout"));
+export const ResendEmailConfirmation = lazy(
+  () => import("./pages/ResendEmailConfirmation")
+);

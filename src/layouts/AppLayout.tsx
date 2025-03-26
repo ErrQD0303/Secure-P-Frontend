@@ -12,6 +12,9 @@ import Banner from "../components/Banner";
 import { getRouteName } from "../services/routeService";
 import ButtonLink from "../components/ButtonLink";
 import AddNewIcon from "../components/svg-icons/AddNew";
+import { useSelector } from "react-redux";
+import { isEmailConfirmed } from "../store/userSlice";
+import EmailConfirmNotificationBar from "./EmailConfirmNotificationBar";
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -32,6 +35,7 @@ function AppLayout() {
   const showAddNewButton = ["subscriptions", "payment-history"].includes(
     routeUrl
   );
+  const haveEmailConfirmed = useSelector(isEmailConfirmed);
 
   // const selector = useSelector(getUserInfo);
 
@@ -75,6 +79,7 @@ function AppLayout() {
           height: "100vh",
         }}
       >
+        {haveEmailConfirmed || <EmailConfirmNotificationBar />}
         <Grid
           size={{
             base: 0,

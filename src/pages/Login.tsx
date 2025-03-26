@@ -281,13 +281,15 @@ function Login() {
             alignItems: "center",
           }}
         >
-          <Box
-            component={"img"}
-            src={logoPng}
-            sx={{
-              maxWidth: "375px",
-            }}
-          ></Box>
+          <ButtonLink to={"/"} type={"none"}>
+            <Box
+              component={"img"}
+              src={logoPng}
+              sx={{
+                maxWidth: "375px",
+              }}
+            ></Box>
+          </ButtonLink>
         </Stack>
       )}
     </>

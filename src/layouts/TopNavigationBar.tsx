@@ -303,7 +303,7 @@ function TopNavigationBar({ routeName }: Props) {
                 </MenuItem>
                 <MenuItem key={"logout"} onClick={handleCloseUserMenu}>
                   <ButtonLink
-                    to="/login"
+                    to="/logout"
                     ariaLabel="Log out"
                     type="link"
                     sx={{

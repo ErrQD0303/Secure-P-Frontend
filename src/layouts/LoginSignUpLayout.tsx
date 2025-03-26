@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import { ResponsiveStyleValue } from "@mui/system";
 import loginLogo from "/LoginLogo.png";
+import ButtonLink from "../components/ButtonLink";
 
 type Props = ContainerProps & {
   pageText: string;
@@ -35,13 +36,15 @@ function LoginSignUpLayout({
           }}
           className="PageLogo"
         >
-          <Box
-            component="img"
-            src={loginLogo}
-            alt="Secure Parking Logo"
-            aria-label="To Homepage"
-            sx={{}}
-          />
+          <ButtonLink to={"/"} type={"none"}>
+            <Box
+              component="img"
+              src={loginLogo}
+              alt="Secure Parking Logo"
+              aria-label="To Homepage"
+              sx={{}}
+            />
+          </ButtonLink>
         </Grid>
         {showWelcomeText && (
           <Grid

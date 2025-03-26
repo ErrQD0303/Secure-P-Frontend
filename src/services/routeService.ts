@@ -28,10 +28,18 @@ export const getRouteName = async (
         route.path === routeSegments[currentSegment] ||
         (routeSegments[currentSegment] === "" && !route?.path)
     );
-    if (path?.name) routeName = path.name;
+
+    if (path?.name) {
+      if (path?.name === "ProtectedRoute") {
+        currentRoute = path?.children as Array<RouteObject & { name?: string }>;
+        continue;
+      }
+      routeName = path.name;
+    }
     const nextCurrentRoute = path?.children as Array<
       RouteObject & { name?: string }
     >;
+
     if (!routeName && !nextCurrentRoute) {
       routeName = currentRoute?.find((route) =>
         route.path?.startsWith(":")

@@ -41,6 +41,7 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 // AddNewSubscription component accepts sx and merges it with default styles
 function AddNewSubscription({ sx, ...props }: ContainerProps) {
   const theme = useTheme();
+
   const {
     formInputs,
     parkingLocations: defaultParkingLocations,
@@ -52,6 +53,7 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     changeSignageFee: number;
     clampingFee: number;
   };
+
   const [parkingLocations, setParkingLocations] = React.useState<
     IParkingLocation[]
   >(defaultParkingLocations ?? []);

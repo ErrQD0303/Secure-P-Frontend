@@ -1,5 +1,5 @@
 import { IRegisterUser } from "../types/user";
-import { IRegisterError } from "./userService";
+import { IEmailConfirmationError, IRegisterError } from "./userService";
 
 export const validateRegisterUser = (user: IRegisterUser): IRegisterError => {
   const errors: IRegisterError = {};
@@ -48,4 +48,21 @@ export const validateRegisterUser = (user: IRegisterUser): IRegisterError => {
   }
 
   return errors;
+};
+
+export const validateEmail = (
+  email: string
+): IEmailConfirmationError | null => {
+  if (!email || email.trim() === "") {
+    return {
+      email: "Email is required",
+    };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return {
+      email: "Invalid email. Please enter a valid email address",
+    };
+
+  return null;
 };

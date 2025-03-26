@@ -8,6 +8,7 @@ export interface IUser {
   mobileNumber: string;
   fullName: string;
   email: string;
+  emailConfirmed: boolean;
   country: Country;
   dayOfBirth: Date | undefined;
   city: string;

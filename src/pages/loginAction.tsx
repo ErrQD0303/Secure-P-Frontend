@@ -42,14 +42,14 @@ const loginAction = async (data: { email: string; password: string }) => {
     undefined,
     data.password
   );
-  console.log(loginResult);
 
   if (!loginResult) {
     return {
-      statusCode: 401,
-      message: "Login failed",
+      statusCode: 500,
+      message: "Server error",
       errors: {
-        summary: "Invalid email or password",
+        summary:
+          "An unexpected error occurred. Server may be down. Please try again later.",
       },
     };
   }
