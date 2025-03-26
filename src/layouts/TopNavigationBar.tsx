@@ -46,7 +46,10 @@ function TopNavigationBar({ routeName }: Props) {
   const showGoBack = true;
   const navigate = useNavigate();
   const fullName = useSelector(getFullName);
-  const avatar = import.meta.env.VITE_BACKEND_URL + useSelector(getAvatar);
+  const userAvatar = useSelector(getAvatar);
+  const avatar = userAvatar
+    ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
+    : StaticFileUrl.DEFAULT_AVATAR;
 
   const handleGoBack = React.useCallback(() => {
     navigate(-1);
@@ -221,9 +224,7 @@ function TopNavigationBar({ routeName }: Props) {
                     sx={{
                       borderRadius: "50%",
                       p: "1.5rem",
-                      background: `url("${
-                        avatar || StaticFileUrl.DEFAULT_AVATAR
-                      }") center center / cover no-repeat`,
+                      background: `url("${avatar}") center center / cover no-repeat`,
                       cursor: "pointer",
                     }}
                   ></Box>

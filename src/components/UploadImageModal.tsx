@@ -3,6 +3,9 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import uploadIcon from "/upload-icon.png";
 import { uploadAvatar } from "../services/uploadService";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store/store";
+import { setAvatar } from "../store/userSlice";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
@@ -87,6 +90,8 @@ function UploadImageModal({ setShowModal, ...props }: Props) {
   const [showUploadButton, setShowUploadButton] = React.useState(false);
   const [image, setImage] = React.useState<File | null>(null);
 
+  const dispatch = useDispatch<AppDispatch>();
+
   const handleCloseModal = React.useCallback(() => {
     setShowModal(false);
   }, [setShowModal]);
@@ -130,9 +135,12 @@ function UploadImageModal({ setShowModal, ...props }: Props) {
 
   const handleUploadButtonClick = React.useCallback(async () => {
     if (!image) return;
-    await uploadAvatar(image);
+    const avatarUrl = await uploadAvatar(image);
+
+    if (avatarUrl !== null) dispatch(setAvatar(avatarUrl));
     handleCloseModal();
-  }, [image, handleCloseModal]);
+    location.reload();
+  }, [image, handleCloseModal, dispatch]);
 
   return (
     <StyledPaper elevation={3}>

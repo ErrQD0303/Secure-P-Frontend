@@ -35,7 +35,11 @@ function Profiles() {
   const { routeName } = useOutletContext() as { routeName: string };
   const { viewWidth } = useViewPort();
 
-  const avatar = import.meta.env.VITE_BACKEND_URL + useSelector(getAvatar);
+  const userAvatar = useSelector(getAvatar);
+  const avatar = userAvatar
+    ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
+    : StaticFileUrl.DEFAULT_AVATAR;
+
   const [showUploadImageModal, setShowUploadImageModal] = React.useState(false);
 
   const [showChangeProfileImage, setShowChangeProfileImage] =
@@ -440,9 +444,7 @@ function Profiles() {
                     width: "100%",
                     height: "100%",
                     borderRadius: "50%",
-                    background: `url('${
-                      avatar || StaticFileUrl.DEFAULT_AVATAR
-                    }') center/cover`,
+                    background: `url('${avatar}') center/cover`,
                   }}
                   id="profileImage"
                 ></Box>

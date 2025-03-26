@@ -31,10 +31,13 @@ const userSlice = createSlice({
     clearUser: () => {
       return initialState;
     },
+    setAvatar: (state, action) => {
+      return { ...state, avatar: action.payload };
+    },
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, setAvatar } = userSlice.actions;
 
 export default userSlice.reducer;
 
