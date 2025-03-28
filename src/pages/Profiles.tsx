@@ -21,6 +21,10 @@ import dayjs from "dayjs";
 import Loader from "../components/Loader";
 import { StaticFileUrl } from "../shared/constants/staticFileUrl";
 import UploadImageModal from "../components/UploadImageModal";
+import {
+  IUpdatePasswordError,
+  IUpdateProfilePersonalInfoError,
+} from "../services/userService";
 
 function Profiles() {
   const theme = useTheme();
@@ -39,6 +43,10 @@ function Profiles() {
   const avatar = userAvatar
     ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
     : StaticFileUrl.DEFAULT_AVATAR;
+
+  const [errors, setErrors] = React.useState<
+    IUpdateProfilePersonalInfoError | IUpdatePasswordError | null
+  >(null);
 
   const [showUploadImageModal, setShowUploadImageModal] = React.useState(false);
 
@@ -68,6 +76,7 @@ function Profiles() {
     profileImage.style.transform = "scale(1)";
     profileImage.style.transition = "transform 0.3s ease-in-out";
   }, []);
+
   const tabs: {
     [key: string]: {
       name: string;
@@ -91,6 +100,8 @@ function Profiles() {
           value?: dayjs.Dayjs | string;
           defaultValue?: string | dayjs.Dayjs | undefined;
           required?: boolean;
+          error?: boolean;
+          helperText?: string | object;
           buttonProps?: ButtonProps;
         };
       };
@@ -116,6 +127,9 @@ function Profiles() {
             name: "email",
             label: "Email",
             defaultValue: email || "",
+            required: true,
+            error: errors && "Email" in errors ? Boolean(errors.Email) : false,
+            helperText: (errors && "Email" in errors ? errors.Email : "") || "",
             placeholder: "anyone@gmail.com",
             size: {
               base: 12,
@@ -133,7 +147,16 @@ function Profiles() {
             id: "currentPassword",
             name: "currentPassword",
             label: "Current Password",
-            placeholder: "******",
+            placeholder: "••••••••",
+            required: true,
+            error:
+              errors && "CurrentPassword" in errors
+                ? Boolean(errors?.CurrentPassword)
+                : false,
+            helperText:
+              errors && "CurrentPassword" in errors
+                ? errors.CurrentPassword
+                : "",
             offset: {
               base: 0,
               lg: 1,
@@ -155,7 +178,10 @@ function Profiles() {
             name: "phone",
             label: "Phone Number",
             defaultValue: mobileNumber,
+            required: true,
             placeholder: "012345678",
+            error: errors && "Phone" in errors ? Boolean(errors?.Phone) : false,
+            helperText: (errors && "Phone" in errors && errors?.Phone) || "",
             offset: {
               base: 0,
             },
@@ -174,8 +200,14 @@ function Profiles() {
             type: "password",
             id: "newPassword",
             name: "newPassword",
-            label: "new Password",
-            placeholder: "*******",
+            label: "New Password",
+            placeholder: "••••••••",
+            error:
+              errors && "NewPassword" in errors
+                ? Boolean(errors?.NewPassword)
+                : false,
+            helperText:
+              errors && "NewPassword" in errors ? errors.NewPassword : "",
             required: true,
             offset: {
               base: 0,
@@ -197,6 +229,13 @@ function Profiles() {
             id: "dayOfBirth",
             name: "dayOfBirth",
             label: "Day of Birth",
+            required: true,
+            error:
+              errors && "DayOfBirth" in errors
+                ? Boolean(errors?.DayOfBirth)
+                : false,
+            helperText:
+              errors && "DayOfBirth" in errors ? errors.DayOfBirth : "",
             defaultValue: dayjs(dayOfBirth),
             placeholder: "dd/mm/yyyy",
             offset: {
@@ -219,7 +258,15 @@ function Profiles() {
             name: "retypeNewPassword",
             label: "Re-type New Password",
             required: true,
-            placeholder: "••••••",
+            placeholder: "••••••••",
+            error:
+              errors && "ConfirmPassword" in errors
+                ? Boolean(errors?.ConfirmPassword)
+                : false,
+            helperText:
+              errors && "ConfirmPassword" in errors
+                ? errors.ConfirmPassword
+                : "",
             offset: {
               base: 0,
               lg: 1,
@@ -315,8 +362,9 @@ function Profiles() {
         formFields: {},
       },
     }),
-    [dayOfBirth, email, mobileNumber, theme.breakpoints, username]
+    [dayOfBirth, email, mobileNumber, theme.breakpoints, username, errors]
   );
+
   const [currentTab, setCurrentTab] = React.useState<number | null>(0);
   const mainComponentRef = React.useRef<HTMLDivElement>(null);
   const handleTabChange = React.useCallback(
@@ -332,7 +380,7 @@ function Profiles() {
       const submitAction = (
         event.nativeEvent as SubmitEvent
       ).submitter?.getAttribute("name");
-      console.log(event);
+
       if (submitAction === "savePersonalInfo") {
         const formData = new FormData(event.currentTarget as HTMLFormElement);
         const filterFields = ["email", "phone", "dayOfBirth"];
@@ -341,11 +389,16 @@ function Profiles() {
             filterFields.includes(key)
           )
         );
+        data.dayOfBirth = (() => {
+          const [day, month, year] = (data.dayOfBirth as string).split("/");
+          return `${year}-${month}-${day}`;
+        })();
         fetcher.submit(new URLSearchParams(data as Record<string, string>), {
           method: "put",
           action: "/profiles/update-personal-info",
         });
       }
+
       if (submitAction === "updatePassword") {
         const formData = new FormData(event.target as HTMLFormElement);
         const filterFields = [
@@ -358,7 +411,7 @@ function Profiles() {
             filterFields.includes(key)
           )
         );
-        console.log(data);
+
         fetcher.submit(new URLSearchParams(data as Record<string, string>), {
           method: "put",
           action: "/profiles/update-password",
@@ -376,6 +429,19 @@ function Profiles() {
     };
     scrollToMainContent();
   }, []);
+
+  React.useEffect(() => {
+    if (fetcher.state === "idle") {
+      if (!fetcher.data) {
+        fetcher.load("/");
+        return;
+      }
+
+      setErrors(fetcher.data as IUpdateProfilePersonalInfoError);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetcher.state, fetcher.load, fetcher.data]);
+
   return (
     <>
       <Paper
@@ -535,6 +601,23 @@ function Profiles() {
                   },
                 }}
               >
+                {errors && errors.summary && (
+                  <Typography
+                    variant="body2"
+                    color="error"
+                    bgcolor={"#FDE8E8"}
+                    p={4}
+                    sx={{
+                      mb: 2,
+                      fontWeight: 500,
+                      fontSize: "1.5rem",
+                      lineHeight: "1.25rem",
+                      textAlign: "center",
+                    }}
+                  >
+                    {errors.summary}
+                  </Typography>
+                )}
                 <fetcher.Form method="PUT" onSubmit={handleSubmit}>
                   <Grid
                     container
@@ -558,6 +641,8 @@ function Profiles() {
                               placeholder,
                               defaultValue,
                               buttonProps,
+                              error,
+                              helperText,
                               ...subValue
                             },
                           ]) => (
@@ -607,12 +692,34 @@ function Profiles() {
                                   >
                                     {label}
                                   </Typography>
+                                  {error && (
+                                    <Typography
+                                      variant="body2"
+                                      color="error"
+                                      sx={{
+                                        mb: 1,
+                                      }}
+                                    >
+                                      {typeof helperText === "object"
+                                        ? Object.values(helperText).map(
+                                            (value: unknown, index: number) => (
+                                              <React.Fragment key={index}>
+                                                {value as string}
+                                                <br />
+                                              </React.Fragment>
+                                            )
+                                          )
+                                        : helperText}
+                                    </Typography>
+                                  )}
                                   <TextField
                                     type={type}
                                     placeholder={placeholder}
                                     name={name}
                                     defaultValue={defaultValue}
-                                    sx={{}}
+                                    sx={{
+                                      width: "100%", // Ensure the TextField spans the full width
+                                    }}
                                   />
                                 </Stack>
                               )}
@@ -631,6 +738,9 @@ function Profiles() {
                                   <AppDatePicker
                                     name={name}
                                     defaultValue={defaultValue as dayjs.Dayjs}
+                                    disableFuture={true}
+                                    error={error}
+                                    helperText={helperText as string}
                                   />
                                 </Stack>
                               )}
@@ -665,6 +775,8 @@ function Profiles() {
                                 placeholder,
                                 defaultValue,
                                 buttonProps,
+                                error,
+                                helperText,
                                 ...subValue
                               },
                             ]) => (
@@ -719,12 +831,25 @@ function Profiles() {
                                           >
                                             {label}
                                           </Typography>
+                                          {error && (
+                                            <Typography
+                                              variant="body2"
+                                              color="error"
+                                              sx={{
+                                                mb: 1,
+                                              }}
+                                            >
+                                              {helperText as string}
+                                            </Typography>
+                                          )}
                                           <TextField
                                             type={type}
                                             placeholder={placeholder}
                                             defaultValue={defaultValue}
                                             name={name}
-                                            sx={{}}
+                                            sx={{
+                                              width: "100%",
+                                            }}
                                           />
                                         </Stack>
                                       );
@@ -746,6 +871,9 @@ function Profiles() {
                                             defaultValue={
                                               defaultValue as dayjs.Dayjs
                                             }
+                                            disableFuture={true}
+                                            error={error}
+                                            helperText={helperText as string}
                                           />
                                         </Stack>
                                       );
@@ -782,6 +910,8 @@ function Profiles() {
                                 placeholder,
                                 defaultValue,
                                 buttonProps,
+                                error,
+                                helperText,
                                 ...subValue
                               },
                             ]) => (
@@ -834,6 +964,17 @@ function Profiles() {
                                     >
                                       {label}
                                     </Typography>
+                                    {error && (
+                                      <Typography
+                                        variant="body2"
+                                        color="error"
+                                        sx={{
+                                          mb: 1,
+                                        }}
+                                      >
+                                        {helperText as string}
+                                      </Typography>
+                                    )}
                                     <TextField
                                       type={type}
                                       placeholder={placeholder}
@@ -858,6 +999,9 @@ function Profiles() {
                                     <AppDatePicker
                                       name={name}
                                       defaultValue={defaultValue as dayjs.Dayjs}
+                                      disableFuture={true}
+                                      error={error}
+                                      helperText={helperText as string}
                                     />
                                   </Stack>
                                 )}

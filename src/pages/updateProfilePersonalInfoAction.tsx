@@ -1,6 +1,9 @@
 import { ActionFunctionArgs } from "react-router-dom";
-import store from "../store/store";
-import { setUser } from "../store/userSlice";
+import {
+  IUpdateProfilePersonalInfoError,
+  updateProfilePersonalInfo,
+} from "../services/userService";
+import { validateUpdateProfilePersonalInfo } from "../services/modelValidateService";
 
 export default async function updateProfilePersonalInfoAction({
   request,
@@ -11,15 +14,17 @@ export default async function updateProfilePersonalInfoAction({
     phone: string;
     dayOfBirth: string;
   };
-  console.log(data.email);
-  store.dispatch(
-    setUser({
-      ...(data.email && data.email !== "" ? { email: data.email } : {}),
-      ...(data.phone && data.phone !== "" ? { mobileNumber: data.phone } : {}),
-      ...(data.dayOfBirth && data.dayOfBirth !== ""
-        ? { dayOfBirth: new Date(data.dayOfBirth) }
-        : {}),
-    })
-  );
-  return null;
+
+  const errors: IUpdateProfilePersonalInfoError =
+    validateUpdateProfilePersonalInfo(data.email, data.phone, data.dayOfBirth);
+
+  if (Object.keys(errors).length > 0) {
+    return errors;
+  }
+
+  return await updateProfilePersonalInfo({
+    email: data.email,
+    phone_number: data.phone,
+    day_of_birth: new Date(data.dayOfBirth),
+  });
 }

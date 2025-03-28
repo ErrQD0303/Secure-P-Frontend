@@ -17,9 +17,15 @@ const StyledStaticDatePicker = styled(DatePicker)({
 export default function AppDatePicker({
   name,
   defaultValue,
+  disableFuture,
+  error,
+  helperText,
 }: {
   name?: string;
   defaultValue?: Dayjs | null;
+  disableFuture?: boolean;
+  error?: boolean;
+  helperText?: string;
 }) {
   return (
     <StyledStaticDatePicker
@@ -30,6 +36,18 @@ export default function AppDatePicker({
         openPickerIcon: CalendarMonthIcon,
       }}
       defaultValue={defaultValue}
+      disableFuture={disableFuture ?? false}
+      slotProps={{
+        textField: {
+          error: error,
+          helperText: helperText,
+          sx: {
+            "& .MuiInputAdornment-root": {
+              display: "none",
+            },
+          },
+        },
+      }}
     />
   );
 }

@@ -264,6 +264,96 @@ export const resendEmailConfirmation = async (
   }
 };
 
+export const updateProfilePersonalInfo = async (
+  updateInfo: IUpdateProfilePersonalInfoRequest
+): Promise<IUpdateProfilePersonalInfoError | null> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const updateProfilePersonalInfoUrl =
+    backendUrl + import.meta.env.VITE_USER_UPDATE_PROFILE_URL;
+
+  try {
+    const tokens = getAccessTokenFromCookie();
+    await axios.put(updateProfilePersonalInfoUrl, updateInfo, {
+      withCredentials: true,
+      headers: {
+        Authorization: tokens,
+      },
+    });
+
+    return null;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data.errors;
+    }
+    throw error;
+  }
+};
+
+export const updatePassword = async (
+  updatePasswordRequest: IUpdatePasswordRequest
+): Promise<IUpdatePasswordError | null> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const updatePasswordUrl =
+    backendUrl + import.meta.env.VITE_USER_UPDATE_PASSWORD_URL;
+
+  try {
+    const tokens = getAccessTokenFromCookie();
+    await axios.put(updatePasswordUrl, updatePasswordRequest, {
+      withCredentials: true,
+      headers: {
+        Authorization: tokens,
+      },
+    });
+
+    return null;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data.errors;
+    }
+    throw error;
+  }
+};
+
+export interface IUpdateProfilePersonalInfoRequest {
+  email?: string;
+  phone_number?: string;
+  day_of_birth?: Date;
+}
+
+export interface IUpdateProfilePersonalInfoResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IUpdateProfilePersonalInfoError;
+  user: IUser;
+}
+
+export interface IUpdatePasswordRequest {
+  old_password: string;
+  new_password: string;
+}
+
+export interface IUpdatePasswordResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IUpdatePasswordError;
+}
+
+export interface IUpdatePasswordError {
+  summary?: string;
+  CurrentPassword?: string;
+  NewPassword?: object;
+  ConfirmPassword?: string;
+}
+
+export interface IUpdateProfilePersonalInfoError {
+  summary?: string;
+  Email?: string;
+  Phone?: string;
+  DayOfBirth?: string;
+}
+
 enum LoginType {
   Email = 0,
   Username = 1,

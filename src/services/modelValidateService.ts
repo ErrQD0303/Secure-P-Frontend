@@ -1,5 +1,10 @@
 import { IRegisterUser } from "../types/user";
-import { IEmailConfirmationError, IRegisterError } from "./userService";
+import {
+  IEmailConfirmationError,
+  IRegisterError,
+  IUpdatePasswordError,
+  IUpdateProfilePersonalInfoError,
+} from "./userService";
 
 export const validateRegisterUser = (user: IRegisterUser): IRegisterError => {
   const errors: IRegisterError = {};
@@ -51,7 +56,7 @@ export const validateRegisterUser = (user: IRegisterUser): IRegisterError => {
 };
 
 export const validateEmail = (
-  email: string
+  email: string | undefined | null
 ): IEmailConfirmationError | null => {
   if (!email || email.trim() === "") {
     return {
@@ -65,4 +70,89 @@ export const validateEmail = (
     };
 
   return null;
+};
+
+export const validatePhoneNumber = (
+  phoneNumber: string
+): IUpdateProfilePersonalInfoError | null => {
+  if (!phoneNumber || phoneNumber.trim() === "") {
+    return {
+      Phone: "Phone number is required",
+    };
+  }
+
+  if (!/^\d{10}$/.test(phoneNumber)) {
+    return {
+      Phone: "Invalid phone number. Please enter a valid 10-digit phone number",
+    };
+  }
+
+  return null;
+};
+
+export const validateDateOfBirth = (
+  dayOfBirth: string | undefined | null
+): IUpdateProfilePersonalInfoError => {
+  const errors: IUpdateProfilePersonalInfoError = {};
+  if (!dayOfBirth || dayOfBirth.trim() === "") {
+    errors.DayOfBirth = "Date of birth is required";
+  } else {
+    const date = new Date(dayOfBirth);
+    if (isNaN(date.getTime())) {
+      errors.DayOfBirth = "Invalid date format. Please use YYYY-MM-DD";
+    } else if (date > new Date()) {
+      errors.DayOfBirth = "Date of birth cannot be in the future";
+    }
+  }
+
+  return errors;
+};
+
+export const validateUpdateProfilePersonalInfo = (
+  email?: string,
+  phone?: string,
+  dayOfBirth?: string
+): IUpdateProfilePersonalInfoError => {
+  const errors: IUpdateProfilePersonalInfoError = {};
+
+  const emailError = validateEmail(email);
+  if (emailError) {
+    errors.Email = emailError.email;
+  }
+
+  const phoneError = validatePhoneNumber(phone || "");
+  if (phoneError) {
+    errors.Phone = phoneError.Phone;
+  }
+
+  const dateError = validateDateOfBirth(dayOfBirth);
+  if (dateError.DayOfBirth) {
+    errors.DayOfBirth = dateError.DayOfBirth;
+  }
+
+  return errors;
+};
+
+export const validateChangePassword = (
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string
+): IUpdatePasswordError => {
+  const errors: IUpdatePasswordError = {};
+
+  if (!oldPassword || oldPassword.trim() === "") {
+    errors.CurrentPassword = "Current password is required";
+  }
+
+  if (!newPassword || newPassword.trim() === "") {
+    errors.NewPassword = { NewPasswordIsRequired: "New password is required" };
+  }
+
+  if (!confirmPassword || confirmPassword.trim() === "") {
+    errors.ConfirmPassword = "Confirm Password is required";
+  } else if (newPassword !== confirmPassword) {
+    errors.ConfirmPassword = "Confirm Password do not match";
+  }
+
+  return errors;
 };
