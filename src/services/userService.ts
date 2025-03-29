@@ -402,3 +402,15 @@ export interface ITokenResponse {
   refresh_token: string;
   token_type: string;
 }
+
+export interface IForgotPasswordResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IForgotPasswordError;
+}
+
+export interface IForgotPasswordError {
+  summary?: string;
+  email?: string;
+}

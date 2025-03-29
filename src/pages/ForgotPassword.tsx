@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, useFetcher } from "react-router-dom";
+import { useActionData, useFetcher, useNavigation } from "react-router-dom";
 import LoginSignUpLayout from "../layouts/LoginSignUpLayout";
 import Grid from "@mui/material/Grid2";
 import {
@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import ButtonLink from "../components/ButtonLink";
+import { IForgotPasswordResponse } from "../services/userService";
 
 type Props = {};
 
-const StyledForm = styled(Form)(() => ({}));
+const StyledForm = styled("form")(() => ({}));
 
 const StyledLoginSignUpLayout = styled(LoginSignUpLayout)(() => ({
   color: "#3D4B56",
@@ -58,10 +59,22 @@ const ResetPasswordButton = styled(ButtonLink)(({ theme }) => ({
   width: "auto",
 }));
 
-function ForgotPassword({}: Props) {
+function ForgotPassword(props: Props) {
+  const handleResetPasswordClick = React.useCallback(() => {}, []);
+  const [response, setResponse] = React.useState<
+    IForgotPasswordResponse | null | undefined
+  >(null);
+
   const fetcher = useFetcher();
+
+  React.useEffect(() => {
+    if (fetcher.data) {
+      setResponse(fetcher.data);
+    }
+  }, [fetcher.data, response]);
+
   return (
-    <StyledForm method="post" action="/forgot-password">
+    <StyledForm as={fetcher.Form} method="post" action="/forgot-password">
       <StyledLoginSignUpLayout
         showWelcomeText={false}
         pageText={"Reset your Password"}
@@ -84,6 +97,11 @@ function ForgotPassword({}: Props) {
             Enter your email address and we will send you instructions to reset
             your password
           </StyledFormInfo>
+          {response && response?.success && (
+            <StyledFormInfo sx={{ color: "green" }}>
+              {response?.message}
+            </StyledFormInfo>
+          )}
         </StyledGrid>
         <StyledGrid
           key={"email"}
