@@ -29,6 +29,8 @@ import {
   ProtectedRoute,
   Logout,
   ResendEmailConfirmation,
+  PasswordReset,
+  ForgotPassword,
 } from "../LazyComponents";
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 
@@ -143,6 +145,14 @@ export const routes = [
     element: <Logout />,
     name: "Logout",
     errorElement: <Error />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/password-reset",
+    element: <PasswordReset />,
   },
 ];
 

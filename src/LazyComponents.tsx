@@ -22,3 +22,5 @@ export const Logout = lazy(() => import("./pages/Logout"));
 export const ResendEmailConfirmation = lazy(
   () => import("./pages/ResendEmailConfirmation")
 );
+export const PasswordReset = lazy(() => import("./pages/PasswordReset"));
+export const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));

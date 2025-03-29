@@ -12,6 +12,7 @@ export type Props = {
   type: string;
   sx?: SxProps<Theme> | undefined;
   state?: unknown;
+  buttonProps?: React.ComponentProps<typeof Button>;
   onClick?: (event: React.MouseEvent) => void;
 };
 
@@ -22,6 +23,7 @@ function ButtonLink({
   type,
   sx,
   state,
+  buttonProps,
   onClick,
 }: Props) {
   const linkTypes: { [key: string]: SxProps<Theme> | undefined } = {
@@ -46,7 +48,7 @@ function ButtonLink({
 
   if (!to)
     return (
-      <Button sx={sx} onClick={onClick}>
+      <Button {...buttonProps} sx={sx} onClick={onClick}>
         {children}
       </Button>
     );
