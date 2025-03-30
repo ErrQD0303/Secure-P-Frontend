@@ -2,7 +2,11 @@ import Container from "@mui/material/Container";
 import Grid, { Grid2Props } from "@mui/material/Grid2";
 import React from "react";
 import { useSelector } from "react-redux";
-import { getAvatar, getProfilesPersonalInfo } from "../store/userSlice";
+import {
+  getAvatar,
+  getAvatarKey,
+  getProfilesPersonalInfo,
+} from "../store/userSlice";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
@@ -40,6 +44,7 @@ function Profiles() {
   const { viewWidth } = useViewPort();
 
   const userAvatar = useSelector(getAvatar);
+  const userAvatarKey = useSelector(getAvatarKey);
   const avatar = userAvatar
     ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
     : StaticFileUrl.DEFAULT_AVATAR;
@@ -506,6 +511,7 @@ function Profiles() {
                 }}
               >
                 <Box
+                  key={userAvatarKey}
                   sx={{
                     width: "100%",
                     height: "100%",

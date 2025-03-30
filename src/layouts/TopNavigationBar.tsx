@@ -20,7 +20,7 @@ import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import logoImage from "/logo.png";
 import { useSelector } from "react-redux";
-import { getAvatar, getFullName } from "../store/userSlice";
+import { getAvatar, getAvatarKey, getFullName } from "../store/userSlice";
 import { StaticFileUrl } from "../shared/constants/staticFileUrl";
 
 type Props = {
@@ -47,6 +47,7 @@ function TopNavigationBar({ routeName }: Props) {
   const navigate = useNavigate();
   const fullName = useSelector(getFullName);
   const userAvatar = useSelector(getAvatar);
+  const userAvatarKey = useSelector(getAvatarKey);
   const avatar = userAvatar
     ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
     : StaticFileUrl.DEFAULT_AVATAR;
@@ -221,6 +222,7 @@ function TopNavigationBar({ routeName }: Props) {
               <ButtonLink to={"profiles"} type="none">
                 <Tooltip title="My Profile">
                   <Box
+                    key={userAvatarKey}
                     sx={{
                       borderRadius: "50%",
                       p: "1.5rem",

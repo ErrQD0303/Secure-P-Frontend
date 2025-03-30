@@ -4,7 +4,9 @@ import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { toPersonalInfo } from "../shared/mappers/users";
 
-const initialState: IUser = {
+const initialState: IUser & {
+  avatarKey?: string | null;
+} = {
   id: "",
   username: undefined,
   mobileNumber: "",
@@ -19,6 +21,7 @@ const initialState: IUser = {
   postCode: "",
   licensePlateNumber: [],
   avatar: null,
+  avatarKey: null,
 };
 
 const userSlice = createSlice({
@@ -32,7 +35,11 @@ const userSlice = createSlice({
       return initialState;
     },
     setAvatar: (state, action) => {
-      return { ...state, avatar: action.payload };
+      return {
+        ...state,
+        avatar: action.payload,
+        avatarKey: Date.now().toString(),
+      };
     },
   },
 });
@@ -56,6 +63,7 @@ export const getProfilesPersonalInfo = createSelector([getUserInfo], (user) =>
 );
 
 export const getAvatar = (state: RootState) => state.user.avatar;
+export const getAvatarKey = (state: RootState) => state.user.avatarKey;
 
 export const getBillingAddress = (state: RootState) =>
   toPersonalInfo(state.user);

@@ -137,7 +137,10 @@ function UploadImageModal({ setShowModal, ...props }: Props) {
     if (!image) return;
     const avatarUrl = await uploadAvatar(image);
 
-    if (avatarUrl !== null) dispatch(setAvatar(avatarUrl));
+    if (avatarUrl !== null) {
+      dispatch(setAvatar(null));
+      dispatch(setAvatar(avatarUrl));
+    }
     handleCloseModal();
     location.reload();
   }, [image, handleCloseModal, dispatch]);
