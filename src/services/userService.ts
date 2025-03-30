@@ -329,14 +329,15 @@ export const forgotPassword = async (
 
     return response.data;
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      return error.response?.data;
+    if (axios.isAxiosError(error) && error?.response) {
+      return error?.response?.data;
     }
 
     return {
       statusCode: 500,
       success: false,
-      message: "Unknown error occurred",
+      message:
+        "Unknown error occurred. Server may be down. Please try again later.",
       errors: {},
     };
   }
