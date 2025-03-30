@@ -1,15 +1,18 @@
 import { LoaderFunctionArgs } from "react-router-dom";
-import { IForgotPasswordResponse } from "../services/userService";
+import { forgotPassword } from "../services/userService";
 
 export default async function action({ request }: LoaderFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email");
+  const email = formData.get("email") as string;
 
-  return {
-    statusCode: 200,
-    success: true,
-    message: "Email sent to " + email,
-    errors: {},
-    loginData: { email: email as string },
-  } as IForgotPasswordResponse;
+  if (!email) {
+    return {
+      statusCode: 400,
+      success: false,
+      message: "Email is required",
+      errors: {},
+    };
+  }
+
+  return await forgotPassword(email);
 }

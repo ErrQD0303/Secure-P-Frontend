@@ -1,5 +1,5 @@
 import React from "react";
-import { useActionData, useFetcher, useNavigation } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 import LoginSignUpLayout from "../layouts/LoginSignUpLayout";
 import Grid from "@mui/material/Grid2";
 import {
@@ -12,8 +12,7 @@ import {
 import PersonIcon from "@mui/icons-material/Person";
 import ButtonLink from "../components/ButtonLink";
 import { IForgotPasswordResponse } from "../services/userService";
-
-type Props = {};
+import Loader from "../components/Loader";
 
 const StyledForm = styled("form")(() => ({}));
 
@@ -59,13 +58,14 @@ const ResetPasswordButton = styled(ButtonLink)(({ theme }) => ({
   width: "auto",
 }));
 
-function ForgotPassword(props: Props) {
-  const handleResetPasswordClick = React.useCallback(() => {}, []);
+function ForgotPassword() {
   const [response, setResponse] = React.useState<
     IForgotPasswordResponse | null | undefined
   >(null);
 
   const fetcher = useFetcher();
+
+  const isLoading = fetcher.state !== "idle";
 
   React.useEffect(() => {
     if (fetcher.data) {
@@ -75,6 +75,7 @@ function ForgotPassword(props: Props) {
 
   return (
     <StyledForm as={fetcher.Form} method="post" action="/forgot-password">
+      {isLoading && <Loader />}
       <StyledLoginSignUpLayout
         showWelcomeText={false}
         pageText={"Reset your Password"}
@@ -97,8 +98,8 @@ function ForgotPassword(props: Props) {
             Enter your email address and we will send you instructions to reset
             your password
           </StyledFormInfo>
-          {response && response?.success && (
-            <StyledFormInfo sx={{ color: "green" }}>
+          {response && (
+            <StyledFormInfo sx={{ color: response?.success ? "green" : "red" }}>
               {response?.message}
             </StyledFormInfo>
           )}
@@ -132,32 +133,34 @@ function ForgotPassword(props: Props) {
             }}
           />
         </StyledGrid>
-        <StyledGrid
-          key={"email"}
-          size={{
-            base: 1,
-            lg: 2,
-          }}
-          offset={{
-            base: 0,
-            lg: 1,
-          }}
-        >
-          <Stack direction={"row"} spacing={2} justifyContent="center">
-            <ResetPasswordButton
-              buttonProps={{
-                variant: "contained",
-                color: "primary",
-                type: "submit",
-                disabled: fetcher.state !== "idle",
-              }}
-              type="button"
-              aria-label="Reset Password"
-            >
-              Reset Password
-            </ResetPasswordButton>
-          </Stack>
-        </StyledGrid>
+        {!response?.success ? (
+          <StyledGrid
+            key={"reset-password"}
+            size={{
+              base: 1,
+              lg: 2,
+            }}
+            offset={{
+              base: 0,
+              lg: 1,
+            }}
+          >
+            <Stack direction={"row"} spacing={2} justifyContent="center">
+              <ResetPasswordButton
+                buttonProps={{
+                  variant: "contained",
+                  color: "primary",
+                  type: "submit",
+                  disabled: fetcher.state !== "idle",
+                }}
+                type="button"
+                aria-label="Reset Password"
+              >
+                Reset Password
+              </ResetPasswordButton>
+            </Stack>
+          </StyledGrid>
+        ) : null}
       </StyledLoginSignUpLayout>
     </StyledForm>
   );

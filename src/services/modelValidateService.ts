@@ -1,6 +1,8 @@
+import { PasswordResetModelValidationException } from "../exceptions/PasswordResetModelValidationException";
 import { IRegisterUser } from "../types/user";
 import {
   IEmailConfirmationError,
+  IPasswordResetError,
   IRegisterError,
   IUpdatePasswordError,
   IUpdateProfilePersonalInfoError,
@@ -155,4 +157,51 @@ export const validateChangePassword = (
   }
 
   return errors;
+};
+
+export const validatePasswordReset = (
+  email?: string | null | undefined,
+  token?: string | null | undefined,
+  password?: string | null | undefined,
+  confirmPassword?: string | null | undefined
+): void => {
+  const errors: IPasswordResetError = {};
+  if (!email || email.trim() === "") {
+    errors.email = "Email is required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = "Invalid email format";
+  }
+
+  if (!token) {
+    errors.token = "Token is required";
+  }
+
+  if (!password || password.trim() === "") {
+    errors.password = "Password is required and cannot be empty";
+  } else if (password.length < 8) {
+    errors.password = "Password must be at least 8 characters long";
+  } else if (password.length > 100) {
+    errors.password = "Password must be at most 100 characters long";
+  } else if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*!])[a-zA-Z\d@#$%^&*!]{8,}$/.test(
+      password
+    )
+  ) {
+    errors.password =
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character";
+  }
+
+  if (!confirmPassword || confirmPassword.trim() === "") {
+    errors.confirm_password =
+      "Confirm Password is required and cannot be empty";
+  } else if (password !== confirmPassword) {
+    errors.confirm_password = "Confirm Password do not match with password";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new PasswordResetModelValidationException(
+      "Password reset validation failed",
+      errors as Record<string, string>
+    );
+  }
 };

@@ -187,7 +187,7 @@ function Login() {
               >
                 <ButtonLink
                   type="none"
-                  to="/password-reset"
+                  to="/forgot-password"
                   sx={{
                     textAlign: "right",
                     display: "block",

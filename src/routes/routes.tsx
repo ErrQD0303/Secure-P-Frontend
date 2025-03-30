@@ -34,6 +34,7 @@ import {
 } from "../LazyComponents";
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 import ForgotPasswordAction from "../pages/forgotPasswordAction";
+import PasswordResetAction from "../pages/passwordResetAction";
 
 export const routes = [
   {
@@ -157,6 +158,9 @@ export const routes = [
   {
     path: "/password-reset",
     element: <PasswordReset />,
+    name: "Password Reset",
+    errorElement: <Error />,
+    action: PasswordResetAction,
   },
 ];
 

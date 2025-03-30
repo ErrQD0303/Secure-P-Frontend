@@ -314,6 +314,97 @@ export const updatePassword = async (
   }
 };
 
+export const forgotPassword = async (
+  email: string
+): Promise<IForgotPasswordResponse | null> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const forgotPasswordUrl =
+    backendUrl + import.meta.env.VITE_USER_FORGOT_PASSWORD_URL;
+
+  try {
+    const response = await axios.post(forgotPasswordUrl, {
+      email,
+      redirectUrl: import.meta.env.VITE_FRONTEND_URL + "/password-reset",
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    }
+
+    return {
+      statusCode: 500,
+      success: false,
+      message: "Unknown error occurred",
+      errors: {},
+    };
+  }
+};
+
+export const passwordReset = async (
+  request: IPasswordResetRequest
+): Promise<IPasswordResetResponse | null> => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const passwordResetUrl =
+    backendUrl + import.meta.env.VITE_USER_RESET_PASSWORD_URL;
+
+  try {
+    const response = await axios.post(passwordResetUrl, request);
+
+    return response.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data;
+    }
+
+    return {
+      statusCode: 500,
+      success: false,
+      message: "Unknown error occurred",
+      errors: {},
+    };
+  }
+};
+
+export interface IPasswordResetRequest {
+  email: string;
+  password: string;
+  confirm_password: string;
+  token: string;
+}
+
+export interface IPasswordResetResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IPasswordResetError;
+}
+
+export interface IPasswordResetError {
+  summary?: string;
+  email?: string;
+  token?: string;
+  password?: string;
+  confirm_password?: string;
+}
+
+export interface IForgotPasswordRequest {
+  email: string;
+}
+
+export interface IForgotPasswordResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IForgotPasswordError;
+}
+
+export interface IForgotPasswordError {
+  summary?: string;
+  email?: string;
+}
+
 export interface IUpdateProfilePersonalInfoRequest {
   email?: string;
   phone_number?: string;
@@ -401,16 +492,4 @@ export interface ITokenResponse {
   access_token: string;
   refresh_token: string;
   token_type: string;
-}
-
-export interface IForgotPasswordResponse {
-  statusCode: number;
-  success: boolean;
-  message: string;
-  errors: IForgotPasswordError;
-}
-
-export interface IForgotPasswordError {
-  summary?: string;
-  email?: string;
 }

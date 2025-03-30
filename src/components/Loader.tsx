@@ -1,6 +1,8 @@
+import { useTheme } from "@emotion/react";
 import Box, { BoxProps } from "@mui/material/Box";
 
 function Loader({ sx, ...props }: BoxProps) {
+  const theme = useTheme();
   return (
     <Box
       {...props}
@@ -12,6 +14,7 @@ function Loader({ sx, ...props }: BoxProps) {
         justifyContent: "center",
         backgroundColor: "rgba(108, 122, 137, 0.2)",
         backdropFilter: "blur(5px)",
+        zIndex: theme.zIndex.modal,
         ...sx,
       }}
     >
