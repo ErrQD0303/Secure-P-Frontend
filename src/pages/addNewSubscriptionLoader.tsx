@@ -53,23 +53,29 @@ export type NewSubscriptionAdditionalProps = {
   control?: JSX.Element;
   buttonType?: "submit" | "reset" | "button";
   buttonElementProps?: ButtonProps;
+  error?: boolean;
+  errorMessage?: string;
   wrapper?: (children: React.ReactNode, props: Grid2Props) => JSX.Element;
 };
 
 const loader = async () => {
+  const parkingLocations = FAKE_PARKING_LOCATIONS;
+  const changeSignageFee = 10;
+  const clampingFee = 20;
+
   const formInputs: Array<Grid2Props & NewSubscriptionAdditionalProps> = [
     {
       name: "product-type",
       type: "select",
       label: "Choose Products",
-      values: Array.from(
-        Object.values(IProductType).map((value) => ({
+      values: Object.values(IProductType)
+        .filter((key) => isNaN(+key))
+        .map((value) => ({
           type: "select-option",
           label: value,
-          value,
+          value: IProductType[value as keyof typeof IProductType] + 1,
           sx: {},
-        }))
-      ) as Array<unknown & NewSubscriptionAdditionalProps>,
+        })) as Array<unknown & NewSubscriptionAdditionalProps>,
       offset: { base: 0 },
       size: {
         base: 12,
@@ -94,7 +100,12 @@ const loader = async () => {
             return <em>--- Choose Products ---</em>;
           }
 
-          return selected;
+          const productTypeKey = Object.keys(IProductType).find(
+            (key) =>
+              IProductType[key as keyof typeof IProductType] === +selected - 1
+          );
+
+          return productTypeKey ? productTypeKey : "--- Choose Products ---";
         },
         inputProps: { "aria-label": "Without label" },
         /* startAdornment: (
@@ -403,6 +414,9 @@ const loader = async () => {
         sx: {
           width: "100%",
         },
+      } as DateTimePickerProps<Dayjs, boolean> & {
+        error?: boolean;
+        errorMessage?: string;
       },
       toDateProps: {
         name: "endDate",
@@ -412,6 +426,9 @@ const loader = async () => {
         sx: {
           width: "100%",
         },
+      } as DateTimePickerProps<Dayjs, boolean> & {
+        error?: boolean;
+        errorMessage?: string;
       },
       timeRangeIconProps: {
         sx: {
@@ -550,10 +567,6 @@ const loader = async () => {
       },
     },
   ];
-
-  const parkingLocations = FAKE_PARKING_LOCATIONS;
-  const changeSignageFee = 10;
-  const clampingFee = 20;
 
   return { formInputs, parkingLocations, changeSignageFee, clampingFee };
 };

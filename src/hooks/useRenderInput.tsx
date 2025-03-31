@@ -7,7 +7,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Stack, { StackProps } from "@mui/material/Stack";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 import SearchIcon from "@mui/icons-material/Search";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import {
+  DateTimePicker,
+  DateTimePickerProps,
+} from "@mui/x-date-pickers/DateTimePicker";
+import { Dayjs } from "dayjs";
 import {
   Autocomplete,
   AutocompleteProps,
@@ -54,6 +58,8 @@ const addNewSubscriptionRenderInput = (
     timeRangeGridProps,
     toDateGridProps,
     buttonElementProps,
+    error,
+    errorMessage,
     ...props
   } = input;
 
@@ -62,6 +68,7 @@ const addNewSubscriptionRenderInput = (
       case "select":
         return (
           <Stack key={name} {...(parentElementProps as StackProps)}>
+            {error && <Typography color="error">{errorMessage}</Typography>}
             <Typography {...(labelProps as TypographyProps)}>
               {label}
             </Typography>
@@ -82,6 +89,7 @@ const addNewSubscriptionRenderInput = (
       case "search-text-input":
         return (
           <Stack key={name} {...(parentElementProps as StackProps)}>
+            {error && <Typography color="error">{errorMessage}</Typography>}
             <Typography {...(labelProps as TypographyProps)}>
               {label}
             </Typography>
@@ -220,6 +228,40 @@ const addNewSubscriptionRenderInput = (
       case "date-time-range":
         return (
           <Stack key={name} {...(parentElementProps as StackProps)}>
+            {(
+              fromDateProps as DateTimePickerProps<Dayjs, boolean> & {
+                error?: boolean;
+                errorMessage?: string;
+              }
+            )?.error && (
+              <Typography color="error">
+                {
+                  (
+                    fromDateProps as DateTimePickerProps<Dayjs, boolean> & {
+                      error?: boolean;
+                      errorMessage?: string;
+                    }
+                  )?.errorMessage
+                }
+              </Typography>
+            )}
+            {(
+              toDateProps as DateTimePickerProps<Dayjs, boolean> & {
+                error?: boolean;
+                errorMessage?: string;
+              }
+            )?.error && (
+              <Typography color="error">
+                {
+                  (
+                    toDateProps as DateTimePickerProps<Dayjs, boolean> & {
+                      error?: boolean;
+                      errorMessage?: string;
+                    }
+                  )?.errorMessage
+                }
+              </Typography>
+            )}
             <Typography {...(labelProps as TypographyProps)}>
               {label}
             </Typography>

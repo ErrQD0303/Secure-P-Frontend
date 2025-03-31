@@ -1,3 +1,4 @@
+import { AddNewUserParkingSubscritionException } from "../exceptions/AddNewUserParkingSubscritionException";
 import { PasswordResetModelValidationException } from "../exceptions/PasswordResetModelValidationException";
 import { IRegisterUser } from "../types/user";
 import {
@@ -6,6 +7,8 @@ import {
   IRegisterError,
   IUpdatePasswordError,
   IUpdateProfilePersonalInfoError,
+  IUserParkingSubscriptionError,
+  IUserParkingSubscriptionRequest,
 } from "./userService";
 
 export const validateRegisterUser = (user: IRegisterUser): IRegisterError => {
@@ -201,6 +204,43 @@ export const validatePasswordReset = (
   if (Object.keys(errors).length > 0) {
     throw new PasswordResetModelValidationException(
       "Password reset validation failed",
+      errors as Record<string, string>
+    );
+  }
+};
+
+export const validateUserParkingSubscription = (
+  request: IUserParkingSubscriptionRequest
+): void => {
+  const errors: IUserParkingSubscriptionError = {};
+
+  if (isNaN(request.product_type)) {
+    errors.product_type = "Please select a product type";
+  }
+
+  if (!request.parking_location || request.parking_location.trim() === "") {
+    errors.parking_location = "Please select a parking location";
+  }
+
+  if (!request.parking_zone || request.parking_zone.trim() === "") {
+    errors.parking_zone = "Please select a parking zone";
+  }
+
+  if (!request.start_date) {
+    errors.start_date = "Start date is required";
+  } else if (request.start_date < new Date()) {
+    errors.start_date = "Start date cannot be less than current date";
+  }
+
+  if (!request.end_date) {
+    errors.end_date = "End date is required";
+  } else if (request.end_date < request.start_date) {
+    errors.end_date = "End date cannot be less than start date";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new AddNewUserParkingSubscritionException(
+      "User parking subscription validation failed",
       errors as Record<string, string>
     );
   }

@@ -368,6 +368,34 @@ export const passwordReset = async (
   }
 };
 
+export interface IUserParkingSubscriptionRequest {
+  product_type: number;
+  parking_location: string;
+  parking_zone: string;
+  start_date: Date;
+  end_date: Date;
+  change_signage_fee: boolean;
+  clamping_fee: boolean;
+}
+
+export interface IUserParkingSubscriptionResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  errors: IUserParkingSubscriptionError;
+}
+
+export interface IUserParkingSubscriptionError {
+  summary?: string;
+  product_type?: string;
+  parking_location?: string;
+  parking_zone?: string;
+  start_date?: string;
+  end_date?: string;
+  change_signage_fee?: string;
+  clamping_fee?: string;
+}
+
 export interface IPasswordResetRequest {
   email: string;
   password: string;

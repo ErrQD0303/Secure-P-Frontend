@@ -1,6 +1,7 @@
 import { ErrorResponse } from "react-router-dom";
 import { BackendLogServerError } from "../../exceptions/BackendLogServerError";
 import { PasswordResetModelValidationException } from "../../exceptions/PasswordResetModelValidationException";
+import { AddNewUserParkingSubscritionException } from "../../exceptions/AddNewUserParkingSubscritionException";
 
 export const isBackendLogServerError = (
   error: unknown
@@ -18,3 +19,8 @@ export const isPasswordResetModelValidationException = (
   error: unknown
 ): error is PasswordResetModelValidationException =>
   (error as PasswordResetModelValidationException).errors !== undefined;
+
+export const isAddNewUserParkingSubscritionException = (
+  error: unknown
+): error is AddNewUserParkingSubscritionException =>
+  (error as AddNewUserParkingSubscritionException).errors !== undefined;

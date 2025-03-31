@@ -8,6 +8,6 @@ export enum Country {
 }
 
 export enum IProductType {
-  Tenant = "Tenant",
-  NonTenant = "Non-Tenant",
+  Tenant = 0,
+  NonTenant = 1,
 }

@@ -20,6 +20,8 @@ import { AutocompleteChangeReason } from "@mui/material/Autocomplete";
 import dayjs, { Dayjs } from "dayjs";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
+import { IUserParkingSubscriptionResponse } from "../services/userService";
+import { DateTimePickerProps } from "@mui/x-date-pickers/DateTimePicker";
 // import React from "react";
 
 // StyledContainer with base styles
@@ -54,6 +56,9 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     clampingFee: number;
   };
 
+  const [response, setResponse] =
+    React.useState<IUserParkingSubscriptionResponse | null>(null);
+
   const [parkingLocations, setParkingLocations] = React.useState<
     IParkingLocation[]
   >(defaultParkingLocations ?? []);
@@ -61,6 +66,18 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     React.useState<boolean>(true);
   const [currentParkingLocationWithZone, setCurrentParkingLocationWithZone] =
     React.useState<IParkingLocationWithZones | null>(null);
+  const productTypeInput = React.useMemo(
+    () => formInputs.find((input) => input.name === "product-type"),
+    [formInputs]
+  );
+
+  if (productTypeInput) {
+    if (productTypeInput) {
+      productTypeInput.error = Boolean(response?.errors?.product_type);
+    }
+    productTypeInput.errorMessage = response?.errors?.product_type;
+  }
+
   const parkingLocationInput = React.useMemo(
     () => formInputs.find((input) => input.name === "parking-location"),
     [formInputs]
@@ -87,6 +104,36 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     []
   );
 
+  const fetcher = useFetcher();
+
+  const handleFormSubmit = React.useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+
+      const productType = formData.get("product-type");
+      if (productType !== null) {
+        formData.set("product-type", String(+productType - 1));
+      }
+
+      formData.set(
+        "parking-location",
+        currentParkingLocationWithZone?.id ?? ""
+      );
+
+      formData.set(
+        "parking-zone",
+        currentParkingLocationWithZone?.currentParkingZone?.id ?? ""
+      );
+
+      fetcher.submit(formData, {
+        method: "POST",
+        encType: "application/x-www-form-urlencoded",
+      });
+    },
+    [fetcher, currentParkingLocationWithZone]
+  );
+
   const handleParkingLocationChange = React.useCallback(
     (
       _event: React.SyntheticEvent,
@@ -101,14 +148,19 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     []
   );
 
-  if (parkingLocationInput && parkingLocationInput.autoCompleteProps) {
-    parkingLocationInput.autoCompleteProps.options = parkingLocations;
-    parkingLocationInput.autoCompleteProps.onInputChange =
-      handleParkingLocationInputChange;
-    parkingLocationInput.autoCompleteProps.onHighlightChange =
-      handleParkingLocationHightLightChange;
-    parkingLocationInput.autoCompleteProps.onChange =
-      handleParkingLocationChange;
+  if (parkingLocationInput) {
+    parkingLocationInput.error = Boolean(response?.errors?.parking_location);
+    parkingLocationInput.errorMessage = response?.errors?.parking_location;
+
+    if (parkingLocationInput && parkingLocationInput.autoCompleteProps) {
+      parkingLocationInput.autoCompleteProps.options = parkingLocations;
+      parkingLocationInput.autoCompleteProps.onInputChange =
+        handleParkingLocationInputChange;
+      parkingLocationInput.autoCompleteProps.onHighlightChange =
+        handleParkingLocationHightLightChange;
+      parkingLocationInput.autoCompleteProps.onChange =
+        handleParkingLocationChange;
+    }
   }
 
   const [parkingZones, setParkingZone] = React.useState<IParkingZone[]>([]);
@@ -148,7 +200,6 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
       reason: AutocompleteChangeReason
     ) => {
       if (reason !== "clear") return;
-      console.log("Clearing parking zone");
       setCurrentParkingLocationWithZone((prev) => {
         if (!prev) return null;
         return {
@@ -171,14 +222,19 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     [formInputs]
   );
 
-  if (parkingZoneInput && parkingZoneInput.autoCompleteProps) {
-    parkingZoneInput.autoCompleteProps.options = parkingZones;
-    parkingZoneInput.autoCompleteProps.onInputChange =
-      handleParkingZoneInputChange;
-    parkingZoneInput.autoCompleteProps.onHighlightChange =
-      handleParkingZoneHightLightChange;
-    parkingZoneInput.autoCompleteProps.onChange = handleParkingZoneChange;
-    parkingZoneInput.autoCompleteProps.resetStateKey = resetParkingZoneKey;
+  if (parkingZoneInput) {
+    parkingZoneInput.error = Boolean(response?.errors?.parking_zone);
+    parkingZoneInput.errorMessage = response?.errors?.parking_zone;
+
+    if (parkingZoneInput && parkingZoneInput.autoCompleteProps) {
+      parkingZoneInput.autoCompleteProps.options = parkingZones;
+      parkingZoneInput.autoCompleteProps.onInputChange =
+        handleParkingZoneInputChange;
+      parkingZoneInput.autoCompleteProps.onHighlightChange =
+        handleParkingZoneHightLightChange;
+      parkingZoneInput.autoCompleteProps.onChange = handleParkingZoneChange;
+      parkingZoneInput.autoCompleteProps.resetStateKey = resetParkingZoneKey;
+    }
   }
 
   const parkingInfoGridBox = React.useMemo(() => {
@@ -249,10 +305,40 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     if (dateRangeGridBox.fromDateProps) {
       dateRangeGridBox.fromDateProps.value = startDate;
       dateRangeGridBox.fromDateProps.onChange = handleFromTimeChange;
+      (
+        dateRangeGridBox.fromDateProps as DateTimePickerProps<
+          Dayjs,
+          boolean
+        > & {
+          error?: boolean;
+          errorMessage?: string;
+        }
+      ).error = Boolean(response?.errors?.start_date);
+      (
+        dateRangeGridBox.fromDateProps as DateTimePickerProps<
+          Dayjs,
+          boolean
+        > & {
+          error?: boolean;
+          errorMessage?: string;
+        }
+      ).errorMessage = response?.errors?.start_date;
     }
     if (dateRangeGridBox.toDateProps) {
       dateRangeGridBox.toDateProps.value = endDate;
       dateRangeGridBox.toDateProps.onChange = handleToTimeChange;
+      (
+        dateRangeGridBox.toDateProps as DateTimePickerProps<Dayjs, boolean> & {
+          error?: boolean;
+          errorMessage?: string;
+        }
+      ).error = Boolean(response?.errors?.end_date);
+      (
+        dateRangeGridBox.toDateProps as DateTimePickerProps<Dayjs, boolean> & {
+          error?: boolean;
+          errorMessage?: string;
+        }
+      ).errorMessage = response?.errors?.end_date;
     }
   }
   const [haveChangeSignage, setHaveChangeSignage] =
@@ -314,6 +400,8 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     } else
       subscriptionFee =
         currentParkingLocationWithZone.rates.monthly * Math.ceil(daysDiff / 30);
+
+    subscriptionFee = subscriptionFee < 0 ? 0 : subscriptionFee;
     totalFee += subscriptionFee;
     return { totalFee, subscriptionFee };
   }, [
@@ -352,7 +440,11 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
             width: "100%",
           },
         },
-        value: <Box className="Mui-Fee-Box">{`$${clampingFee}`}</Box>,
+        value: (
+          <Box className="Mui-Fee-Box">{`$${
+            haveClamping ? clampingFee : 0
+          }`}</Box>
+        ),
       },
       {
         name: "Change Signage Fee",
@@ -365,7 +457,11 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
             width: "100%",
           },
         },
-        value: <Box className="Mui-Fee-Box">{`$${changeSignageFee}`}</Box>,
+        value: (
+          <Box className="Mui-Fee-Box">{`$${
+            haveChangeSignage ? changeSignageFee : 0
+          }`}</Box>
+        ),
       },
       {
         name: "Total Amount",
@@ -394,7 +490,14 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
         ),
       },
     ],
-    [subscriptionFee, clampingFee, changeSignageFee, totalFee]
+    [
+      subscriptionFee,
+      clampingFee,
+      changeSignageFee,
+      totalFee,
+      haveClamping,
+      haveChangeSignage,
+    ]
   );
 
   const feeDataGridBox = React.useMemo(() => {
@@ -405,10 +508,15 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
     feeDataGridBox.values = outputFeeData;
   }
 
-  const fetcher = useFetcher();
-
   const { renderInput } = useRenderInput();
   const { routeName } = useOutletContext() as { routeName: string };
+
+  React.useEffect(() => {
+    if (fetcher.data) {
+      setResponse(fetcher.data as IUserParkingSubscriptionResponse);
+    }
+  }, [fetcher.data]);
+
   return (
     <StyledContainer
       sx={{
@@ -452,7 +560,8 @@ function AddNewSubscription({ sx, ...props }: ContainerProps) {
               }}
             />
           </Stack>
-          <fetcher.Form method="POST">
+          {response?.message && <Grid>{response?.message}</Grid>}
+          <fetcher.Form method="POST" onSubmit={handleFormSubmit}>
             <Grid
               container
               sx={{
