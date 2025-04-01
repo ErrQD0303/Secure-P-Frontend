@@ -24,3 +24,9 @@ export const ResendEmailConfirmation = lazy(
 );
 export const PasswordReset = lazy(() => import("./pages/PasswordReset"));
 export const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+export const ManageParkingLocation = lazy(
+  () => import("./pages/ManageParkingLocation")
+);
+export const AddNewParkingLocation = lazy(
+  () => import("./pages/AddNewParkingLocation")
+);

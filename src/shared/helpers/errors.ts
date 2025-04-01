@@ -24,3 +24,8 @@ export const isAddNewUserParkingSubscritionException = (
   error: unknown
 ): error is AddNewUserParkingSubscritionException =>
   (error as AddNewUserParkingSubscritionException).errors !== undefined;
+
+export const isAddNewParkingLocationException = (
+  error: unknown
+): error is AddNewUserParkingSubscritionException =>
+  (error as AddNewUserParkingSubscritionException).errors !== undefined;

@@ -30,11 +30,29 @@ function AppLayout() {
   );
   const mainLayoutRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
-  const [routeUrl] = location.pathname.split("/").slice(1);
+  const [routeUrl, actionUrl] = location.pathname.split("/").slice(1);
   const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
-  const showAddNewButton = ["subscriptions", "payment-history"].includes(
-    routeUrl
-  );
+  const showAddNewButtonRouteName = React.useMemo(
+    () => ({
+      subscriptions: {
+        to: "/subscriptions/add",
+        text: "Add New Subscription",
+      },
+      "payment-history": {
+        to: "/subscriptions/add",
+        text: "Add New Subscription",
+      },
+      "parking-locations": {
+        to: "/parking-locations/add",
+        text: "Add New Parking Location",
+      },
+    }),
+    []
+  ) as unknown as Record<string, { to: string; text: string }>;
+  const showAddNewButton = React.useMemo(() => {
+    const keys = Object.keys(showAddNewButtonRouteName);
+    return keys.includes(routeUrl) && actionUrl !== "add";
+  }, [routeUrl, showAddNewButtonRouteName, actionUrl]);
   const haveEmailConfirmed = useSelector(isEmailConfirmed);
 
   // const selector = useSelector(getUserInfo);
@@ -142,8 +160,8 @@ function AppLayout() {
                 </Box>
                 {showAddNewButton && (
                   <ButtonLink
-                    to="/subscriptions/add"
-                    ariaLabel="My subscriptions"
+                    to={showAddNewButtonRouteName[routeUrl].to}
+                    ariaLabel={showAddNewButtonRouteName[routeUrl].text}
                     type="button"
                     sx={{
                       my: "1.4375rem",
@@ -169,7 +187,7 @@ function AppLayout() {
                     >
                       <AddNewIcon />
                       <Box component={"span"} sx={{}}>
-                        Add New Subscription
+                        {showAddNewButtonRouteName[routeUrl].text}
                       </Box>
                     </Button>
                   </ButtonLink>

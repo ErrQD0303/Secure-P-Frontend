@@ -25,7 +25,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 
 // type Props = {};
-const FAKE_DATA: {
+const FORM_DATA: {
   [key: string]: {
     [subKey: string]: {
       questions: { question: string; url: string }[];
@@ -69,7 +69,7 @@ function HelpCenter() {
   const [search, setSearch] = React.useState("");
   const pageName = React.useMemo(() => "HelpCenter", []);
 
-  const topics = Object.entries(FAKE_DATA)[+currentTab][1];
+  const topics = Object.entries(FORM_DATA)[+currentTab][1];
 
   const issues = React.useMemo(() => {
     const selectedTopicIssues =
@@ -174,7 +174,7 @@ function HelpCenter() {
             },
           }}
         >
-          {Object.entries(FAKE_DATA).map(([name], index) => (
+          {Object.entries(FORM_DATA).map(([name], index) => (
             <Tab
               label={name}
               key={index}
@@ -189,7 +189,7 @@ function HelpCenter() {
             md: "column",
           }}
         >
-          {Object.entries(FAKE_DATA).map(
+          {Object.entries(FORM_DATA).map(
             ([, value], index) =>
               Object.keys(value).length > 0 && (
                 <CustomTabPanel

@@ -31,10 +31,13 @@ import {
   ResendEmailConfirmation,
   PasswordReset,
   ForgotPassword,
+  ManageParkingLocation,
+  AddNewParkingLocation,
 } from "../LazyComponents";
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 import ForgotPasswordAction from "../pages/forgotPasswordAction";
 import PasswordResetAction from "../pages/passwordResetAction";
+import AddNewParkingLocationAction from "../pages/addNewParkingLocationAction";
 
 export const routes = [
   {
@@ -124,6 +127,25 @@ export const routes = [
             name: "Resend Email Confirmation",
             action: resendEmailConfirmationAction,
             errorElement: <Error />,
+          },
+          {
+            path: "/parking-locations",
+            errorElement: <Error />,
+            children: [
+              {
+                index: true,
+                element: <ManageParkingLocation />,
+                name: "Manage Parking Locations",
+                errorElement: <Error />,
+              },
+              {
+                path: "add",
+                element: <AddNewParkingLocation />,
+                name: "Add New Parking Location",
+                action: AddNewParkingLocationAction,
+                errorElement: <Error />,
+              },
+            ],
           },
         ],
       },

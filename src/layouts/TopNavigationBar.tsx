@@ -306,6 +306,30 @@ function TopNavigationBar({ routeName }: Props) {
                     </Typography>
                   </ButtonLink>
                 </MenuItem>
+                {/* Delete when Possible */}
+                <MenuItem key={"ParkingLocations"}>
+                  <ButtonLink
+                    to="/parking-locations"
+                    ariaLabel="Manage Parking Locations"
+                    type="link"
+                    sx={{
+                      m: 0,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        color: "#3D4B56",
+                        fontWeight: 600,
+                        fontSize: "0.875rem",
+                        lineHeight: "1.3125rem",
+                        letterSpacing: "0.00875rem",
+                      }}
+                    >
+                      Manage Parking Locations
+                    </Typography>
+                  </ButtonLink>
+                </MenuItem>
+                {/* Delete when Possible */}
                 <MenuItem key={"logout"} onClick={handleCloseUserMenu}>
                   <ButtonLink
                     to="/logout"

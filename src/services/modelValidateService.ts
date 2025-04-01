@@ -1,6 +1,11 @@
+import { AddNewParkingLocationException } from "../exceptions/AddNewParkingLocationException";
 import { AddNewUserParkingSubscritionException } from "../exceptions/AddNewUserParkingSubscritionException";
 import { PasswordResetModelValidationException } from "../exceptions/PasswordResetModelValidationException";
 import { IRegisterUser } from "../types/user";
+import {
+  IAddNewParkingLocationRequest,
+  IAddNewParkingLocationRequestError,
+} from "./parkingService";
 import {
   IEmailConfirmationError,
   IPasswordResetError,
@@ -241,6 +246,37 @@ export const validateUserParkingSubscription = (
   if (Object.keys(errors).length > 0) {
     throw new AddNewUserParkingSubscritionException(
       "User parking subscription validation failed",
+      errors as Record<string, string>
+    );
+  }
+};
+
+export const validateParkingLocationModel = ({
+  name,
+  capacity,
+  address,
+}: IAddNewParkingLocationRequest): void => {
+  const errors: IAddNewParkingLocationRequestError = {};
+
+  if (!name || name.trim() === "") {
+    errors.name = "Name is required";
+  } else if (name.length < 2) {
+    errors.name = "Name must be at least 2 characters long";
+  }
+
+  if (!address || address.trim() === "") {
+    errors.address = "Address is required";
+  } else if (address.length < 2) {
+    errors.address = "Address must be at least 2 characters long";
+  }
+
+  if (!capacity || capacity < 0) {
+    errors.capacity = "Capacity is required and must be a positive number";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    throw new AddNewParkingLocationException(
+      "Parking location validation failed",
       errors as Record<string, string>
     );
   }

@@ -1,6 +1,8 @@
 import { FAKE_PARKING_LOCATIONS } from "../shared/constants/fakeParkingLocation";
 import { FAKE_PARKING_ZONES } from "../shared/constants/fakeParkingZone";
 import { IParkingLocation, IParkingZone } from "../types/parking";
+import axios from "axios";
+import { getAccessTokenFromCookie } from "./userService";
 
 export const fetchUpdatedParkingLocations = async (
   parkingLocations: string | null = null
@@ -21,6 +23,7 @@ export const fetchUpdatedParkingZones = async (
   if (!parkinglocationId) {
     return [];
   }
+
   return parkingZones && parkingZones.length > 0
     ? FAKE_PARKING_ZONES.filter(
         (pz) =>
@@ -31,3 +34,64 @@ export const fetchUpdatedParkingZones = async (
         (pz) => pz.parkingLocationId === parkinglocationId
       );
 };
+
+export const addNewParkingLocation = async (
+  request: IAddNewParkingLocationRequest
+): Promise<IAddNewParkingLocationResponse> => {
+  const backEndUrl = import.meta.env.VITE_BACKEND_URL;
+  const parkingLocationEndpoint =
+    backEndUrl + import.meta.env.VITE_PARKING_LOCATION_URL;
+  try {
+    const response = await axios.post(parkingLocationEndpoint, request, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: getAccessTokenFromCookie(),
+      },
+    });
+    return response.data as IAddNewParkingLocationResponse;
+  } catch (error: unknown) {
+    console.log(error);
+    if (axios.isAxiosError(error)) {
+      return error.response?.data
+        ? (error.response?.data as IAddNewParkingLocationResponse)
+        : {
+            statusCode: error.response?.status || 500,
+            message: error.message,
+            success: false,
+            errors: {
+              summary: "An unexpected error occurred.",
+            },
+          };
+    }
+
+    return {
+      statusCode: 500,
+      message: "Internal server error. An unexpected error occurred.",
+      success: false,
+      errors: {
+        summary: "An unexpected error occurred.",
+      },
+    };
+  }
+};
+
+export interface IAddNewParkingLocationRequest {
+  name: string;
+  address: string;
+  capacity: number;
+}
+
+export interface IAddNewParkingLocationResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  errors: IAddNewParkingLocationRequestError;
+}
+
+export interface IAddNewParkingLocationRequestError {
+  summary?: string;
+  name?: string;
+  address?: string;
+  capacity?: string;
+}
