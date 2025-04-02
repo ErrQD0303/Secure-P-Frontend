@@ -45,13 +45,11 @@ export const addNewParkingLocation = async (
     const response = await axios.post(parkingLocationEndpoint, request, {
       withCredentials: true,
       headers: {
-        "Content-Type": "multipart/form-data",
         Authorization: getAccessTokenFromCookie(),
       },
     });
     return response.data as IAddNewParkingLocationResponse;
   } catch (error: unknown) {
-    console.log(error);
     if (axios.isAxiosError(error)) {
       return error.response?.data
         ? (error.response?.data as IAddNewParkingLocationResponse)
@@ -80,6 +78,9 @@ export interface IAddNewParkingLocationRequest {
   name: string;
   address: string;
   capacity: number;
+  hourly_rate: number;
+  monthly_rate: number;
+  daily_rate: number;
 }
 
 export interface IAddNewParkingLocationResponse {
@@ -94,4 +95,8 @@ export interface IAddNewParkingLocationRequestError {
   name?: string;
   address?: string;
   capacity?: string;
+  available_spaces?: string;
+  monthly_rate?: string;
+  hourly_rate?: string;
+  daily_rate?: string;
 }

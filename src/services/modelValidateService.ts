@@ -270,7 +270,7 @@ export const validateParkingLocationModel = ({
     errors.address = "Address must be at least 2 characters long";
   }
 
-  if (!capacity || capacity < 0) {
+  if (!capacity || capacity <= 0) {
     errors.capacity = "Capacity is required and must be a positive number";
   }
 

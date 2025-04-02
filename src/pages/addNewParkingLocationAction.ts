@@ -9,10 +9,20 @@ export default async function action({ request }: ActionFunctionArgs) {
     name: string;
     address: string;
     capacity: number;
+    "hourly-rate": number;
+    "monthly-rate": number;
+    "daily-rate": number;
+  };
+
+  const addNewForm = {
+    ...form,
+    hourly_rate: form["hourly-rate"],
+    monthly_rate: form["monthly-rate"],
+    daily_rate: form["daily-rate"],
   };
 
   try {
-    validateParkingLocationModel(form);
+    validateParkingLocationModel(addNewForm);
   } catch (error) {
     if (isAddNewParkingLocationException(error)) {
       return {
@@ -33,5 +43,5 @@ export default async function action({ request }: ActionFunctionArgs) {
     };
   }
 
-  return await addNewParkingLocation(form);
+  return await addNewParkingLocation(addNewForm);
 }

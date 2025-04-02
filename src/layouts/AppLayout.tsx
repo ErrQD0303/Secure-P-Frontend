@@ -1,10 +1,22 @@
 import { Outlet, useLoaderData, useLocation } from "react-router-dom";
-import { Box, Button, Container, Paper, Stack } from "@mui/material";
+import {
+  AlertColor,
+  AlertPropsColorOverrides,
+  Box,
+  Button,
+  Container,
+  Paper,
+  Stack,
+  styled,
+} from "@mui/material";
+import { OverridableStringUnion } from "@mui/types";
 import { useCallback, useEffect, useState } from "react";
 import AppBottomNavigation from "./AppBottomNavigation";
 import useViewPort from "../hooks/useViewPort";
 import { useTheme } from "@emotion/react";
 import TopNavigationBar from "./TopNavigationBar";
+import Snackbar, { SnackbarProps } from "@mui/material/Snackbar";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 import SideBar from "./SideBar";
 import Grid from "@mui/material/Grid2";
 import React from "react";
@@ -15,6 +27,47 @@ import AddNewIcon from "../components/svg-icons/AddNew";
 import { useSelector } from "react-redux";
 import { isEmailConfirmed } from "../store/userSlice";
 import EmailConfirmNotificationBar from "./EmailConfirmNotificationBar";
+
+const StyledAlert = styled(MuiAlert)(() => ({}));
+
+const StyledSnackbar = styled(Snackbar)(({ theme }) => ({
+  zIndex: theme.zIndex.modal + 1,
+})).withComponent(
+  (
+    props: SnackbarProps & {
+      severity?:
+        | OverridableStringUnion<AlertColor, AlertPropsColorOverrides>
+        | undefined;
+      alertProps?: AlertProps;
+    }
+  ) => {
+    const { alertProps, message, children, severity, onClose, ...rest } = props;
+
+    return (
+      <Snackbar
+        autoHideDuration={3000}
+        onClose={onClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        {...rest}
+      >
+        <StyledAlert
+          onClose={
+            onClose as unknown as
+              | ((event: React.SyntheticEvent) => void)
+              | undefined
+          }
+          severity={severity ?? "success"}
+          {...alertProps}
+        >
+          {children ?? message}
+        </StyledAlert>
+      </Snackbar>
+    );
+  }
+);
 
 function AppLayout() {
   const [value, setValue] = useState(0);
@@ -54,6 +107,25 @@ function AppLayout() {
     return keys.includes(routeUrl) && actionUrl !== "add";
   }, [routeUrl, showAddNewButtonRouteName, actionUrl]);
   const haveEmailConfirmed = useSelector(isEmailConfirmed);
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [severity, setSeverity] = useState<
+    OverridableStringUnion<AlertColor, AlertPropsColorOverrides> | undefined
+  >(undefined);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleClose = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  const logAlert = React.useCallback((newMessage: string, severity: string) => {
+    setOpen(true);
+    setMessage(newMessage);
+    setSeverity(
+      severity as
+        | OverridableStringUnion<AlertColor, AlertPropsColorOverrides>
+        | undefined
+    );
+  }, []);
 
   // const selector = useSelector(getUserInfo);
 
@@ -78,6 +150,12 @@ function AppLayout() {
         [theme.breakpoints.between("xs", "md")]: {},
       }}
     >
+      <StyledSnackbar
+        open={open}
+        onClose={handleClose}
+        message={message}
+        severity={severity}
+      />
       <TopNavigationBar routeName={routeName ?? ""} />
 
       <Grid
@@ -195,7 +273,7 @@ function AppLayout() {
               </Stack>
             )}
             <Banner />
-            <Outlet context={{ routeName, showBodyRouteName }} />
+            <Outlet context={{ routeName, showBodyRouteName, logAlert }} />
           </Container>
         </Grid>
       </Grid>

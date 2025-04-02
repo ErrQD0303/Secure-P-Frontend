@@ -8,13 +8,23 @@ import React from "react";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Form, Link, useActionData } from "react-router-dom";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import HomeIcon from "@mui/icons-material/Home";
 import StorageIcon from "@mui/icons-material/Storage";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import TodayIcon from "@mui/icons-material/Today";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import theme from "../styles/theme";
-import { Error } from "../LazyComponents";
+import Error from "./Error";
 import { IAddNewParkingLocationResponse } from "../services/parkingService";
 
 const StyledContainer = styled(Container)(({ theme }) => {
@@ -86,6 +96,26 @@ const StyledGrid = styled(Grid)(() => ({
 const NumberTextFieldGrid = styled(StyledGrid)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof Grid>) => (
     <Grid size={{ base: 1, md: 2.5 }} {...props}></Grid>
+  )
+);
+
+const RateTextFieldGrid = styled(StyledGrid)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof Grid>) => (
+    <Grid size={{ base: 1, md: 5, lg: 1 }} {...props}></Grid>
+  )
+);
+
+const OffsetOneRateTextFieldGrid = styled(StyledGrid)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof Grid>) => (
+    <Grid
+      size={{ base: 1, md: 5, lg: 1 }}
+      offset={{
+        base: 0,
+        md: 0,
+        lg: 1,
+      }}
+      {...props}
+    ></Grid>
   )
 );
 
@@ -249,6 +279,32 @@ const NumberTextField = styled(StyledTextField)(() => ({})).withComponent(
   }
 );
 
+const RateTextField = styled(NumberTextField)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TextField>) => {
+    const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(e.target.value);
+      if (isNaN(value) || value < 0) {
+        e.target.value = "0";
+        return;
+      }
+    };
+
+    return (
+      <NumberTextField
+        onChange={handleRateChange}
+        gridElement={RateTextFieldGrid}
+        slotProps={{
+          htmlInput: {
+            min: 0,
+            step: "0.01",
+          },
+        }}
+        {...props}
+      />
+    );
+  }
+);
+
 const CapacityField = styled(NumberTextField)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof TextField>) => {
     return (
@@ -270,6 +326,47 @@ const AvailableSpacesField = styled(NumberTextField)(() => ({})).withComponent(
         label="Available Spaces"
         disabled
         icon={<MeetingRoomIcon />}
+        {...props}
+      />
+    );
+  }
+);
+
+const HourlyRateField = styled(RateTextField)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TextField>) => {
+    return (
+      <RateTextField
+        id="hourly-rate"
+        label="Hourly Rate"
+        icon={<AccessTimeIcon />}
+        {...props}
+      />
+    );
+  }
+);
+
+const MonthlyRateField = styled(RateTextField)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TextField>) => {
+    return (
+      <RateTextField
+        id="monthly-rate"
+        label="Monthly Rate"
+        gridElement={OffsetOneRateTextFieldGrid}
+        icon={<CalendarMonthIcon />}
+        {...props}
+      />
+    );
+  }
+);
+
+const DailyRateField = styled(RateTextField)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TextField>) => {
+    return (
+      <RateTextField
+        id="daily-rate"
+        label="Daily Rate"
+        gridElement={OffsetOneRateTextFieldGrid}
+        icon={<TodayIcon />}
         {...props}
       />
     );
@@ -362,13 +459,42 @@ function AddNewParkingLocation() {
     | null;
   const showError = Boolean(response && !response?.success);
 
+  const { logAlert } = useOutletContext<{
+    logAlert: (message: string, severity: string) => void;
+  }>();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (response) {
+      if (response?.success) {
+        logAlert("Parking location added successfully", "success");
+        return navigate("/parking-locations", {
+          replace: false,
+        });
+      }
+
+      logAlert(
+        response?.message ??
+          response?.errors?.summary ??
+          "Unexpected Error Occured. Please try again.",
+        "error"
+      );
+    }
+  }, [response, logAlert, navigate, location]);
+
   return (
     <StyledContainer>
       <StyledPaper>
         <AddForm>
           {showError && (
             <StyledError
-              message={response?.message ?? "Unexpected Error Occured"}
+              message={
+                response?.message ??
+                response?.errors?.summary ??
+                "Unexpected Error Occured"
+              }
             />
           )}
           <NameTextField
@@ -386,6 +512,18 @@ function AddNewParkingLocation() {
             onChange={HandleCapacityChange}
           />
           <AvailableSpacesField value={currentCapacity} />
+          <HourlyRateField
+            error={!!response?.errors?.hourly_rate}
+            helperText={response?.errors?.hourly_rate}
+          />
+          <DailyRateField
+            error={!!response?.errors?.daily_rate}
+            helperText={response?.errors?.daily_rate}
+          />
+          <MonthlyRateField
+            error={!!response?.errors?.monthly_rate}
+            helperText={response?.errors?.monthly_rate}
+          />
           <CancelButton />
           <AddButton />
         </AddForm>
