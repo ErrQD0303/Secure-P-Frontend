@@ -6,6 +6,7 @@ import {
   getAvatar,
   getAvatarKey,
   getProfilesPersonalInfo,
+  getUserPermissions,
 } from "../store/userSlice";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -29,6 +30,7 @@ import {
   IUpdatePasswordError,
   IUpdateProfilePersonalInfoError,
 } from "../services/userService";
+import { AppPolicy } from "../types/enum";
 
 function Profiles() {
   const theme = useTheme();
@@ -61,26 +63,46 @@ function Profiles() {
   const isLoading =
     fetcher.state === "submitting" || fetcher.state === "loading";
 
+  const userPermissions = useSelector(getUserPermissions);
+  const showChangeProfileImageButton = React.useMemo(() => {
+    return userPermissions.some(
+      (permission) => permission === AppPolicy.ChangeAvatar
+    );
+  }, [userPermissions]);
+  const showChangeProfileInfo = React.useMemo(() => {
+    return userPermissions.some(
+      (permission) => permission === AppPolicy.UpdateProfile
+    );
+  }, [userPermissions]);
+  const showChangePassword = React.useMemo(() => {
+    return userPermissions.some(
+      (permission) => permission === AppPolicy.ChangePassword
+    );
+  }, [userPermissions]);
+
   const handleProfileImageClick = React.useCallback(() => {
+    if (!showChangeProfileImageButton) return;
     setShowUploadImageModal(true);
-  }, []);
+  }, [showChangeProfileImageButton]);
 
   const handleProfileImageMouseOver = React.useCallback(() => {
+    if (!showChangeProfileImageButton) return;
     // Add logic here if needed, or remove this callback if unused
     setShowChangeProfileImage(true);
     const profileImage = document.getElementById("profileImage");
     if (!profileImage) return;
     profileImage.style.transform = "scale(1.1)";
     profileImage.style.transition = "transform 0.3s ease-in-out";
-  }, []);
+  }, [showChangeProfileImageButton]);
 
   const handleProfileImageMouseOut = React.useCallback(() => {
+    if (!showChangeProfileImageButton) return;
     setShowChangeProfileImage(false);
     const profileImage = document.getElementById("profileImage");
     if (!profileImage) return;
     profileImage.style.transform = "scale(1)";
     profileImage.style.transition = "transform 0.3s ease-in-out";
-  }, []);
+  }, [showChangeProfileImageButton]);
 
   const tabs: {
     [key: string]: {
@@ -127,7 +149,7 @@ function Profiles() {
             },
           },
           email: {
-            type: "email",
+            type: showChangeProfileInfo ? "email" : "normalText",
             id: "email",
             name: "email",
             label: "Email",
@@ -148,7 +170,7 @@ function Profiles() {
             },
           },
           currentPassword: {
-            type: "password",
+            type: showChangePassword ? "password" : "hidden",
             id: "currentPassword",
             name: "currentPassword",
             label: "Current Password",
@@ -178,7 +200,7 @@ function Profiles() {
             },
           },
           phoneNumber: {
-            type: "phone",
+            type: showChangeProfileInfo ? "phone" : "normalText",
             id: "phone",
             name: "phone",
             label: "Phone Number",
@@ -202,7 +224,7 @@ function Profiles() {
             },
           },
           newPassword: {
-            type: "password",
+            type: showChangePassword ? "password" : "hidden",
             id: "newPassword",
             name: "newPassword",
             label: "New Password",
@@ -230,7 +252,7 @@ function Profiles() {
             },
           },
           dayOfBirth: {
-            type: "date",
+            type: showChangeProfileInfo ? "date" : "normalText",
             id: "dayOfBirth",
             name: "dayOfBirth",
             label: "Day of Birth",
@@ -241,7 +263,9 @@ function Profiles() {
                 : false,
             helperText:
               errors && "DayOfBirth" in errors ? errors.DayOfBirth : "",
-            defaultValue: dayjs(dayOfBirth),
+            defaultValue: showChangeProfileInfo
+              ? dayjs(dayOfBirth)
+              : dayjs(dayOfBirth).format("DD/MM/YYYY"),
             placeholder: "dd/mm/yyyy",
             offset: {
               base: 0,
@@ -258,7 +282,7 @@ function Profiles() {
             },
           },
           retypeNewPassword: {
-            type: "password",
+            type: showChangePassword ? "password" : "hidden",
             id: "retypeNewPassword",
             name: "retypeNewPassword",
             label: "Re-type New Password",
@@ -288,7 +312,7 @@ function Profiles() {
             },
           },
           saveChangeButton: {
-            type: "button",
+            type: showChangeProfileInfo ? "button" : "hidden",
             id: "saveChangeButton",
             name: "savePersonalInfo",
             label: "Save Changes",
@@ -322,7 +346,7 @@ function Profiles() {
             },
           },
           UpdatePasswordButton: {
-            type: "button",
+            type: showChangePassword ? "button" : "hidden",
             id: "updatePasswordButton",
             name: "updatePassword",
             label: "Update Password",
@@ -367,7 +391,16 @@ function Profiles() {
         formFields: {},
       },
     }),
-    [dayOfBirth, email, mobileNumber, theme.breakpoints, username, errors]
+    [
+      dayOfBirth,
+      email,
+      mobileNumber,
+      theme.breakpoints,
+      username,
+      errors,
+      showChangeProfileInfo,
+      showChangePassword,
+    ]
   );
 
   const [currentTab, setCurrentTab] = React.useState<number | null>(0);
@@ -680,7 +713,7 @@ function Profiles() {
                                       color: "#A3B0BF",
                                     }}
                                   >
-                                    {username}
+                                    {defaultValue as string}
                                   </Box>
                                 </Stack>
                               )}
@@ -755,6 +788,7 @@ function Profiles() {
                                   {label}
                                 </Button>
                               )}
+                              {type === "hidden" && <></>}
                             </Grid>
                           )
                         )}

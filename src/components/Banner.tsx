@@ -8,6 +8,7 @@ function Banner() {
   const theme = useTheme();
   return (
     <Container
+      id="banner"
       sx={{
         background: `url('${mobileBanner}') top right no-repeat, linear-gradient(to right, #513393, #513393)`,
         height: "160px",

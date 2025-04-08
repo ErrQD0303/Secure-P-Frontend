@@ -6,6 +6,7 @@ import { toPersonalInfo } from "../shared/mappers/users";
 
 const initialState: IUser & {
   avatarKey?: string | null;
+  permission?: string[];
 } = {
   id: "",
   username: undefined,
@@ -22,6 +23,7 @@ const initialState: IUser & {
   licensePlateNumber: [],
   avatar: null,
   avatarKey: null,
+  permission: [],
 };
 
 const userSlice = createSlice({
@@ -41,10 +43,14 @@ const userSlice = createSlice({
         avatarKey: Date.now().toString(),
       };
     },
+    setPermissions: (state, action) => {
+      return { ...state, permissions: action.payload };
+    },
   },
 });
 
-export const { setUser, clearUser, setAvatar } = userSlice.actions;
+export const { setUser, clearUser, setAvatar, setPermissions } =
+  userSlice.actions;
 
 export default userSlice.reducer;
 
@@ -71,3 +77,6 @@ export const getBillingAddress = (state: RootState) =>
 export const isAuthenticated = (state: RootState) => !!state.user.id;
 
 export const isEmailConfirmed = (state: RootState) => state.user.emailConfirmed;
+
+export const getUserPermissions = (state: RootState) =>
+  state.user.permission || [];

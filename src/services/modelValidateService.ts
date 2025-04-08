@@ -5,7 +5,7 @@ import { IRegisterUser } from "../types/user";
 import {
   IAddNewParkingLocationRequest,
   IAddNewParkingLocationRequestError,
-} from "./parkingService";
+} from "./parkingLocationService";
 import {
   IEmailConfirmationError,
   IPasswordResetError,

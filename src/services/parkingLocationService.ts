@@ -3,6 +3,7 @@ import { FAKE_PARKING_ZONES } from "../shared/constants/fakeParkingZone";
 import { IParkingLocation, IParkingZone } from "../types/parking";
 import axios from "axios";
 import { getAccessTokenFromCookie } from "./userService";
+import { ParkingLocationSortBy } from "../types/enum";
 
 export const fetchUpdatedParkingLocations = async (
   parkingLocations: string | null = null
@@ -73,6 +74,97 @@ export const addNewParkingLocation = async (
     };
   }
 };
+
+export const getAllParkingLocations = async (
+  request: IGetAllParkingLocationsRequest
+): Promise<IGetAllParkingLocationsResponse> => {
+  const backEndUrl = import.meta.env.VITE_BACKEND_URL;
+  const parkingLocationEndpoint =
+    backEndUrl + import.meta.env.VITE_PARKING_LOCATION_URL;
+  try {
+    const response = await axios.get(parkingLocationEndpoint, {
+      withCredentials: true,
+      headers: {
+        Authorization: getAccessTokenFromCookie(),
+      },
+      params: {
+        page: request.page,
+        limit: request.limit,
+        search: request.search,
+        sort: request.sort,
+        desc: request.desc,
+      },
+    });
+    return response.data as IGetAllParkingLocationsResponse;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data
+        ? (error.response?.data as IGetAllParkingLocationsResponse)
+        : {
+            statusCode: error.response?.status || 500,
+            message: error.message,
+            success: false,
+            data: {
+              items: [],
+              total_pages: 0,
+            } as IGetAllParkingLocationResponseDto,
+            errors: {
+              summary: "An unexpected error occurred.",
+            },
+          };
+    }
+
+    return {
+      statusCode: 500,
+      message: "Internal server error. An unexpected error occurred.",
+      success: false,
+      data: {
+        items: [],
+        total_pages: 0,
+      } as IGetAllParkingLocationResponseDto,
+      errors: {
+        summary: "An unexpected error occurred.",
+      },
+    };
+  }
+};
+
+export interface IGetAllParkingLocationsRequest {
+  page: number;
+  limit: number;
+  search?: string;
+  sort?: ParkingLocationSortBy;
+  desc?: boolean;
+}
+
+export interface IGetAllParkingLocationsResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  data: IGetAllParkingLocationResponseDto;
+  errors: IGetAllParkingLocationRequestError;
+}
+
+export interface IGetAllParkingLocationRequestError {
+  summary?: string;
+}
+
+export interface IGetAllParkingLocationResponseDto {
+  items: IGetParkingLocationDto[];
+  total_pages: number;
+}
+
+export interface IGetParkingLocationDto {
+  id: string;
+  name: string;
+  address: string;
+  capacity: number;
+  available_spaces: number;
+  monthly_rate: number;
+  hourly_rate: number;
+  daily_rate: number;
+  concurrency_stamp: string;
+}
 
 export interface IAddNewParkingLocationRequest {
   name: string;

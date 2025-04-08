@@ -22,6 +22,8 @@ import logoImage from "/logo.png";
 import { useSelector } from "react-redux";
 import { getAvatar, getAvatarKey, getFullName } from "../store/userSlice";
 import { StaticFileUrl } from "../shared/constants/staticFileUrl";
+import { getUserPermissions } from "../services/permissionService";
+import { AppPolicy } from "../types/enum";
 
 type Props = {
   routeName: string;
@@ -51,6 +53,28 @@ function TopNavigationBar({ routeName }: Props) {
   const avatar = userAvatar
     ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
     : StaticFileUrl.DEFAULT_AVATAR;
+  const userPermissions = useSelector(getUserPermissions);
+  const showProfileSettings =
+    userPermissions.some(
+      (permission) => permission === AppPolicy.ChangePassword
+    ) ||
+    userPermissions.some(
+      (permission) => permission === AppPolicy.UpdateProfile
+    ) ||
+    userPermissions.some((permission) => permission === AppPolicy.ChangeAvatar);
+  const showParkingLocations =
+    userPermissions.some(
+      (permission) => permission === AppPolicy.ReadParkingLocation
+    ) ||
+    userPermissions.some(
+      (permission) => permission === AppPolicy.CreateParkingLocation
+    ) ||
+    userPermissions.some(
+      (permission) => permission === AppPolicy.UpdateParkingLocation
+    ) ||
+    userPermissions.some(
+      (permission) => permission === AppPolicy.DeleteParkingLocation
+    );
 
   const handleGoBack = React.useCallback(() => {
     navigate(-1);
@@ -219,19 +243,31 @@ function TopNavigationBar({ routeName }: Props) {
                 borderRight: "0.125rem solid #EAEFF5",
               }}
             >
-              <ButtonLink to={"profiles"} type="none">
-                <Tooltip title="My Profile">
-                  <Box
-                    key={userAvatarKey}
-                    sx={{
-                      borderRadius: "50%",
-                      p: "1.5rem",
-                      background: `url("${avatar}") center center / cover no-repeat`,
-                      cursor: "pointer",
-                    }}
-                  ></Box>
-                </Tooltip>
-              </ButtonLink>
+              {showProfileSettings ? (
+                <ButtonLink to={"profiles"} type="none">
+                  <Tooltip title="My Profile">
+                    <Box
+                      key={userAvatarKey}
+                      sx={{
+                        borderRadius: "50%",
+                        p: "1.5rem",
+                        background: `url("${avatar}") center center / cover no-repeat`,
+                        cursor: "pointer",
+                      }}
+                    ></Box>
+                  </Tooltip>
+                </ButtonLink>
+              ) : (
+                <Box
+                  key={userAvatarKey}
+                  sx={{
+                    borderRadius: "50%",
+                    p: "1.5rem",
+                    background: `url("${avatar}") center center / cover no-repeat`,
+                    cursor: "pointer",
+                  }}
+                ></Box>
+              )}
               <Tooltip title="Profile Settings">
                 <Button
                   type="button"
@@ -284,51 +320,55 @@ function TopNavigationBar({ routeName }: Props) {
                   },
                 }}
               >
-                <MenuItem key={"profile"}>
-                  <ButtonLink
-                    to="/profiles"
-                    ariaLabel="My Profile"
-                    type="link"
-                    sx={{
-                      m: 0,
-                    }}
-                  >
-                    <Typography
+                {showProfileSettings && (
+                  <MenuItem key={"profile"}>
+                    <ButtonLink
+                      to="/profiles"
+                      ariaLabel="My Profile"
+                      type="link"
                       sx={{
-                        color: "#3D4B56",
-                        fontWeight: 600,
-                        fontSize: "0.875rem",
-                        lineHeight: "1.3125rem",
-                        letterSpacing: "0.00875rem",
+                        m: 0,
                       }}
                     >
-                      My Profile
-                    </Typography>
-                  </ButtonLink>
-                </MenuItem>
+                      <Typography
+                        sx={{
+                          color: "#3D4B56",
+                          fontWeight: 600,
+                          fontSize: "0.875rem",
+                          lineHeight: "1.3125rem",
+                          letterSpacing: "0.00875rem",
+                        }}
+                      >
+                        My Profile
+                      </Typography>
+                    </ButtonLink>
+                  </MenuItem>
+                )}
                 {/* Delete when Possible */}
-                <MenuItem key={"ParkingLocations"}>
-                  <ButtonLink
-                    to="/parking-locations"
-                    ariaLabel="Manage Parking Locations"
-                    type="link"
-                    sx={{
-                      m: 0,
-                    }}
-                  >
-                    <Typography
+                {showParkingLocations && (
+                  <MenuItem key={"ParkingLocations"}>
+                    <ButtonLink
+                      to="/parking-locations"
+                      ariaLabel="Manage Parking Locations"
+                      type="link"
                       sx={{
-                        color: "#3D4B56",
-                        fontWeight: 600,
-                        fontSize: "0.875rem",
-                        lineHeight: "1.3125rem",
-                        letterSpacing: "0.00875rem",
+                        m: 0,
                       }}
                     >
-                      Manage Parking Locations
-                    </Typography>
-                  </ButtonLink>
-                </MenuItem>
+                      <Typography
+                        sx={{
+                          color: "#3D4B56",
+                          fontWeight: 600,
+                          fontSize: "0.875rem",
+                          lineHeight: "1.3125rem",
+                          letterSpacing: "0.00875rem",
+                        }}
+                      >
+                        Manage Parking Locations
+                      </Typography>
+                    </ButtonLink>
+                  </MenuItem>
+                )}
                 {/* Delete when Possible */}
                 <MenuItem key={"logout"} onClick={handleCloseUserMenu}>
                   <ButtonLink

@@ -15,7 +15,10 @@ import {
   StyledPaper,
 } from "./AddNewParkingLocation.style";
 import { useActionData, useNavigate, useOutletContext } from "react-router-dom";
-import { IAddNewParkingLocationResponse } from "../services/parkingService";
+import { IAddNewParkingLocationResponse } from "../services/parkingLocationService";
+import { useSelector } from "react-redux";
+import { getUserPermissions } from "../store/userSlice";
+import { AppPolicy } from "../types/enum";
 
 function AddNewParkingLocation() {
   const [currentCapacity, setCurrentCapacity] = React.useState<number>(0);
@@ -35,6 +38,9 @@ function AddNewParkingLocation() {
     | undefined
     | null;
   const showError = Boolean(response && !response?.success);
+  const havePermission = useSelector(getUserPermissions).includes(
+    AppPolicy.CreateParkingLocation
+  );
 
   const { logAlert } = useOutletContext<{
     logAlert: (message: string, severity: string) => void;
@@ -59,6 +65,18 @@ function AddNewParkingLocation() {
       );
     }
   }, [response, logAlert, navigate]);
+
+  React.useEffect(() => {
+    if (!havePermission) {
+      logAlert(
+        "Forbidden! You do not have permission to add a new parking location.",
+        "error"
+      );
+      return navigate("/parking-locations", {
+        replace: false,
+      });
+    }
+  }, [havePermission, logAlert, navigate]);
 
   return (
     <StyledContainer>

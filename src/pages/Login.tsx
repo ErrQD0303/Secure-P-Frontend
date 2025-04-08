@@ -17,8 +17,9 @@ import OTP from "./OTP";
 import { SimplePaletteColor } from "@mui/material/styles";
 import logoPng from "/logo.png";
 import { ILoginError } from "../services/userService";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { isAuthenticated } from "../store/userSlice";
+import { AppDispatch } from "../store/store";
 
 function Login() {
   const theme = useTheme();
@@ -31,6 +32,7 @@ function Login() {
   } | null>(null);
 
   const isAuth = useSelector(isAuthenticated);
+  const dispatch = useDispatch<AppDispatch>();
 
   const showSpinner =
     fetcher.state === "loading" || fetcher.state === "submitting";
@@ -109,7 +111,7 @@ function Login() {
     if (isAuth) {
       redirect("/");
     }
-  }, [isAuth]);
+  }, [isAuth, dispatch]);
 
   React.useEffect(() => {
     if (fetcher.data) {

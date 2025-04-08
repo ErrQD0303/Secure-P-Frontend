@@ -25,8 +25,9 @@ import { getRouteName } from "../services/routeService";
 import ButtonLink from "../components/ButtonLink";
 import AddNewIcon from "../components/svg-icons/AddNew";
 import { useSelector } from "react-redux";
-import { isEmailConfirmed } from "../store/userSlice";
+import { getUserPermissions, isEmailConfirmed } from "../store/userSlice";
 import EmailConfirmNotificationBar from "./EmailConfirmNotificationBar";
+import { AppPolicy } from "../types/enum";
 
 const StyledAlert = styled(MuiAlert)(() => ({}));
 
@@ -85,27 +86,35 @@ function AppLayout() {
   const location = useLocation();
   const [routeUrl, actionUrl] = location.pathname.split("/").slice(1);
   const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
+  const userPermissions = useSelector(getUserPermissions);
   const showAddNewButtonRouteName = React.useMemo(
     () => ({
       subscriptions: {
         to: "/subscriptions/add",
         text: "Add New Subscription",
+        show: true,
       },
       "payment-history": {
         to: "/subscriptions/add",
         text: "Add New Subscription",
+        show: true,
       },
       "parking-locations": {
         to: "/parking-locations/add",
         text: "Add New Parking Location",
+        show: userPermissions?.includes(AppPolicy.CreateParkingLocation),
       },
     }),
-    []
-  ) as unknown as Record<string, { to: string; text: string }>;
+    [userPermissions]
+  ) as unknown as Record<string, { to: string; text: string; show: boolean }>;
   const showAddNewButton = React.useMemo(() => {
     const keys = Object.keys(showAddNewButtonRouteName);
-    return keys.includes(routeUrl) && actionUrl !== "add";
-  }, [routeUrl, showAddNewButtonRouteName, actionUrl]);
+    return (
+      keys.includes(routeUrl) &&
+      actionUrl !== "add" &&
+      showAddNewButtonRouteName[routeUrl].show
+    );
+  }, [routeUrl, actionUrl, showAddNewButtonRouteName]);
   const haveEmailConfirmed = useSelector(isEmailConfirmed);
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [severity, setSeverity] = useState<

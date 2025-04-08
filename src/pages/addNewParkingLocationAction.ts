@@ -1,7 +1,7 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { validateParkingLocationModel } from "../services/modelValidateService";
 import { isAddNewParkingLocationException } from "../shared/helpers/errors";
-import { addNewParkingLocation } from "../services/parkingService";
+import { addNewParkingLocation } from "../services/parkingLocationService";
 
 export default async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();

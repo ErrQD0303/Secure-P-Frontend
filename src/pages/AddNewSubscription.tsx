@@ -15,7 +15,7 @@ import {
 import {
   fetchUpdatedParkingLocations,
   fetchUpdatedParkingZones,
-} from "../services/parkingService";
+} from "../services/parkingLocationService";
 import { AutocompleteChangeReason } from "@mui/material/Autocomplete";
 import dayjs, { Dayjs } from "dayjs";
 import Paper from "@mui/material/Paper";

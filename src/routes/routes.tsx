@@ -38,6 +38,8 @@ import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 import ForgotPasswordAction from "../pages/forgotPasswordAction";
 import PasswordResetAction from "../pages/passwordResetAction";
 import AddNewParkingLocationAction from "../pages/addNewParkingLocationAction";
+import manageParkingLocationLoader from "../pages/manageParkingLocationLoader";
+import manageParkingLocationAction from "../pages/manageParkingLocationAction";
 
 export const routes = [
   {
@@ -137,6 +139,8 @@ export const routes = [
                 element: <ManageParkingLocation />,
                 name: "Manage Parking Locations",
                 errorElement: <Error />,
+                loader: manageParkingLocationLoader,
+                action: manageParkingLocationAction,
               },
               {
                 path: "add",
