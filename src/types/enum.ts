@@ -37,4 +37,7 @@ export enum ParkingLocationSortBy {
   Address = 1,
   Capacity = 2,
   AvailableSpaces = 3,
+  HourlyRate = 4,
+  DailyRate = 5,
+  MonthlyRate = 6,
 }

@@ -7,6 +7,7 @@ export default async function loader() {
     limit: TableSettings.DEFAULT_PAGE_SIZE,
     sort: TableSettings.DEFAULT_SORT,
     desc: TableSettings.DEFAULT_DESC_ORDER,
+    search: "",
   });
   return (
     parkingLocations.data ?? {

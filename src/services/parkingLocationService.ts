@@ -4,6 +4,7 @@ import { IParkingLocation, IParkingZone } from "../types/parking";
 import axios from "axios";
 import { getAccessTokenFromCookie } from "./userService";
 import { ParkingLocationSortBy } from "../types/enum";
+import { IGetAllResponseDto } from "../types/response";
 
 export const fetchUpdatedParkingLocations = async (
   parkingLocations: string | null = null
@@ -129,6 +130,60 @@ export const getAllParkingLocations = async (
   }
 };
 
+export const deleteParkingLocation = async (
+  request: IDeleteParkingLocationRequest
+): Promise<IDeleteParkingLocationResponse> => {
+  const backEndUrl = import.meta.env.VITE_BACKEND_URL;
+  const parkingLocationEndpoint =
+    backEndUrl + import.meta.env.VITE_PARKING_LOCATION_URL + "/" + request.id;
+  try {
+    const response = await axios.delete(parkingLocationEndpoint, {
+      withCredentials: true,
+      headers: {
+        Authorization: getAccessTokenFromCookie(),
+      },
+    });
+    return response.data as IDeleteParkingLocationResponse;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data
+        ? (error.response?.data as IDeleteParkingLocationResponse)
+        : {
+            statusCode: error.response?.status || 500,
+            message: error.message,
+            success: false,
+            errors: {
+              summary: "An unexpected error occurred.",
+            },
+          };
+    }
+
+    return {
+      statusCode: 500,
+      message: "Internal server error. An unexpected error occurred.",
+      success: false,
+      errors: {
+        summary: "An unexpected error occurred.",
+      },
+    };
+  }
+};
+
+export interface IDeleteParkingLocationRequest {
+  id: string;
+}
+
+export interface IDeleteParkingLocationResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  errors: IDeleteParkingLocationRequestError;
+}
+
+export interface IDeleteParkingLocationRequestError {
+  summary?: string;
+}
+
 export interface IGetAllParkingLocationsRequest {
   page: number;
   limit: number;
@@ -149,7 +204,8 @@ export interface IGetAllParkingLocationRequestError {
   summary?: string;
 }
 
-export interface IGetAllParkingLocationResponseDto {
+export interface IGetAllParkingLocationResponseDto
+  extends IGetAllResponseDto<IGetParkingLocationDto> {
   items: IGetParkingLocationDto[];
   total_pages: number;
 }

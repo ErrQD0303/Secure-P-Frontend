@@ -1,93 +1,174 @@
-import { useFetcher, useLoaderData } from "react-router-dom";
+import { useFetcher, useLoaderData, useOutletContext } from "react-router-dom";
 import {
-  StyledTableContainer,
-  StyledTable,
-  StyledTableHead,
-  StyledTableRow,
-  FirstCell,
-  OtherCell,
-  StyledTableBody,
-  EditButton,
-  DeleteButton,
-  EditDeleteButtonCell,
-  HeaderFirstCell,
-  HeaderOtherCell,
-} from "./ManageParkingLocation.style";
-import { IGetAllParkingLocationResponseDto } from "../services/parkingLocationService";
+  IDeleteParkingLocationResponse,
+  IGetAllParkingLocationResponseDto,
+  IGetParkingLocationDto,
+} from "../services/parkingLocationService";
 import React from "react";
 import TableSettings from "../shared/constants/tableSettings";
-import { ParkingLocationSortBy } from "../types/enum";
-import Loader from "../components/Loader";
+import { AppPolicy, ParkingLocationSortBy } from "../types/enum";
+import AdminDataTable from "./AdminDataTable";
+import {
+  DeleteButton,
+  EditButton,
+  EditDeleteButtonCell,
+  FirstCell,
+  OtherCell,
+  StyledTableRow,
+} from "./AdminDataTable.style";
+import { useSelector } from "react-redux";
+import { getUserPermissions } from "../store/userSlice";
 
 function ManageParkingLocation() {
-  const loaderData = useLoaderData() as unknown as
-    | IGetAllParkingLocationResponseDto
-    | undefined;
+  const loaderData = useLoaderData() as IGetAllParkingLocationResponseDto;
+  const permissions = useSelector(getUserPermissions);
+  const [canEdit, canDelete] = React.useMemo(() => {
+    const canEdit = permissions.some(
+      (permission) => permission === AppPolicy.UpdateParkingLocation
+    );
+    const canDelete = permissions.some(
+      (permission) => permission === AppPolicy.DeleteParkingLocation
+    );
+
+    return [canEdit, canDelete];
+  }, [permissions]);
+  const [currentId, setCurrentId] = React.useState<string | null>(null);
   const [response, setResponse] = React.useState<
     IGetAllParkingLocationResponseDto | undefined
   >(loaderData);
-  const rows = response?.items || [];
-  const total_pages = response?.total_pages || 0;
 
-  const [sort, setSort] = React.useState<ParkingLocationSortBy>(
-    TableSettings.DEFAULT_SORT
+  const handleGetParkingLocationDto = React.useCallback(
+    (response: IGetAllParkingLocationResponseDto) => {
+      setResponse(response);
+    },
+    [setResponse]
   );
-  const [isDesc, setIsDesc] = React.useState<boolean>(
-    TableSettings.DEFAULT_DESC_ORDER
-  );
-  const [page, setPage] = React.useState<number>(
-    TableSettings.DEFAULT_PAGE_INDEX
-  );
-  const [pageSize, setPageSize] = React.useState<number>(
-    TableSettings.DEFAULT_PAGE_SIZE
-  );
-  const [search, setSearch] = React.useState<string>("");
+
+  const tableHeaders = React.useMemo(() => {
+    const originalHeaders = [
+      {
+        id: String(ParkingLocationSortBy.Name),
+        label: "Name",
+        numeric: false,
+      },
+      {
+        id: String(ParkingLocationSortBy.Address),
+        label: "Address",
+        numeric: false,
+      },
+      {
+        id: String(ParkingLocationSortBy.Capacity),
+        label: "Capacity",
+        numeric: true,
+      },
+      {
+        id: String(ParkingLocationSortBy.AvailableSpaces),
+        label: "Available",
+        numeric: true,
+      },
+      {
+        id: String(ParkingLocationSortBy.HourlyRate),
+        label: "Hourly Rate",
+        numeric: true,
+      },
+      {
+        id: String(ParkingLocationSortBy.DailyRate),
+        label: "Daily Rate",
+        numeric: true,
+      },
+      {
+        id: String(ParkingLocationSortBy.MonthlyRate),
+        label: "Monthly Rate",
+        numeric: true,
+      },
+      {
+        id: "",
+        label: "",
+        numeric: false,
+      },
+    ];
+    return canEdit || canDelete
+      ? originalHeaders
+      : originalHeaders.slice(0, -1);
+  }, [canEdit, canDelete]);
 
   const fetcher = useFetcher();
 
-  const handleRequestSort = React.useCallback(
-    (_: unknown, property: ParkingLocationSortBy) => {
-      const isAsc = sort === property ? isDesc : true;
-      setIsDesc(!isAsc);
-      setSort(property);
-      setPage(0);
+  const HandleDeleteParkingLocation = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const id = (event.currentTarget as HTMLButtonElement).dataset.rowid;
+      if (!id) return;
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("method", "DELETE");
+      fetcher.submit(formData, {
+        method: "POST",
+        action: ".",
+      });
+      setCurrentId(id);
     },
-    [sort, isDesc]
+    [fetcher]
   );
 
-  const createSortHandler = React.useCallback(
-    (property: ParkingLocationSortBy) => (event: React.MouseEvent<unknown>) => {
-      handleRequestSort(event, property);
+  const renderRow = React.useCallback(
+    (row: IGetParkingLocationDto) => {
+      const showEditDeleteCell = canEdit || canDelete;
+      return (
+        <StyledTableRow key={row.id}>
+          <FirstCell numeric={false}>{row.name}</FirstCell>
+          <OtherCell numeric={false}>{row.address}</OtherCell>
+          <OtherCell numeric={true}>{row.capacity}</OtherCell>
+          <OtherCell numeric={true}>{row.available_spaces}</OtherCell>
+          <OtherCell numeric={true}>{row.hourly_rate}</OtherCell>
+          <OtherCell numeric={true}>{row.daily_rate}</OtherCell>
+          <OtherCell numeric={true}>{row.monthly_rate}</OtherCell>
+          {showEditDeleteCell && (
+            <EditDeleteButtonCell>
+              {canEdit && <EditButton />}
+              {canDelete && (
+                <DeleteButton
+                  data-rowId={row.id}
+                  onClick={HandleDeleteParkingLocation}
+                />
+              )}
+            </EditDeleteButtonCell>
+          )}
+        </StyledTableRow>
+      );
     },
-    [handleRequestSort]
+    [canEdit, canDelete, HandleDeleteParkingLocation]
   );
 
-  const isLoading =
-    fetcher.state === "submitting" || fetcher.state === "loading";
-
-  React.useEffect(() => {
-    const formData = new FormData();
-    formData.append("page", page.toString());
-    formData.append("limit", pageSize.toString());
-    formData.append("search", search);
-    formData.append("sort", sort as unknown as string);
-    formData.append("desc", isDesc.toString());
-
-    fetcher.submit(formData, {
-      method: "POST",
-      action: ".",
-      encType: "application/x-www-form-urlencoded",
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sort, isDesc, page, pageSize, search]);
+  const { logAlert } = useOutletContext<{
+    logAlert: (message: string, severity: string) => void;
+  }>();
 
   React.useEffect(() => {
     if (fetcher.data) {
-      const responseData =
-        fetcher.data as unknown as IGetAllParkingLocationResponseDto;
-      setResponse(responseData);
+      const response = fetcher.data as IDeleteParkingLocationResponse & {
+        method: string;
+      };
+      if (response?.success) {
+        setResponse((prev: IGetAllParkingLocationResponseDto | undefined) => ({
+          ...prev!,
+          items: prev!.items.filter(
+            (item: IGetParkingLocationDto) => item.id !== currentId
+          ),
+        }));
+        setCurrentId(null);
+        logAlert(response.message, "success");
+      }
+      if (response?.errors?.summary) {
+        logAlert(response.errors.summary, "error");
+      }
+      if (response?.statusCode === 403) {
+        logAlert(
+          "Forbidden! You do not have permission to delete this parking location.",
+          "error"
+        );
+      }
     }
-  }, [fetcher.data]);
+  }, [fetcher.data, currentId, logAlert]);
 
   React.useEffect(() => {
     const banner = document.getElementById("banner");
@@ -100,96 +181,17 @@ function ManageParkingLocation() {
   }, []);
 
   return (
-    <StyledTableContainer>
-      <StyledTable>
-        <StyledTableHead>
-          <StyledTableRow>
-            <HeaderFirstCell
-              id={ParkingLocationSortBy.Name as unknown as string}
-              orderBy={sort}
-              isDesc={isDesc}
-              createSortHandler={createSortHandler}
-              numeric={false}
-            >
-              Name
-            </HeaderFirstCell>
-            <HeaderOtherCell
-              id={ParkingLocationSortBy.Address as unknown as string}
-              orderBy={sort}
-              isDesc={isDesc}
-              createSortHandler={createSortHandler}
-              numeric={false}
-            >
-              Address
-            </HeaderOtherCell>
-            <HeaderOtherCell
-              id={ParkingLocationSortBy.Capacity as unknown as string}
-              orderBy={sort}
-              isDesc={isDesc}
-              createSortHandler={createSortHandler}
-              numeric={true}
-            >
-              Capacity
-            </HeaderOtherCell>
-            <HeaderOtherCell
-              id={ParkingLocationSortBy.AvailableSpaces as unknown as string}
-              orderBy={sort}
-              isDesc={isDesc}
-              createSortHandler={createSortHandler}
-              numeric={true}
-            >
-              Available
-            </HeaderOtherCell>
-            <HeaderOtherCell
-            // id={ParkingLocationSortBy.Name as unknown as string}
-            // orderBy={sort}
-            // isDesc={isDesc}
-            // createSortHandler={createSortHandler}
-            // numeric={true}
-            >
-              Hourly Rate
-            </HeaderOtherCell>
-            <HeaderOtherCell
-            // id={ParkingLocationSortBy.Name as unknown as string}
-            // orderBy={sort}
-            // isDesc={isDesc}
-            // createSortHandler={createSortHandler}
-            // numeric={true}
-            >
-              Daily Rate
-            </HeaderOtherCell>
-            <HeaderOtherCell
-            // id={ParkingLocationSortBy.Name as unknown as string}
-            // orderBy={sort}
-            // isDesc={isDesc}
-            // createSortHandler={createSortHandler}
-            // numeric={true}
-            >
-              Monthly Rate
-            </HeaderOtherCell>
-            <HeaderOtherCell></HeaderOtherCell>
-          </StyledTableRow>
-        </StyledTableHead>
-        <StyledTableBody>
-          {isLoading && <Loader />}
-          {rows.map((row) => (
-            <StyledTableRow key={row.id}>
-              <FirstCell numeric={false}>{row.name}</FirstCell>
-              <OtherCell numeric={false}>{row.address}</OtherCell>
-              <OtherCell numeric={true}>{row.capacity}</OtherCell>
-              <OtherCell numeric={true}>{row.available_spaces}</OtherCell>
-              <OtherCell numeric={true}>{row.hourly_rate}</OtherCell>
-              <OtherCell numeric={true}>{row.daily_rate}</OtherCell>
-              <OtherCell numeric={true}>{row.monthly_rate}</OtherCell>
-              <EditDeleteButtonCell>
-                <EditButton />
-                <DeleteButton />
-              </EditDeleteButtonCell>
-            </StyledTableRow>
-          ))}
-        </StyledTableBody>
-      </StyledTable>
-    </StyledTableContainer>
+    <AdminDataTable
+      loaderData={response as IGetAllParkingLocationResponseDto}
+      headers={tableHeaders}
+      defaultSort={TableSettings.DEFAULT_SORT}
+      defaultIsDesc={TableSettings.DEFAULT_DESC_ORDER}
+      defaultPageIndex={TableSettings.DEFAULT_PAGE_INDEX}
+      defaultPageSize={TableSettings.DEFAULT_PAGE_SIZE}
+      defaultSearch={""}
+      renderRow={renderRow}
+      setResponse={handleGetParkingLocationDto}
+    />
   );
 }
 
