@@ -56,15 +56,15 @@ export const AddForm = styled(Form)(() => ({
   width: "100%",
   height: "100%",
 })).withComponent((props: React.ComponentProps<typeof Form>) => {
-  const { children, ...rest } = props;
+  const { children, method, ...rest } = props;
   return (
-    <Form method="POST" {...rest}>
+    <Form method={method ?? "POST"} {...rest}>
       <StyledGridContainer>{children}</StyledGridContainer>
     </Form>
   );
 });
 
-const StyledGridContainer = styled(Grid)(() => ({})).withComponent(
+export const StyledGridContainer = styled(Grid)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof Grid>) => (
     <Grid
       {...props}
@@ -367,7 +367,7 @@ export const DailyRateField = styled(RateTextField)(() => ({})).withComponent(
 
 export const CancelButton = styled(Button)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof Button>) => {
-    const label = "Cancel";
+    const label = props.children ?? "Cancel";
     return (
       <CancelButtonGrid>
         <Button
@@ -375,7 +375,7 @@ export const CancelButton = styled(Button)(() => ({})).withComponent(
           type="button"
           component={Link as React.ElementType}
           to="/parking-locations"
-          aria-label={label}
+          aria-label={label.toString()}
           {...props}
           sx={{
             width: "100%",
@@ -399,13 +399,13 @@ export const CancelButton = styled(Button)(() => ({})).withComponent(
 
 export const AddButton = styled(Button)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof Button>) => {
-    const label = "Add";
+    const label = props.children ?? "Add";
     return (
       <AddButtonGrid>
         <Button
           variant="contained"
           type="submit"
-          aria-label={label}
+          aria-label={label.toString()}
           {...props}
           sx={{
             width: "100%",

@@ -169,6 +169,135 @@ export const deleteParkingLocation = async (
   }
 };
 
+export const getParkingLocationById = async (
+  request: IGetParkingLocationByIdRequest
+): Promise<IGetParkingLocationByIdResponse> => {
+  const backEndUrl = import.meta.env.VITE_BACKEND_URL;
+  const parkingLocationEndpoint =
+    backEndUrl + import.meta.env.VITE_PARKING_LOCATION_URL + "/" + request.id;
+  try {
+    const response = await axios.get(parkingLocationEndpoint, {
+      withCredentials: true,
+      headers: {
+        Authorization: getAccessTokenFromCookie(),
+      },
+    });
+    return response.data as IGetParkingLocationByIdResponse;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data
+        ? (error.response?.data as IGetParkingLocationByIdResponse)
+        : {
+            statusCode: error.response?.status || 500,
+            message: error.message,
+            success: false,
+            errors: {
+              summary: "An unexpected error occurred.",
+            },
+          };
+    }
+
+    return {
+      statusCode: 500,
+      message: "Internal server error. An unexpected error occurred.",
+      success: false,
+      errors: {
+        summary: "An unexpected error occurred.",
+      },
+    };
+  }
+};
+
+export const updateParkingLocation = async (
+  request: IUpdateParkingLocationRequest
+): Promise<IUpdateParkingLocationResponse> => {
+  const backEndUrl = import.meta.env.VITE_BACKEND_URL;
+  const parkingLocationEndpoint =
+    backEndUrl + import.meta.env.VITE_PARKING_LOCATION_URL + "/" + request.id;
+  try {
+    const response = await axios.put(parkingLocationEndpoint, request.body, {
+      withCredentials: true,
+      headers: {
+        Authorization: getAccessTokenFromCookie(),
+      },
+    });
+    return response.data as IUpdateParkingLocationResponse;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      return error.response?.data
+        ? (error.response?.data as IUpdateParkingLocationResponse)
+        : {
+            statusCode: error.response?.status || 500,
+            message: error.message,
+            success: false,
+            errors: {
+              summary: "An unexpected error occurred.",
+            },
+          };
+    }
+
+    return {
+      statusCode: 500,
+      message: "Internal server error. An unexpected error occurred.",
+      success: false,
+      errors: {
+        summary: "An unexpected error occurred.",
+      },
+    };
+  }
+};
+
+export interface IUpdateParkingLocationRequest {
+  id: string;
+  body: IUpdateParkingLocationRequestBody;
+}
+
+export interface IUpdateParkingLocationRequestBody {
+  name: string;
+  address: string;
+  capacity: number;
+  available_spaces: number;
+  monthly_rate: number;
+  hourly_rate: number;
+  daily_rate: number;
+  concurrency_stamp: string;
+}
+
+export interface IUpdateParkingLocationResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  errors: IUpdateParkingLocationRequestError;
+}
+
+export interface IUpdateParkingLocationRequestError {
+  summary?: string;
+  name?: string;
+  address?: string;
+  capacity?: string;
+  available_spaces?: string;
+  monthly_rate?: string;
+  hourly_rate?: string;
+  daily_rate?: string;
+  concurrency_stamp?: string;
+}
+
+export interface IGetParkingLocationByIdRequest {
+  id: string;
+}
+
+export interface IGetParkingLocationByIdResponse {
+  statusCode: number;
+  message: string;
+  success: boolean;
+  data?: IGetParkingLocationDto;
+  errors: IGetParkingLocationRequestError;
+}
+
+export interface IGetParkingLocationRequestError {
+  summary?: string;
+}
+
 export interface IDeleteParkingLocationRequest {
   id: string;
 }

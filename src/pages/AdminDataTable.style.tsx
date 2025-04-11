@@ -26,6 +26,7 @@ const StyledContainer = styled(Container)(({ theme }) => {
       paddingBottom: "7rem",
       marginTop: "2rem",
     },
+    position: "relative",
   };
 });
 
@@ -33,32 +34,39 @@ const StyledPaper = styled(Paper)(({ theme }) => {
   return {
     width: "100%",
     height: "100%",
-    padding: "2rem",
+    padding: "1rem",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    overflowX: "auto",
     backgroundColor: theme.palette.background.paper,
     [theme.breakpoints.up("md")]: {
-      padding: "3rem",
+      // padding: "3rem",
     },
   };
 }).withComponent((props: React.ComponentProps<typeof Paper>) => {
   return <Paper {...props} elevation={1} />;
 });
 
-const StyledTableContainer = styled(TableContainer)(() => ({})).withComponent(
-  (props: React.ComponentProps<typeof TableContainer>) => {
-    return (
-      <StyledContainer>
-        <TableContainer component={StyledPaper} {...props}></TableContainer>
-      </StyledContainer>
-    );
-  }
-);
+const StyledTableContainer = styled(TableContainer)(() => ({
+  overflowX: "auto", // <-- allow horizontal scrolling
+  width: "100%", // ensure it takes full width
+  maxWidth: "100%", // prevent expanding beyond parent
+})).withComponent((props: React.ComponentProps<typeof TableContainer>) => {
+  return (
+    <StyledContainer>
+      <StyledPaper>
+        {/* This is where the scrolling happens */}
+        <TableContainer {...props} />
+      </StyledPaper>
+    </StyledContainer>
+  );
+});
 
 const StyledTable = styled(Table)(() => ({
   minWidth: 650,
+  // width: "100%",
 })).withComponent((props: React.ComponentProps<typeof Table>) => {
   return <Table aria-label="simple table" {...props} />;
 });

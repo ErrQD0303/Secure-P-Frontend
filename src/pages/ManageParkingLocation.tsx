@@ -1,7 +1,9 @@
-import { useFetcher, useLoaderData, useOutletContext } from "react-router-dom";
+import { useLoaderData, useOutletContext } from "react-router-dom";
 import {
-  IDeleteParkingLocationResponse,
+  deleteParkingLocation,
+  getAllParkingLocations,
   IGetAllParkingLocationResponseDto,
+  IGetAllParkingLocationsResponse,
   IGetParkingLocationDto,
 } from "../services/parkingLocationService";
 import React from "react";
@@ -18,10 +20,119 @@ import {
 } from "./AdminDataTable.style";
 import { useSelector } from "react-redux";
 import { getUserPermissions } from "../store/userSlice";
+import UpdateParkingLocationDialog from "../components/UpdateParkingLocationDialog";
+import DeleteParkingLocationDialog from "../components/DeleteParkingLocationDialog";
 
 function ManageParkingLocation() {
-  const loaderData = useLoaderData() as IGetAllParkingLocationResponseDto;
+  const { logAlert } = useOutletContext<{
+    logAlert: (message: string, severity: string) => void;
+  }>();
   const permissions = useSelector(getUserPermissions);
+  const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [currentId, setCurrentId] = React.useState<string | null>(null);
+  const [response, setResponse] = React.useState<
+    IGetAllParkingLocationResponseDto | undefined
+  >(useLoaderData() as IGetAllParkingLocationResponseDto);
+
+  const [sort, setSort] = React.useState<ParkingLocationSortBy>(
+    TableSettings.DEFAULT_SORT
+  );
+  const [isDesc, setIsDesc] = React.useState<boolean>(
+    TableSettings.DEFAULT_DESC_ORDER
+  );
+  const [page, setPage] = React.useState<number>(
+    TableSettings.DEFAULT_PAGE_INDEX
+  );
+  const [pageSize, setPageSize] = React.useState<number>(
+    TableSettings.DEFAULT_PAGE_SIZE
+  );
+  const [search, setSearch] = React.useState<string>("");
+
+  const handleOpenUpdateDialog = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const id = (event.currentTarget as HTMLButtonElement).dataset.rowid;
+      if (!id) return;
+      setCurrentId(id);
+      setOpenUpdateDialog(true);
+    },
+    [setOpenUpdateDialog]
+  );
+
+  const getParkingLocations = React.useCallback(
+    async (
+      page: number,
+      limit: number,
+      sort: ParkingLocationSortBy,
+      desc: boolean,
+      search: string
+    ) => {
+      const fetchedData = (await getAllParkingLocations({
+        page,
+        limit,
+        sort,
+        desc,
+        search,
+      })) as IGetAllParkingLocationsResponse;
+      setIsLoading(false);
+
+      if (fetchedData?.success) {
+        setResponse(fetchedData.data);
+        setCurrentId(null);
+        logAlert(fetchedData.message, "success");
+      } else if (fetchedData?.errors?.summary) {
+        logAlert(fetchedData.errors.summary, "error");
+      }
+      if (fetchedData?.statusCode === 403) {
+        logAlert(
+          "Forbidden! You do not have permission to get parking locations.",
+          "error"
+        );
+      }
+    },
+    [logAlert]
+  );
+
+  const handleCloseUpdateDialog = React.useCallback(
+    async (refetch?: boolean) => {
+      setOpenUpdateDialog(false);
+      if (!refetch) return;
+      await getParkingLocations(page, pageSize, sort, isDesc, search);
+    },
+    [getParkingLocations, isDesc, page, pageSize, search, sort]
+  );
+
+  const handleCloseDeleteDialog = React.useCallback(() => {
+    setOpenDeleteDialog(false);
+  }, []);
+
+  const handleSubmitDeleteDialog = React.useCallback(async () => {
+    setIsLoading(true);
+    const response = await deleteParkingLocation({
+      id: currentId || "",
+    });
+    setIsLoading(false);
+    if (response?.success) {
+      setResponse((prev) => ({
+        ...prev!,
+        items: prev?.items.filter(
+          (item) => item && item?.id && item.id !== currentId
+        ) as unknown as IGetParkingLocationDto[],
+      }));
+      setCurrentId(null);
+      logAlert(response.message, "success");
+    } else if (response?.errors?.summary) {
+      logAlert(response.errors.summary, "error");
+    }
+    if (response?.statusCode === 403) {
+      logAlert(
+        "Forbidden! You do not have permission to delete this parking location.",
+        "error"
+      );
+    }
+    setOpenDeleteDialog(false);
+  }, [currentId, logAlert]);
+
   const [canEdit, canDelete] = React.useMemo(() => {
     const canEdit = permissions.some(
       (permission) => permission === AppPolicy.UpdateParkingLocation
@@ -32,17 +143,6 @@ function ManageParkingLocation() {
 
     return [canEdit, canDelete];
   }, [permissions]);
-  const [currentId, setCurrentId] = React.useState<string | null>(null);
-  const [response, setResponse] = React.useState<
-    IGetAllParkingLocationResponseDto | undefined
-  >(loaderData);
-
-  const handleGetParkingLocationDto = React.useCallback(
-    (response: IGetAllParkingLocationResponseDto) => {
-      setResponse(response);
-    },
-    [setResponse]
-  );
 
   const tableHeaders = React.useMemo(() => {
     const originalHeaders = [
@@ -90,24 +190,18 @@ function ManageParkingLocation() {
     return canEdit || canDelete
       ? originalHeaders
       : originalHeaders.slice(0, -1);
-  }, [canEdit, canDelete]);
+  }, [canDelete, canEdit]);
 
-  const fetcher = useFetcher();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const HandleDeleteParkingLocation = React.useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
       const id = (event.currentTarget as HTMLButtonElement).dataset.rowid;
       if (!id) return;
-      const formData = new FormData();
-      formData.append("id", id);
-      formData.append("method", "DELETE");
-      fetcher.submit(formData, {
-        method: "POST",
-        action: ".",
-      });
       setCurrentId(id);
+      setOpenDeleteDialog(true);
     },
-    [fetcher]
+    []
   );
 
   const renderRow = React.useCallback(
@@ -124,7 +218,12 @@ function ManageParkingLocation() {
           <OtherCell numeric={true}>{row.monthly_rate}</OtherCell>
           {showEditDeleteCell && (
             <EditDeleteButtonCell>
-              {canEdit && <EditButton />}
+              {canEdit && (
+                <EditButton
+                  data-rowId={row.id}
+                  onClick={handleOpenUpdateDialog}
+                />
+              )}
               {canDelete && (
                 <DeleteButton
                   data-rowId={row.id}
@@ -136,39 +235,20 @@ function ManageParkingLocation() {
         </StyledTableRow>
       );
     },
-    [canEdit, canDelete, HandleDeleteParkingLocation]
+    [canEdit, canDelete, HandleDeleteParkingLocation, handleOpenUpdateDialog]
   );
 
-  const { logAlert } = useOutletContext<{
-    logAlert: (message: string, severity: string) => void;
-  }>();
-
-  React.useEffect(() => {
-    if (fetcher.data) {
-      const response = fetcher.data as IDeleteParkingLocationResponse & {
-        method: string;
-      };
-      if (response?.success) {
-        setResponse((prev: IGetAllParkingLocationResponseDto | undefined) => ({
-          ...prev!,
-          items: prev!.items.filter(
-            (item: IGetParkingLocationDto) => item.id !== currentId
-          ),
-        }));
-        setCurrentId(null);
-        logAlert(response.message, "success");
-      }
-      if (response?.errors?.summary) {
-        logAlert(response.errors.summary, "error");
-      }
-      if (response?.statusCode === 403) {
-        logAlert(
-          "Forbidden! You do not have permission to delete this parking location.",
-          "error"
-        );
-      }
-    }
-  }, [fetcher.data, currentId, logAlert]);
+  const handleRequestSort = React.useCallback(
+    async (_: unknown, property: ParkingLocationSortBy) => {
+      const isAsc = sort === property ? isDesc : true;
+      setIsDesc(!isAsc);
+      setSort(property);
+      setPage(0);
+      setIsLoading(true);
+      await getParkingLocations(0, pageSize, property, !isAsc, search);
+    },
+    [getParkingLocations, isDesc, pageSize, search, sort]
+  );
 
   React.useEffect(() => {
     const banner = document.getElementById("banner");
@@ -184,14 +264,31 @@ function ManageParkingLocation() {
     <AdminDataTable
       loaderData={response as IGetAllParkingLocationResponseDto}
       headers={tableHeaders}
-      defaultSort={TableSettings.DEFAULT_SORT}
-      defaultIsDesc={TableSettings.DEFAULT_DESC_ORDER}
-      defaultPageIndex={TableSettings.DEFAULT_PAGE_INDEX}
-      defaultPageSize={TableSettings.DEFAULT_PAGE_SIZE}
-      defaultSearch={""}
+      sort={sort}
+      isDesc={isDesc}
+      pageIndex={page}
+      pageSize={pageSize}
+      search={search}
       renderRow={renderRow}
-      setResponse={handleGetParkingLocationDto}
-    />
+      handleRequestSort={handleRequestSort}
+      isLoading={isLoading}
+    >
+      {openUpdateDialog && (
+        <UpdateParkingLocationDialog
+          parkingLocationId={currentId}
+          open={openUpdateDialog}
+          handleClose={handleCloseUpdateDialog}
+        />
+      )}
+      {openDeleteDialog && (
+        <DeleteParkingLocationDialog
+          parkingLocationId={currentId}
+          open={openDeleteDialog}
+          handleClose={handleCloseDeleteDialog}
+          handleSubmit={handleSubmitDeleteDialog}
+        />
+      )}
+    </AdminDataTable>
   );
 }
 
