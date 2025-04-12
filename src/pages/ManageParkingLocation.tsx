@@ -68,17 +68,12 @@ function ManageParkingLocation() {
 
       if (fetchedData?.success) {
         setResponse(fetchedData.data);
-        setCurrentId(null);
         logAlert(fetchedData.message, "success");
-      } else if (fetchedData?.errors?.summary) {
-        logAlert(fetchedData.errors.summary, "error");
+      } else {
+        setResponse(undefined);
+        logAlert(fetchedData?.message ?? fetchedData.errors.summary, "error");
       }
-      if (fetchedData?.statusCode === 403) {
-        logAlert(
-          "Forbidden! You do not have permission to get parking locations.",
-          "error"
-        );
-      }
+      setCurrentId(null);
     },
     [logAlert]
   );
