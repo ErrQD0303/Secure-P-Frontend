@@ -1,4 +1,12 @@
-import { styled } from "@mui/material";
+import {
+  keyframes,
+  styled,
+  TablePagination,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import TableSortLabel from "@mui/material/TableSortLabel";
@@ -13,6 +21,10 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import React from "react";
 import { visuallyHidden } from "@mui/utils";
+import IconButton from "@mui/material/IconButton";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
+import TableSettings from "../shared/constants/tableSettings";
 
 const StyledContainer = styled(Container)(({ theme }) => {
   return {
@@ -34,16 +46,13 @@ const StyledPaper = styled(Paper)(({ theme }) => {
   return {
     width: "100%",
     height: "100%",
-    padding: "1rem",
+    // padding: "1rem",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     overflowX: "auto",
     backgroundColor: theme.palette.background.paper,
-    [theme.breakpoints.up("md")]: {
-      // padding: "3rem",
-    },
   };
 }).withComponent((props: React.ComponentProps<typeof Paper>) => {
   return <Paper {...props} elevation={1} />;
@@ -82,6 +91,12 @@ const StyledTableRow = styled(TableRow)(() => ({})).withComponent(
     return <TableRow {...props} />;
   }
 );
+
+const BodyTableRow = styled(TableRow)(() => ({
+  cursor: "pointer",
+})).withComponent((props: React.ComponentProps<typeof TableRow>) => {
+  return <TableRow hover {...props} />;
+});
 
 const FirstCell = styled(TableCell)(() => ({})).withComponent(
   (
@@ -260,6 +275,156 @@ const DeleteButton = styled(Button)(({ theme }) => ({
   return <Button {...props}>Delete</Button>;
 });
 
+const FilterListTooltip = styled(Tooltip)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof Tooltip>) => {
+    return <Tooltip {...props} />;
+  }
+);
+
+const TableNameText = styled(Typography)(() => ({
+  flex: "1 1 100%",
+  fontWeight: "bold",
+  fontSize: "1.625rem",
+  textAlign: "left",
+  lineHeight: "2.438rem",
+  // marginBottom: "1rem",
+})).withComponent((props: React.ComponentProps<typeof Typography>) => {
+  const { children, ...rest } = props;
+  return (
+    <Typography {...rest} variant="h6" id="tableTitle">
+      {children}
+    </Typography>
+  );
+});
+
+const WhiteFilterListIcon = styled(FilterListIcon)(() => ({
+  color: "white",
+  "&:hover,&:active": {
+    color: "#f4f4f4",
+  },
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof FilterListIcon> & {
+      open?: boolean;
+    }
+  ) => {
+    const { open, ...rest } = props;
+    return open ? <CloseIcon {...rest} /> : <FilterListIcon {...rest} />;
+  }
+);
+
+export interface EnhancedTableToolbarProps
+  extends React.ComponentProps<typeof Toolbar> {
+  search: string;
+  handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleEnterKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+}
+
+const lengthExpandTextField = keyframes`
+  0% {
+    width: 0;
+    }
+    100% {
+    width: 100%;
+    }
+    `;
+
+const lengthCollapseTextField = keyframes`
+  0% {
+    width: 100%;
+    }
+    100% {
+    width: 0;
+    }
+    `;
+
+const SearchTextField = styled(TextField)(({ theme }) => ({
+  backgroundColor: theme.palette.common.white,
+  borderRadius: "0.5rem",
+  width: "0",
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: theme.palette.dark.main,
+    },
+    "&:hover fieldset": {
+      borderColor: theme.palette.dark.main,
+    },
+    "&.Mui-focused fieldset": { borderColor: theme.palette.dark.main },
+  },
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof TextField> & {
+      open?: boolean;
+    }
+  ) => {
+    const { open, ...rest } = props;
+    return (
+      <TextField
+        {...rest}
+        size="small"
+        sx={{
+          animation: `${
+            open ? lengthExpandTextField : lengthCollapseTextField
+          } 0.5s ease-in-out forwards`,
+        }}
+      />
+    );
+  }
+);
+
+const EnhancedTableToolbar = styled(Toolbar)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.common.white,
+  width: "100%",
+  padding: "1.5rem 0rem",
+})).withComponent((props: EnhancedTableToolbarProps) => {
+  const { search, handleSearchChange, handleEnterKeyDown, ...rest } = props;
+  const [open, setOpen] = React.useState(false);
+  const [showTextField, setShowTextField] = React.useState(false);
+  const handleClick = React.useCallback(() => {
+    if (open) {
+      setOpen(false);
+      setTimeout(() => setShowTextField(false), 500);
+    } else {
+      setShowTextField(true);
+      setOpen(true);
+    }
+  }, [open]);
+
+  return (
+    <Toolbar {...rest}>
+      {showTextField ? (
+        <SearchTextField
+          placeholder="Type your parking location name here..."
+          value={search}
+          onChange={handleSearchChange}
+          onKeyDown={handleEnterKeyDown}
+          open={open}
+        />
+      ) : (
+        <TableNameText>Parking Locations</TableNameText>
+      )}
+      <FilterListTooltip title={open ? "Close" : "Filter list"}>
+        <IconButton onClick={handleClick} size="large">
+          <WhiteFilterListIcon open={open} />
+        </IconButton>
+      </FilterListTooltip>
+    </Toolbar>
+  );
+});
+
+const StyledTablePagination = styled(TablePagination)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TablePagination>) => {
+    return (
+      <TablePagination
+        component="div"
+        rowsPerPageOptions={TableSettings.DEFAULT_ROWS_PER_PAGE_OPTIONS}
+        {...props}
+      />
+    );
+  }
+);
+
 export {
   StyledContainer,
   StyledPaper,
@@ -267,6 +432,8 @@ export {
   StyledTable,
   StyledTableHead,
   StyledTableRow,
+  StyledTablePagination,
+  BodyTableRow,
   FirstCell,
   OtherCell,
   StyledTableBody,
@@ -276,4 +443,5 @@ export {
   HeaderFirstCell,
   HeaderOtherCell,
   EnhancedTableHead,
+  EnhancedTableToolbar,
 };

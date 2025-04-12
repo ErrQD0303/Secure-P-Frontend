@@ -108,6 +108,7 @@ export const getAllParkingLocations = async (
             data: {
               items: [],
               total_pages: 0,
+              total_items: 0,
             } as IGetAllParkingLocationResponseDto,
             errors: {
               summary: "An unexpected error occurred.",
@@ -122,6 +123,7 @@ export const getAllParkingLocations = async (
       data: {
         items: [],
         total_pages: 0,
+        total_items: 0,
       } as IGetAllParkingLocationResponseDto,
       errors: {
         summary: "An unexpected error occurred.",
@@ -337,6 +339,7 @@ export interface IGetAllParkingLocationResponseDto
   extends IGetAllResponseDto<IGetParkingLocationDto> {
   items: IGetParkingLocationDto[];
   total_pages: number;
+  total_items: number;
 }
 
 export interface IGetParkingLocationDto {

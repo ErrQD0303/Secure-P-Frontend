@@ -11,12 +11,12 @@ import TableSettings from "../shared/constants/tableSettings";
 import { AppPolicy, ParkingLocationSortBy } from "../types/enum";
 import AdminDataTable from "./AdminDataTable";
 import {
+  BodyTableRow,
   DeleteButton,
   EditButton,
   EditDeleteButtonCell,
   FirstCell,
   OtherCell,
-  StyledTableRow,
 } from "./AdminDataTable.style";
 import { useSelector } from "react-redux";
 import { getUserPermissions } from "../store/userSlice";
@@ -48,16 +48,6 @@ function ManageParkingLocation() {
     TableSettings.DEFAULT_PAGE_SIZE
   );
   const [search, setSearch] = React.useState<string>("");
-
-  const handleOpenUpdateDialog = React.useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      const id = (event.currentTarget as HTMLButtonElement).dataset.rowid;
-      if (!id) return;
-      setCurrentId(id);
-      setOpenUpdateDialog(true);
-    },
-    [setOpenUpdateDialog]
-  );
 
   const getParkingLocations = React.useCallback(
     async (
@@ -91,6 +81,56 @@ function ManageParkingLocation() {
       }
     },
     [logAlert]
+  );
+
+  const handlePageChange = React.useCallback(
+    async (newPage: number) => {
+      setPage(newPage);
+      setIsLoading(true);
+      await getParkingLocations(newPage, pageSize, sort, isDesc, search);
+      setIsLoading(false);
+    },
+    [getParkingLocations, isDesc, pageSize, search, sort]
+  );
+
+  const handlePageSizeChange = React.useCallback(
+    async (newPageSize: number) => {
+      setPageSize(newPageSize);
+      setPage(1);
+      setIsLoading(true);
+      await getParkingLocations(1, newPageSize, sort, isDesc, search);
+      setIsLoading(false);
+    },
+    [getParkingLocations, isDesc, search, sort]
+  );
+
+  const handleSearchChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    []
+  );
+
+  const handleEnterKeyDown = React.useCallback(
+    async (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key !== "Enter") return;
+
+      setPage(1);
+      setIsLoading(true);
+      await getParkingLocations(1, pageSize, sort, isDesc, search);
+      setIsLoading(false);
+    },
+    [getParkingLocations, isDesc, pageSize, search, sort]
+  );
+
+  const handleOpenUpdateDialog = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      const id = (event.currentTarget as HTMLButtonElement).dataset.rowid;
+      if (!id) return;
+      setCurrentId(id);
+      setOpenUpdateDialog(true);
+    },
+    [setOpenUpdateDialog]
   );
 
   const handleCloseUpdateDialog = React.useCallback(
@@ -208,7 +248,7 @@ function ManageParkingLocation() {
     (row: IGetParkingLocationDto) => {
       const showEditDeleteCell = canEdit || canDelete;
       return (
-        <StyledTableRow key={row.id}>
+        <BodyTableRow key={row.id}>
           <FirstCell numeric={false}>{row.name}</FirstCell>
           <OtherCell numeric={false}>{row.address}</OtherCell>
           <OtherCell numeric={true}>{row.capacity}</OtherCell>
@@ -232,7 +272,7 @@ function ManageParkingLocation() {
               )}
             </EditDeleteButtonCell>
           )}
-        </StyledTableRow>
+        </BodyTableRow>
       );
     },
     [canEdit, canDelete, HandleDeleteParkingLocation, handleOpenUpdateDialog]
@@ -243,9 +283,9 @@ function ManageParkingLocation() {
       const isAsc = sort === property ? isDesc : true;
       setIsDesc(!isAsc);
       setSort(property);
-      setPage(0);
+      setPage(1);
       setIsLoading(true);
-      await getParkingLocations(0, pageSize, property, !isAsc, search);
+      await getParkingLocations(1, pageSize, property, !isAsc, search);
     },
     [getParkingLocations, isDesc, pageSize, search, sort]
   );
@@ -272,6 +312,10 @@ function ManageParkingLocation() {
       renderRow={renderRow}
       handleRequestSort={handleRequestSort}
       isLoading={isLoading}
+      handleSearchChange={handleSearchChange}
+      handleEnterKeyDown={handleEnterKeyDown}
+      handlePageChange={handlePageChange}
+      handlePageSizeChange={handlePageSizeChange}
     >
       {openUpdateDialog && (
         <UpdateParkingLocationDialog
