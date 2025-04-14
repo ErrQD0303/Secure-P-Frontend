@@ -9,7 +9,7 @@ import {
 import React from "react";
 import TableSettings from "../shared/constants/tableSettings";
 import { AppPolicy, ParkingLocationSortBy } from "../types/enum";
-import AdminDataTable from "./AdminDataTable";
+import AdminDataTable from "../components/AdminDataTable";
 import {
   BodyTableRow,
   DeleteButton,
@@ -17,7 +17,7 @@ import {
   EditDeleteButtonCell,
   FirstCell,
   OtherCell,
-} from "./AdminDataTable.style";
+} from "../components/AdminDataTable.style";
 import { useSelector } from "react-redux";
 import { getUserPermissions } from "../store/userSlice";
 import UpdateParkingLocationDialog from "../components/UpdateParkingLocationDialog";
@@ -48,6 +48,13 @@ function ManageParkingLocation() {
     TableSettings.DEFAULT_PAGE_SIZE
   );
   const [search, setSearch] = React.useState<string>("");
+
+  const [searchTextFieldPlaceholder, tableTitle] = React.useMemo(() => {
+    const searchTextFieldPlaceholder =
+      "Type parking location name or address to search...";
+    const tableTitle = "Parking Locations";
+    return [searchTextFieldPlaceholder, tableTitle];
+  }, []);
 
   const getParkingLocations = React.useCallback(
     async (
@@ -154,17 +161,11 @@ function ManageParkingLocation() {
           (item) => item && item?.id && item.id !== currentId
         ) as unknown as IGetParkingLocationDto[],
       }));
-      setCurrentId(null);
       logAlert(response.message, "success");
-    } else if (response?.errors?.summary) {
-      logAlert(response.errors.summary, "error");
+    } else {
+      logAlert(response.message ?? response.errors.summary, "error");
     }
-    if (response?.statusCode === 403) {
-      logAlert(
-        "Forbidden! You do not have permission to delete this parking location.",
-        "error"
-      );
-    }
+    setCurrentId(null);
     setOpenDeleteDialog(false);
   }, [currentId, logAlert]);
 
@@ -190,6 +191,11 @@ function ManageParkingLocation() {
         id: String(ParkingLocationSortBy.Address),
         label: "Address",
         numeric: false,
+      },
+      {
+        id: String(ParkingLocationSortBy.TotalParkingZones),
+        label: "Total Parking Zones",
+        numeric: true,
       },
       {
         id: String(ParkingLocationSortBy.Capacity),
@@ -246,11 +252,19 @@ function ManageParkingLocation() {
         <BodyTableRow key={row.id}>
           <FirstCell numeric={false}>{row.name}</FirstCell>
           <OtherCell numeric={false}>{row.address}</OtherCell>
-          <OtherCell numeric={true}>{row.capacity}</OtherCell>
-          <OtherCell numeric={true}>{row.available_spaces}</OtherCell>
-          <OtherCell numeric={true}>{row.hourly_rate}</OtherCell>
-          <OtherCell numeric={true}>{row.daily_rate}</OtherCell>
-          <OtherCell numeric={true}>{row.monthly_rate}</OtherCell>
+          <OtherCell numeric={true}>{row.parking_zones.length}</OtherCell>
+          <OtherCell numeric={true}>
+            {row.parking_zones.reduce((acc, pz) => acc + pz.capacity, 0)}
+          </OtherCell>
+          <OtherCell numeric={true}>
+            {row.parking_zones.reduce(
+              (acc, pz) => acc + pz.available_spaces,
+              0
+            )}
+          </OtherCell>
+          <OtherCell numeric={true}>{row.parking_rate.hourly_rate}</OtherCell>
+          <OtherCell numeric={true}>{row.parking_rate.daily_rate}</OtherCell>
+          <OtherCell numeric={true}>{row.parking_rate.monthly_rate}</OtherCell>
           {showEditDeleteCell && (
             <EditDeleteButtonCell>
               {canEdit && (
@@ -307,6 +321,9 @@ function ManageParkingLocation() {
       renderRow={renderRow}
       handleRequestSort={handleRequestSort}
       isLoading={isLoading}
+      searchPlaceholder={searchTextFieldPlaceholder}
+      tableTitle={tableTitle}
+      rowsPerPageOptions={TableSettings.DEFAULT_ROWS_PER_PAGE_OPTIONS}
       handleSearchChange={handleSearchChange}
       handleEnterKeyDown={handleEnterKeyDown}
       handlePageChange={handlePageChange}

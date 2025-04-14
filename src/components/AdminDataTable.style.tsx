@@ -316,6 +316,8 @@ const WhiteFilterListIcon = styled(FilterListIcon)(() => ({
 export interface EnhancedTableToolbarProps
   extends React.ComponentProps<typeof Toolbar> {
   search: string;
+  searchTextFieldPlaceholder?: string;
+  tableName?: string;
   handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleEnterKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
@@ -378,7 +380,14 @@ const EnhancedTableToolbar = styled(Toolbar)(({ theme }) => ({
   width: "100%",
   padding: "1.5rem 0rem",
 })).withComponent((props: EnhancedTableToolbarProps) => {
-  const { search, handleSearchChange, handleEnterKeyDown, ...rest } = props;
+  const {
+    search,
+    handleSearchChange,
+    handleEnterKeyDown,
+    searchTextFieldPlaceholder,
+    tableName,
+    ...rest
+  } = props;
   const [open, setOpen] = React.useState(false);
   const [showTextField, setShowTextField] = React.useState(false);
   const handleClick = React.useCallback(() => {
@@ -395,14 +404,14 @@ const EnhancedTableToolbar = styled(Toolbar)(({ theme }) => ({
     <Toolbar {...rest}>
       {showTextField ? (
         <SearchTextField
-          placeholder="Type your parking location name here..."
+          placeholder={searchTextFieldPlaceholder ?? "Type to search..."}
           value={search}
           onChange={handleSearchChange}
           onKeyDown={handleEnterKeyDown}
           open={open}
         />
       ) : (
-        <TableNameText>Parking Locations</TableNameText>
+        <TableNameText>{tableName}</TableNameText>
       )}
       <FilterListTooltip title={open ? "Close" : "Filter list"}>
         <IconButton onClick={handleClick} size="large">

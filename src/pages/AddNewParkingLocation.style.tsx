@@ -1,4 +1,8 @@
-import { InputAdornment, styled } from "@mui/material";
+import { FormHelperText, InputAdornment, styled } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid2";
@@ -18,6 +22,9 @@ import TodayIcon from "@mui/icons-material/Today";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import theme from "../styles/theme";
 import Error from "./Error";
+import CloseIcon from "@mui/icons-material/Close";
+import { IParkingRates } from "../types/parking";
+import { IAddNewParkingLocationRequestParkingZoneError } from "../services/parkingLocationService";
 
 export const StyledContainer = styled(Container)(({ theme }) => {
   return {
@@ -297,10 +304,36 @@ const RateTextField = styled(NumberTextField)(() => ({})).withComponent(
   }
 );
 
+const IntegerTextField = styled(NumberTextField)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof TextField>) => {
+    const handleIntegerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseInt(e.target.value, 10);
+      if (isNaN(value) || value < 0) {
+        e.target.value = "0";
+      }
+    };
+
+    return (
+      <StyledTextField
+        type="number"
+        gridElement={NumberTextFieldGrid}
+        slotProps={{
+          htmlInput: {
+            min: 0,
+            step: "1",
+          },
+        }}
+        onChange={handleIntegerChange}
+        {...props}
+      />
+    );
+  }
+);
+
 export const CapacityField = styled(NumberTextField)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof TextField>) => {
     return (
-      <NumberTextField
+      <IntegerTextField
         id="capacity"
         label="Capacity"
         icon={<StorageIcon />}
@@ -314,7 +347,7 @@ export const AvailableSpacesField = styled(NumberTextField)(
   () => ({})
 ).withComponent((props: React.ComponentProps<typeof TextField>) => {
   return (
-    <NumberTextField
+    <IntegerTextField
       id="available-spaces"
       label="Available Spaces"
       disabled
@@ -427,6 +460,330 @@ export const StyledError = styled(Error)(() => ({})).withComponent(
     return (
       <StyledGrid>
         <Error message={props.message} />
+      </StyledGrid>
+    );
+  }
+);
+
+export const RemoveParkingZoneIcon = styled(Button)(({ theme }) => ({
+  position: "absolute",
+  top: "0.5rem",
+  right: "0.5rem",
+  color: theme.palette.error.main,
+  padding: 0,
+  minWidth: "1rem",
+})).withComponent((props: React.ComponentProps<typeof Button>) => {
+  return (
+    <Tooltip title={"Remove Parking Zone"}>
+      <Button
+        variant="text"
+        type="button"
+        aria-label="Remove Parking Zone"
+        {...props}
+      >
+        <CloseIcon />
+      </Button>
+    </Tooltip>
+  );
+});
+
+export const ParkingZoneGridParent = styled(StyledGrid)(() => ({
+  marginTop: "1rem",
+})).withComponent((props: React.ComponentProps<typeof Grid>) => (
+  <StyledGrid
+    container
+    spacing={2}
+    justifyContent={"center"}
+    columns={{
+      base: 1,
+      md: 5,
+    }}
+    {...props}
+  />
+));
+
+export const ParkingZoneNameGrid = styled(StyledGrid)(() => ({
+  marginTop: "0.4rem",
+})).withComponent((props: React.ComponentProps<typeof Grid>) => (
+  <StyledGrid size={{ base: 1, md: 2.5 }} {...props} />
+));
+
+export const ParkingZoneCapacityGrid = styled(NumberTextFieldGrid)(() => ({
+  marginTop: "0.4rem",
+})).withComponent((props: React.ComponentProps<typeof Grid>) => (
+  <StyledGrid size={{ base: 1, md: 1.25 }} {...props} />
+));
+
+export const ParkingZoneAvailableSpacesGrid = styled(NumberTextFieldGrid)(
+  () => ({
+    marginTop: "0.4rem",
+  })
+).withComponent((props: React.ComponentProps<typeof Grid>) => (
+  <StyledGrid size={{ base: 1, md: 1.25 }} {...props} />
+));
+
+export const ParkingZoneGridRecord = styled(StyledGrid)(() => ({
+  width: "100%",
+  border: "1px solid #E0E0E0",
+  borderRadius: "8px",
+  padding: "1rem",
+  position: "relative",
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof Grid> & {
+      index?: number;
+      zone?: {
+        capacity?: number;
+        availableSpaces?: number;
+      };
+      error?: IAddNewParkingLocationRequestParkingZoneError;
+      handleRemoveZone?: (index: number) => void;
+      handleZoneChange?: (
+        index: number,
+        newFieldValue: {
+          field: string;
+          value: number | string;
+        }[]
+      ) => void;
+    }
+  ) => {
+    const { index, zone, handleZoneChange, handleRemoveZone, error, ...rest } =
+      props;
+    const { capacity } = zone || {};
+    const [currentCapacity, setCurrentCapacity] = React.useState<number>(
+      capacity || 0
+    );
+    const HandleCapacityChange = React.useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = parseInt(e.target.value, 10);
+        if (isNaN(value) || value < 0) {
+          setCurrentCapacity(0);
+        } else {
+          setCurrentCapacity(value);
+        }
+      },
+      []
+    );
+
+    const HandleRemoveZone = React.useCallback(() => {
+      if (index === undefined) {
+        throw new TypeError("index is undefined");
+      }
+      handleRemoveZone?.(index);
+    }, [index, handleRemoveZone]);
+
+    React.useEffect(() => {
+      if (currentCapacity !== zone?.capacity) {
+        if (index === undefined) {
+          throw new TypeError("index is undefined");
+        }
+        handleZoneChange?.(index, [
+          {
+            field: "capacity",
+            value: currentCapacity,
+          },
+          {
+            field: "availableSpaces",
+            value: currentCapacity,
+          },
+        ]);
+      }
+    });
+
+    return (
+      <StyledGrid
+        container
+        {...rest}
+        columns={{
+          base: 1,
+          md: 5,
+        }}
+        size={{ base: 1, md: 5 }}
+        spacing={2}
+      >
+        <RemoveParkingZoneIcon onClick={HandleRemoveZone} />
+        <NameTextField
+          id={`parking_zones[${index}].name`}
+          label="Parking Zone Name"
+          icon={<PersonIcon />}
+          defaultValue="New Parking Zone"
+          gridElement={ParkingZoneNameGrid}
+          error={!!error?.name}
+          helperText={error?.name}
+        />
+        <CapacityField
+          id={`parking_zones[${index}].capacity`}
+          value={currentCapacity}
+          onChange={HandleCapacityChange}
+          gridElement={ParkingZoneCapacityGrid}
+          error={!!error?.capacity}
+          helperText={error?.capacity}
+        />
+        <AvailableSpacesField
+          id={`parking_zones[${index}].available-spaces`}
+          value={currentCapacity}
+          gridElement={ParkingZoneAvailableSpacesGrid}
+          error={!!error?.available_spaces}
+          helperText={error?.available_spaces}
+        />
+      </StyledGrid>
+    );
+  }
+);
+
+export const TotalParkingLocationCapacityAndAvailableSpaces = styled(
+  StyledGrid
+)(() => ({})).withComponent(
+  (
+    props: React.ComponentProps<typeof Grid> & {
+      capacity?: number;
+      availableSpaces?: number;
+    }
+  ) => {
+    const { capacity, availableSpaces, ...rest } = props;
+    return (
+      <StyledGrid
+        container
+        {...rest}
+        columns={{
+          base: 1,
+          md: 5,
+        }}
+        spacing={2}
+      >
+        <CapacityField
+          disabled
+          id={`total_capacity`}
+          value={capacity}
+          label="Total Capacity"
+        />
+        <AvailableSpacesField
+          id={`total_available_spaces`}
+          value={availableSpaces}
+          label="Total Available Spaces"
+        />
+      </StyledGrid>
+    );
+  }
+);
+
+export const AddNewParkingZoneButton = styled(Button)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof Button>) => {
+    const label = props.children ?? "Add New Parking Zone";
+    return (
+      <Tooltip title={label.toString()}>
+        <Button
+          variant="outlined"
+          type="button"
+          aria-label={label.toString()}
+          {...props}
+        >
+          {label}
+        </Button>
+      </Tooltip>
+    );
+  }
+);
+
+export const AddNewParkingZoneGrid = styled(StyledGrid)(() => ({
+  marginTop: "1rem",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof Grid> & {
+      handleAddZone: () => void;
+    }
+  ) => {
+    const { handleAddZone, ...rest } = props;
+    return (
+      <StyledGrid {...rest}>
+        <AddNewParkingZoneButton
+          variant="outlined"
+          type="button"
+          onClick={handleAddZone}
+        >
+          {props.children ?? "Add New Parking Zone"}
+        </AddNewParkingZoneButton>
+      </StyledGrid>
+    );
+  }
+);
+
+export const ParkingRateSelectInput = styled(Select)(() => ({
+  width: "100%",
+  height: "100%",
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof Grid> & {
+      label?: string;
+      parkingRates?: IParkingRates[];
+      handleParkingRateChange?: (rate: string | null) => void;
+      errorEle?: string;
+      input?: Record<
+        string,
+        | React.ComponentProps<typeof Select>
+        | React.ComponentProps<typeof MenuItem>
+        | React.ComponentProps<typeof StyledTextFieldLabel>
+        | React.ComponentProps<typeof Tooltip>
+        | React.ComponentProps<typeof FormControl>
+      >;
+    }
+  ) => {
+    const {
+      label,
+      input,
+      parkingRates,
+      errorEle,
+      handleParkingRateChange,
+      ...rest
+    } = props;
+    const labelId = input?.inputLabel?.id || "parking-rate-label";
+    const [parkingRateId, setParkingRateId] = React.useState<string>("");
+    const handleChange = React.useCallback(
+      (event: SelectChangeEvent<unknown>) => {
+        setParkingRateId(event.target.value as string);
+        handleParkingRateChange?.(event.target.value as string);
+      },
+      [handleParkingRateChange]
+    );
+
+    return (
+      <StyledGrid container {...rest}>
+        <FormControl
+          fullWidth
+          error={!!props.errorEle}
+          {...(input?.formControl as React.ComponentProps<typeof FormControl>)}
+        >
+          <StyledTextFieldLabel
+            labelContent={label ?? "Parking Rate"}
+            htmlFor={rest.id}
+            {...(input?.label as React.ComponentProps<
+              typeof StyledTextFieldLabel
+            >)}
+          />
+          <Select
+            labelId={labelId}
+            id="parking-rate-id"
+            name="parking-rate-id"
+            value={parkingRateId}
+            onChange={handleChange}
+            displayEmpty
+            required
+            {...(input?.select as React.ComponentProps<typeof Select>)}
+          >
+            <MenuItem value="" disabled hidden>
+              Select Parking Rate
+            </MenuItem>
+            {parkingRates?.map(({ id, hourly, daily, monthly }) => (
+              <MenuItem value={id}>
+                Hourly: {hourly}, Daily: {daily}, Monthly: {monthly}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>{errorEle}</FormHelperText>
+        </FormControl>
       </StyledGrid>
     );
   }

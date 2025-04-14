@@ -11,6 +11,7 @@ export interface IParkingZone {
 
 // ../types/parking.d.ts
 export interface IParkingRates {
+  id: string;
   hourly: number;
   daily: number;
   monthly: number;

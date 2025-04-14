@@ -9,7 +9,7 @@ import {
   StyledTableContainer,
   StyledTablePagination,
 } from "./AdminDataTable.style";
-import Loader from "../components/Loader";
+import Loader from "./Loader";
 import TableSettings from "../shared/constants/tableSettings";
 
 export interface AdminDataTableHeader {
@@ -41,6 +41,9 @@ export interface AdminDataTableProps<
   handlePageSizeChange?: (newPageSize: number) => void;
   children?: React.ReactNode;
   isLoading?: boolean;
+  rowsPerPageOptions?: number[];
+  searchPlaceholder?: string;
+  tableTitle?: string;
 }
 
 function AdminDataTable<
@@ -54,6 +57,8 @@ function AdminDataTable<
   pageIndex = 0,
   pageSize = 10,
   search = "",
+  searchPlaceholder,
+  tableTitle,
   headers,
   renderRow,
   children,
@@ -63,6 +68,7 @@ function AdminDataTable<
   handlePageChange,
   handlePageSizeChange,
   isLoading = false,
+  rowsPerPageOptions = TableSettings.DEFAULT_ROWS_PER_PAGE_OPTIONS,
 }: AdminDataTableProps<TData, TSortBy, TGetResponseDto>) {
   const rows = (loaderData?.items || []) as unknown as TGetResponseDto[];
   const totalItems = loaderData?.total_items || 0;
@@ -98,6 +104,8 @@ function AdminDataTable<
       {children}
       <EnhancedTableToolbar
         search={search}
+        tableName={tableTitle}
+        searchTextFieldPlaceholder={searchPlaceholder}
         handleSearchChange={
           handleSearchChange as unknown as (
             event: React.ChangeEvent<HTMLInputElement>
@@ -125,7 +133,7 @@ function AdminDataTable<
         </StyledTableBody>
       </StyledTable>
       <StyledTablePagination
-        rowsPerPageOptions={TableSettings.DEFAULT_ROWS_PER_PAGE_OPTIONS}
+        rowsPerPageOptions={rowsPerPageOptions}
         rowsPerPage={pageSize}
         count={totalItems}
         page={pageIndex - 1}

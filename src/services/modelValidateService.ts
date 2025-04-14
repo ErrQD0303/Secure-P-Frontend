@@ -5,6 +5,7 @@ import { IRegisterUser } from "../types/user";
 import {
   IAddNewParkingLocationRequest,
   IAddNewParkingLocationRequestError,
+  IAddNewParkingLocationRequestParkingZoneError,
 } from "./parkingLocationService";
 import {
   IEmailConfirmationError,
@@ -253,8 +254,9 @@ export const validateUserParkingSubscription = (
 
 export const validateParkingLocationModel = ({
   name,
-  capacity,
   address,
+  parking_rate_id,
+  parking_zones,
 }: IAddNewParkingLocationRequest): void => {
   const errors: IAddNewParkingLocationRequestError = {};
 
@@ -270,8 +272,27 @@ export const validateParkingLocationModel = ({
     errors.address = "Address must be at least 2 characters long";
   }
 
-  if (!capacity || capacity <= 0) {
-    errors.capacity = "Capacity is required and must be a positive number";
+  if (!parking_rate_id || parking_rate_id.trim() === "") {
+    errors.parking_rate_id = "Please select a parking rate";
+  }
+
+  const zoneErrors: {
+    [key: string]: IAddNewParkingLocationRequestParkingZoneError;
+  } = {};
+  parking_zones.forEach((zone, index) => {
+    if (!zone.name || zone.name.trim() === "") {
+      zoneErrors[String(index)].name = "Name is required";
+    } else if (zone.name.length < 2) {
+      zoneErrors[String(index)].name =
+        "Name must be at least 2 characters long";
+    }
+    if (isNaN(zone.capacity) || zone.capacity <= 0) {
+      zoneErrors[String(index)].capacity = "Capacity must be a positive number";
+    }
+  });
+
+  if (Object.keys(zoneErrors).length > 0) {
+    errors.parking_zones = zoneErrors;
   }
 
   if (Object.keys(errors).length > 0) {

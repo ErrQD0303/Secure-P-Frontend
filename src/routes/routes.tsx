@@ -37,6 +37,7 @@ import {
 import addNewSubscriptionAction from "../pages/addNewSubscriptionAction";
 import ForgotPasswordAction from "../pages/forgotPasswordAction";
 import PasswordResetAction from "../pages/passwordResetAction";
+import addNewParkingLocationLoader from "../pages/addNewParkingLocationLoader";
 import AddNewParkingLocationAction from "../pages/addNewParkingLocationAction";
 import manageParkingLocationLoader from "../pages/manageParkingLocationLoader";
 import manageParkingLocationAction from "../pages/manageParkingLocationAction";
@@ -146,6 +147,7 @@ export const routes = [
                 path: "add",
                 element: <AddNewParkingLocation />,
                 name: "Add New Parking Location",
+                loader: addNewParkingLocationLoader,
                 action: AddNewParkingLocationAction,
                 errorElement: <Error />,
               },

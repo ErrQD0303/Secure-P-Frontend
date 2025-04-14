@@ -2,37 +2,34 @@ import React from "react";
 import {
   AddButton,
   AddForm,
+  AddNewParkingZoneGrid,
   AddressTextField,
-  AvailableSpacesField,
   CancelButton,
-  CapacityField,
   DailyRateField,
   HourlyRateField,
   MonthlyRateField,
   NameTextField,
+  ParkingRateSelectInput,
+  ParkingZoneGridParent,
+  ParkingZoneGridRecord,
   StyledContainer,
   StyledError,
   StyledPaper,
+  TotalParkingLocationCapacityAndAvailableSpaces,
 } from "./AddNewParkingLocation.style";
-import { useActionData, useNavigate, useOutletContext } from "react-router-dom";
+import {
+  useActionData,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import { IAddNewParkingLocationResponse } from "../services/parkingLocationService";
 import { useSelector } from "react-redux";
 import { getUserPermissions } from "../store/userSlice";
 import { AppPolicy } from "../types/enum";
+import { IParkingRates } from "../types/parking";
 
 function AddNewParkingLocation() {
-  const [currentCapacity, setCurrentCapacity] = React.useState<number>(0);
-  const HandleCapacityChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = +e.target.value;
-      if (isNaN(value) || value < 0) {
-        setCurrentCapacity(0);
-      } else {
-        setCurrentCapacity(value);
-      }
-    },
-    []
-  );
   const response = useActionData() as
     | IAddNewParkingLocationResponse
     | undefined
@@ -41,6 +38,70 @@ function AddNewParkingLocation() {
   const havePermission = useSelector(getUserPermissions).includes(
     AppPolicy.CreateParkingLocation
   );
+  const currentIndex = React.useRef(0);
+  const [parkingZones, setParkingZones] = React.useState<
+    { capacity: number; availableSpaces: number; index: number }[]
+  >([{ capacity: 1, availableSpaces: 1, index: currentIndex.current++ }]);
+  const { parkingRates } = useLoaderData() as { parkingRates: IParkingRates[] };
+  console.log(parkingRates);
+  const [selectedParkingRate, setSelectedParkingRate] =
+    React.useState<IParkingRates | null>(null);
+
+  const handleParkingRateChange = React.useCallback(
+    (rate: string | null) => {
+      setSelectedParkingRate(parkingRates.find((r) => r.id === rate) ?? null);
+    },
+    [parkingRates]
+  );
+
+  const [totalCapacity, totalAvailableSpaces] = React.useMemo(() => {
+    return parkingZones.reduce(
+      (acc, zone) => {
+        acc[0] += zone.capacity;
+        acc[1] += zone.availableSpaces;
+        return acc;
+      },
+      [0, 0] as number[]
+    );
+  }, [parkingZones]);
+
+  const handleAddZone = () => {
+    setParkingZones((prev) => [
+      ...prev,
+      { capacity: 0, availableSpaces: 0, index: currentIndex.current++ },
+    ]);
+  };
+
+  const handleRemoveZone = (removeIndex: number) => {
+    setParkingZones((prev) => {
+      return prev.filter(({ index }) => removeIndex !== index);
+    });
+  };
+
+  const handleZoneChange = (
+    index: number,
+    newFieldValue: {
+      field: string;
+      value: number | string;
+    }[]
+  ) => {
+    setParkingZones((prev) =>
+      prev.map((zone) => {
+        if (zone.index !== index) return zone;
+
+        const newZone = { ...zone };
+        newFieldValue.forEach(({ field, value }) => {
+          if (field === "capacity") {
+            newZone.capacity = Number(value);
+          } else if (field === "availableSpaces") {
+            newZone.availableSpaces = Number(value);
+          }
+        });
+
+        return newZone;
+      })
+    );
+  };
 
   const { logAlert } = useOutletContext<{
     logAlert: (message: string, severity: string) => void;
@@ -99,25 +160,31 @@ function AddNewParkingLocation() {
             error={!!response?.errors?.address}
             helperText={response?.errors?.address}
           />
-          <CapacityField
-            error={!!response?.errors?.capacity}
-            helperText={response?.errors?.capacity}
-            value={currentCapacity}
-            onChange={HandleCapacityChange}
+          <TotalParkingLocationCapacityAndAvailableSpaces
+            capacity={totalCapacity}
+            availableSpaces={totalAvailableSpaces}
           />
-          <AvailableSpacesField value={currentCapacity} />
-          <HourlyRateField
-            error={!!response?.errors?.hourly_rate}
-            helperText={response?.errors?.hourly_rate}
+          <ParkingZoneGridParent>
+            {parkingZones.map((zone) => (
+              <ParkingZoneGridRecord
+                key={zone.index}
+                index={zone.index}
+                zone={zone}
+                handleZoneChange={handleZoneChange}
+                handleRemoveZone={handleRemoveZone}
+                error={response?.errors?.parking_zones?.[zone.index]}
+              />
+            ))}
+            <AddNewParkingZoneGrid handleAddZone={handleAddZone} />
+          </ParkingZoneGridParent>
+          <ParkingRateSelectInput
+            parkingRates={parkingRates}
+            handleParkingRateChange={handleParkingRateChange}
+            errorEle={response?.errors?.parking_rate_id}
           />
-          <DailyRateField
-            error={!!response?.errors?.daily_rate}
-            helperText={response?.errors?.daily_rate}
-          />
-          <MonthlyRateField
-            error={!!response?.errors?.monthly_rate}
-            helperText={response?.errors?.monthly_rate}
-          />
+          <HourlyRateField value={selectedParkingRate?.hourly} disabled />
+          <DailyRateField value={selectedParkingRate?.daily} disabled />
+          <MonthlyRateField value={selectedParkingRate?.monthly} disabled />
           <CancelButton />
           <AddButton />
         </AddForm>

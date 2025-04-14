@@ -40,4 +40,11 @@ export enum ParkingLocationSortBy {
   HourlyRate = 4,
   DailyRate = 5,
   MonthlyRate = 6,
+  TotalParkingZones = 7,
+}
+
+export enum ParkingRateSortBy {
+  Hourly = 0,
+  Daily = 1,
+  Monthly = 2,
 }
