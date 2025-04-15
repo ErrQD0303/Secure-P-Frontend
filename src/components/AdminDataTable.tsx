@@ -4,7 +4,7 @@ import { IGetAllResponseDto } from "../types/response"; // Ensure this import po
 import {
   EnhancedTableHead,
   EnhancedTableToolbar,
-  StyledTable,
+  StickyStyledTable,
   StyledTableBody,
   StyledTableContainer,
   StyledTablePagination,
@@ -117,7 +117,7 @@ function AdminDataTable<
           ) => void
         }
       />
-      <StyledTable>
+      <StickyStyledTable>
         <EnhancedTableHead
           tableHeaders={headers}
           sort={sort as unknown as string}
@@ -131,7 +131,7 @@ function AdminDataTable<
         <StyledTableBody>
           {rows.map((row) => renderRow(row) as React.ReactNode)}
         </StyledTableBody>
-      </StyledTable>
+      </StickyStyledTable>
       <StyledTablePagination
         rowsPerPageOptions={rowsPerPageOptions}
         rowsPerPage={pageSize}

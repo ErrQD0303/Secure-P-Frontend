@@ -1,6 +1,6 @@
 import { ActionFunctionArgs } from "react-router-dom";
 import { validateParkingLocationModel } from "../services/modelValidateService";
-import { isAddNewParkingLocationException } from "../shared/helpers/errors";
+import { isUpdateParkingLocationException } from "../shared/helpers/errors";
 import {
   addNewParkingLocation,
   IAddNewParkingLocationParkingZoneDto,
@@ -58,7 +58,7 @@ export default async function action({ request }: ActionFunctionArgs) {
   try {
     validateParkingLocationModel(addNewForm);
   } catch (error) {
-    if (isAddNewParkingLocationException(error)) {
+    if (isUpdateParkingLocationException(error)) {
       return {
         statusCode: 400,
         message: "Validation error",

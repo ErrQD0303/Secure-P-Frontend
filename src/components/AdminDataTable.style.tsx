@@ -80,6 +80,12 @@ const StyledTable = styled(Table)(() => ({
   return <Table aria-label="simple table" {...props} />;
 });
 
+const StickyStyledTable = styled(StyledTable)(() => ({})).withComponent(
+  (props: React.ComponentProps<typeof StyledTable>) => {
+    return <StyledTable stickyHeader {...props} />;
+  }
+);
+
 const StyledTableHead = styled(TableHead)(() => ({})).withComponent(
   (props: React.ComponentProps<typeof TableHead>) => {
     return <TableHead {...props} />;
@@ -140,7 +146,7 @@ function GenericHeaderFirstCell<TSortBy extends string | number>(
       align={numeric ? "right" : "left"}
       sortDirection={orderBy === rest.id ? (isDesc ? "desc" : "asc") : false}
     >
-      {orderBy || orderBy === 0 ? (
+      {rest.id && rest.id !== "" ? (
         <TableSortLabel
           active={orderBy === (rest.id as unknown as TSortBy)}
           direction={
@@ -438,6 +444,7 @@ export {
   StyledContainer,
   StyledPaper,
   StyledTableContainer,
+  StickyStyledTable,
   StyledTable,
   StyledTableHead,
   StyledTableRow,

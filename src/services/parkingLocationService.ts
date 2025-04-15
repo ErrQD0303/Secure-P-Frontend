@@ -257,11 +257,8 @@ export interface IUpdateParkingLocationRequest {
 export interface IUpdateParkingLocationRequestBody {
   name: string;
   address: string;
-  capacity: number;
-  available_spaces: number;
-  monthly_rate: number;
-  hourly_rate: number;
-  daily_rate: number;
+  parking_zones: IUpdateParkingLocationParkingZoneDto[];
+  parking_rate_id: string | null;
   concurrency_stamp: string;
 }
 
@@ -276,12 +273,17 @@ export interface IUpdateParkingLocationRequestError {
   summary?: string;
   name?: string;
   address?: string;
+  parking_rate_id?: string;
+  parking_zones?: {
+    [key: string]: IUpdateParkingLocationRequestParkingZoneError;
+  };
+  concurrency_stamp?: string;
+}
+
+export interface IUpdateParkingLocationRequestParkingZoneError {
+  name?: string;
   capacity?: string;
   available_spaces?: string;
-  monthly_rate?: string;
-  hourly_rate?: string;
-  daily_rate?: string;
-  concurrency_stamp?: string;
 }
 
 export interface IGetParkingLocationByIdRequest {
@@ -363,6 +365,17 @@ export interface IGetParkingLocationParkingRateDto {
   hourly_rate: number;
   daily_rate: number;
   monthly_rate: number;
+}
+
+export interface IUpdateParkingLocationParkingZonesObjectDto {
+  [key: string]: IUpdateParkingLocationParkingZoneDto;
+}
+
+export interface IUpdateParkingLocationParkingZoneDto {
+  id: string;
+  name: string;
+  capacity: number;
+  available_spaces?: number;
 }
 
 export interface IAddNewParkingLocationParkingZoneDto {

@@ -6,6 +6,8 @@ import {
   IAddNewParkingLocationRequest,
   IAddNewParkingLocationRequestError,
   IAddNewParkingLocationRequestParkingZoneError,
+  IUpdateParkingLocationRequestBody,
+  IUpdateParkingLocationRequestError,
 } from "./parkingLocationService";
 import {
   IEmailConfirmationError,
@@ -257,8 +259,10 @@ export const validateParkingLocationModel = ({
   address,
   parking_rate_id,
   parking_zones,
-}: IAddNewParkingLocationRequest): void => {
-  const errors: IAddNewParkingLocationRequestError = {};
+}: IAddNewParkingLocationRequest | IUpdateParkingLocationRequestBody): void => {
+  const errors:
+    | IAddNewParkingLocationRequestError
+    | IUpdateParkingLocationRequestError = {};
 
   if (!name || name.trim() === "") {
     errors.name = "Name is required";

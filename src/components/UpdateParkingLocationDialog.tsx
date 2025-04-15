@@ -2,7 +2,6 @@ import React from "react";
 import {
   CancelButton,
   DisabledIdTextField,
-  EnableAvailableSpacesTextField,
   HiddenConcurrencyStampTextField,
   HiddenIdTextField,
   StyledDialog,
@@ -11,26 +10,32 @@ import {
   StyledDialogTitle,
   StyledTransition,
   UpdateButton,
+  UpdateParkingLocationParkingZoneGridRecord,
 } from "./UpdateParkingLocationDialog.style";
 import {
   getParkingLocationById,
   IGetParkingLocationDto,
+  IUpdateParkingLocationRequestParkingZoneError,
   IUpdateParkingLocationResponse,
 } from "../services/parkingLocationService";
 import Loader from "./Loader";
 import {
+  AddNewParkingZoneGrid,
   AddressTextField,
-  CapacityField,
   DailyRateField,
   HourlyRateField,
   MonthlyRateField,
   NameTextField,
+  ParkingRateSelectInput,
+  ParkingZoneGridParent,
   StyledContainer,
   StyledError,
   StyledGridContainer,
   StyledPaper,
+  TotalParkingLocationCapacityAndAvailableSpaces,
 } from "../pages/AddNewParkingLocation.style";
 import { useFetcher, useOutletContext } from "react-router-dom";
+import { IParkingRates } from "../types/parking";
 
 export interface UpdateParkingLocationDialogProps {
   parkingLocationId: string | null;
@@ -51,13 +56,100 @@ function UpdateParkingLocationDialog({
     React.useState<IUpdateParkingLocationResponse | null>(null);
   const fetcher = useFetcher();
 
+  // Prevent unnecessary re-renders by memoizing fetcher state
+  // const fetcherState = React.useMemo(() => fetcher.state, [fetcher.state]);
+  // const fetcherData = React.useMemo(() => fetcher.data, [fetcher.data]);
+  const fetcherLoad = React.useMemo(() => fetcher.load, [fetcher.load]);
+  const ref = React.useRef<string | null>(null);
+  const currentIndex = React.useRef(parkingLocation?.parking_zones.length ?? 0);
+  const [parkingRates, setParkingRates] = React.useState<IParkingRates[]>([]);
+
+  const parkingZones = React.useMemo(
+    () => parkingLocation?.parking_zones ?? [],
+    [parkingLocation]
+  );
+  const [selectedParkingRate, setSelectedParkingRate] =
+    React.useState<IParkingRates | null>(null);
+
+  const handleParkingRateChange = React.useCallback(
+    (rate: string | null) => {
+      setSelectedParkingRate(parkingRates.find((r) => r.id === rate) ?? null);
+    },
+    [parkingRates]
+  );
+
+  const [totalCapacity, totalAvailableSpaces] = React.useMemo(() => {
+    return parkingZones.reduce(
+      (acc, zone) => {
+        acc[0] += zone.capacity;
+        acc[1] += zone.available_spaces;
+        return acc;
+      },
+      [0, 0] as number[]
+    );
+  }, [parkingZones]);
+
+  const handleAddZone = () => {
+    setParkingLocation((prev) => ({
+      ...prev!,
+      parking_zones: [
+        ...(prev?.parking_zones ?? []), // Ensure parking_zones is always an array
+        {
+          id: `new-${currentIndex.current++}`,
+          name: `New Parking Zone`,
+          capacity: 0,
+          available_spaces: 0,
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveZone = (removeId: string) => {
+    setParkingLocation((prev) => {
+      return {
+        ...prev!,
+        parking_zones: (prev?.parking_zones ?? []).filter(
+          ({ id }) => removeId !== id
+        ), // Ensure parking_zones is always an array
+      };
+    });
+  };
+
+  const handleZoneChange = (
+    changeId: string,
+    newFieldValue: {
+      field: string;
+      value: number | string;
+    }[]
+  ) => {
+    setParkingLocation((prev) => ({
+      ...prev!,
+      parking_zones: (prev?.parking_zones ?? []).map((zone) => {
+        if (zone.id !== changeId) return zone;
+
+        const newZone = { ...zone };
+        newFieldValue.forEach(({ field, value }) => {
+          if (field === "capacity") {
+            newZone.capacity = Number(value);
+          } else if (field === "availableSpaces") {
+            newZone.available_spaces = Number(value);
+          } else if (field === "name") {
+            newZone.name = value as string;
+          }
+        });
+
+        return newZone;
+      }),
+    }));
+  };
+
   const { logAlert } = useOutletContext<{
     logAlert: (message: string, severity: string) => void;
   }>();
 
   const showError = !!response && !response?.success;
 
-  const handleNumberChange = React.useCallback(
+  /* const handleNumberChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = +e.target.value;
       if (isNaN(value) || value < 0) {
@@ -67,7 +159,7 @@ function UpdateParkingLocationDialog({
       }
     },
     []
-  );
+  ); */
 
   const handleNameChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,70 +187,10 @@ function UpdateParkingLocationDialog({
     []
   );
 
-  const handleHourlyRateChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setParkingLocation((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          hourly_rate: handleNumberChange(e),
-        };
-      }),
-    [handleNumberChange]
-  );
-
-  const handleDailyRateChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setParkingLocation((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          daily_rate: handleNumberChange(e),
-        };
-      }),
-    [handleNumberChange]
-  );
-
-  const handleMonthlyRateChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setParkingLocation((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          monthly_rate: handleNumberChange(e),
-        };
-      }),
-    [handleNumberChange]
-  );
-
-  const handleCapacityChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setParkingLocation((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          capacity: handleNumberChange(e),
-        };
-      }),
-    [handleNumberChange]
-  );
-
-  const handleAvailableSpacesChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setParkingLocation((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          available_spaces: handleNumberChange(e),
-        };
-      }),
-    [handleNumberChange]
-  );
   const getParkingLocationByIdFromDb = React.useCallback(
     async (id: string) => {
       const response = await getParkingLocationById({ id });
       if (response?.success) {
-        console.log(response.data);
         return response.data;
       } else {
         logAlert(
@@ -180,12 +212,19 @@ function UpdateParkingLocationDialog({
   );
 
   React.useEffect(() => {
+    if (ref.current === parkingLocationId) return;
     fetchParkingLocationById(parkingLocationId as string);
+    ref.current = parkingLocationId; // This is to prevent the effect from running again if the id is the same in development mode (React.StrictMode).
+    // This is a workaround for the double render issue in React.StrictMode.
 
-    return () => {
+    /* return () => {
       setParkingLocation(undefined);
-    };
-  }, [logAlert, parkingLocationId, fetchParkingLocationById]);
+    }; */
+  }, [parkingLocationId, fetchParkingLocationById]);
+
+  React.useEffect(() => {
+    fetcherLoad("/parking-locations/add");
+  }, [fetcherLoad]);
 
   React.useEffect(() => {
     const setErrorsOnConcurrencyConflict = async function (id: string | null) {
@@ -196,12 +235,13 @@ function UpdateParkingLocationDialog({
       if (!data) return;
       setParkingLocation((prev) => ({
         ...prev!,
+        parking_zones: prev?.parking_zones ?? [], // Ensure parking_zones is always an array
         concurrency_stamp: data.concurrency_stamp,
       }));
 
-      setResponse((prev) => ({
-        ...prev!,
-        errors: {
+      setResponse((prev) => {
+        const newResponse = { ...prev! };
+        newResponse.errors = {
           ...prev?.errors,
           name:
             data.name === parkingLocation?.name
@@ -211,26 +251,57 @@ function UpdateParkingLocationDialog({
             data.address === parkingLocation?.address
               ? prev?.errors.address
               : `Updated address: ${data.address}`,
-          capacity:
-            data.capacity === parkingLocation?.capacity
-              ? prev?.errors.capacity
-              : `Updated capacity: ${data.capacity}`,
-          available_spaces:
-            data.available_spaces === parkingLocation?.available_spaces
-              ? prev?.errors.available_spaces
-              : `Updated available spaces: ${data.available_spaces}`,
-          hourly_rate:
-            data.hourly_rate === parkingLocation?.hourly_rate
-              ? prev?.errors.hourly_rate
-              : `Updated hourly rate: ${data.hourly_rate}`,
-          daily_rate:
-            data.daily_rate === parkingLocation?.daily_rate
-              ? prev?.errors.daily_rate
-              : `Updated daily rate: ${data.daily_rate}`,
           concurrency_stamp:
             "This parking location was updated by someone else. Please review the changes.",
-        },
-      }));
+          parking_rate_id:
+            data.parking_rate.id === parkingLocation?.parking_rate.id &&
+            data.parking_rate.daily_rate ===
+              parkingLocation?.parking_rate.daily_rate &&
+            data.parking_rate.hourly_rate ===
+              parkingLocation?.parking_rate.hourly_rate &&
+            data.parking_rate.monthly_rate ===
+              parkingLocation?.parking_rate.monthly_rate
+              ? prev?.errors.parking_rate_id
+              : `Updated parking rate: ${data.parking_rate.id}`,
+        };
+
+        const parkingZonesErrors: {
+          [key: string]: IUpdateParkingLocationRequestParkingZoneError | null;
+        } = prev?.errors.parking_zones ?? {};
+        data.parking_zones.forEach((zone) => {
+          if (
+            zone.capacity ===
+            parkingLocation?.parking_zones.find((z) => z.id === zone.id)
+              ?.capacity
+          ) {
+            parkingZonesErrors[zone.id] =
+              prev?.errors.parking_zones?.[zone.id] ?? null;
+          }
+          if (
+            zone.available_spaces ===
+            parkingLocation?.parking_zones.find((z) => z.id === zone.id)
+              ?.available_spaces
+          ) {
+            parkingZonesErrors[zone.id] =
+              prev?.errors.parking_zones?.[zone.id] ?? null;
+          }
+          if (
+            zone.name ===
+            parkingLocation?.parking_zones.find((z) => z.id === zone.id)?.name
+          ) {
+            parkingZonesErrors[zone.id] =
+              prev?.errors.parking_zones?.[zone.id] ?? null;
+          }
+        });
+
+        newResponse.errors.parking_zones = Object.fromEntries(
+          Object.entries(parkingZonesErrors).filter(
+            ([, error]) => error !== null
+          )
+        ) as { [key: string]: IUpdateParkingLocationRequestParkingZoneError };
+
+        return newResponse;
+      });
     };
 
     if (fetcher.state === "submitting" || fetcher.state === "loading") {
@@ -238,34 +309,52 @@ function UpdateParkingLocationDialog({
     } else {
       if (fetcher.data) {
         setIsLoading(false);
-        setResponse(fetcher.data as IUpdateParkingLocationResponse);
-        const response = fetcher.data as IUpdateParkingLocationResponse;
-        if (response?.success) {
-          logAlert(response?.message, "success");
-          handleClose?.(true);
+        if (
+          (fetcher.data as { parkingRates: IParkingRates[] }).parkingRates !==
+          undefined
+        ) {
+          const parkingRates = (
+            fetcher.data as { parkingRates: IParkingRates[] }
+          ).parkingRates;
+          setParkingRates(parkingRates);
+          setSelectedParkingRate(
+            parkingRates?.find(
+              (rate) => rate.id === parkingLocation?.parking_rate.id
+            ) ?? null
+          );
         } else {
-          logAlert(response.message ?? response.errors.summary, "error");
-          if (response.errors?.concurrency_stamp) {
-            logAlert("Someone else has updated this parking location", "error");
-            setErrorsOnConcurrencyConflict(parkingLocationId);
+          setResponse(fetcher.data as IUpdateParkingLocationResponse);
+          const response = fetcher.data as IUpdateParkingLocationResponse;
+          if (response?.success) {
+            logAlert(response?.message, "success");
+            handleClose?.(true);
+          } else {
+            logAlert(response.message ?? response.errors.summary, "error");
+            if (response.errors?.concurrency_stamp) {
+              logAlert(
+                "Someone else has updated this parking location",
+                "error"
+              );
+              setErrorsOnConcurrencyConflict(parkingLocationId);
+            }
           }
         }
       }
     }
   }, [
-    fetcher.state,
     fetcher.data,
+    fetcher.state,
+    getParkingLocationByIdFromDb,
     handleClose,
     logAlert,
-    fetchParkingLocationById,
-    parkingLocationId,
-    getParkingLocationByIdFromDb,
-    parkingLocation?.name,
     parkingLocation?.address,
-    parkingLocation?.capacity,
-    parkingLocation?.available_spaces,
-    parkingLocation?.hourly_rate,
-    parkingLocation?.daily_rate,
+    parkingLocation?.name,
+    parkingLocation?.parking_rate.daily_rate,
+    parkingLocation?.parking_rate.hourly_rate,
+    parkingLocation?.parking_rate.id,
+    parkingLocation?.parking_rate.monthly_rate,
+    parkingLocation?.parking_zones,
+    parkingLocationId,
   ]);
 
   const cancelWithoutRefetch = React.useCallback(() => {
@@ -316,35 +405,34 @@ function UpdateParkingLocationDialog({
                   helperText={response?.errors?.address}
                   onChange={handleAddressChange}
                 />
-                <CapacityField
-                  value={parkingLocation?.capacity}
-                  error={!!response?.errors?.capacity}
-                  helperText={response?.errors?.capacity}
-                  onChange={handleCapacityChange}
+                <TotalParkingLocationCapacityAndAvailableSpaces
+                  capacity={totalCapacity}
+                  availableSpaces={totalAvailableSpaces}
                 />
-                <EnableAvailableSpacesTextField
-                  value={parkingLocation?.available_spaces}
-                  onChange={handleAvailableSpacesChange}
-                  error={!!response?.errors?.available_spaces}
-                  helperText={response?.errors?.available_spaces}
+                <ParkingZoneGridParent>
+                  {parkingZones.map((zone) => (
+                    <UpdateParkingLocationParkingZoneGridRecord
+                      key={zone.id}
+                      zoneId={zone.id}
+                      zone={zone}
+                      handleZoneChange={handleZoneChange}
+                      handleRemoveZone={handleRemoveZone}
+                      error={response?.errors?.parking_zones?.[zone.id]}
+                    />
+                  ))}
+                  <AddNewParkingZoneGrid handleAddZone={handleAddZone} />
+                </ParkingZoneGridParent>
+                <ParkingRateSelectInput
+                  parkingRates={parkingRates}
+                  userControlParkingRateId={selectedParkingRate?.id}
+                  handleParkingRateChange={handleParkingRateChange}
+                  errorEle={response?.errors?.parking_rate_id}
                 />
-                <HourlyRateField
-                  value={parkingLocation?.hourly_rate}
-                  error={!!response?.errors?.hourly_rate}
-                  helperText={response?.errors?.hourly_rate}
-                  onChange={handleHourlyRateChange}
-                />
-                <DailyRateField
-                  value={parkingLocation?.daily_rate}
-                  error={!!response?.errors?.daily_rate}
-                  helperText={response?.errors?.daily_rate}
-                  onChange={handleDailyRateChange}
-                />
+                <HourlyRateField value={selectedParkingRate?.hourly} disabled />
+                <DailyRateField value={selectedParkingRate?.daily} disabled />
                 <MonthlyRateField
-                  value={parkingLocation?.monthly_rate}
-                  error={!!response?.errors?.monthly_rate}
-                  helperText={response?.errors?.monthly_rate}
-                  onChange={handleMonthlyRateChange}
+                  value={selectedParkingRate?.monthly}
+                  disabled
                 />
               </StyledGridContainer>
             </fetcher.Form>

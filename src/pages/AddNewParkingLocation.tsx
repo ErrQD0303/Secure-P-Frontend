@@ -43,7 +43,6 @@ function AddNewParkingLocation() {
     { capacity: number; availableSpaces: number; index: number }[]
   >([{ capacity: 1, availableSpaces: 1, index: currentIndex.current++ }]);
   const { parkingRates } = useLoaderData() as { parkingRates: IParkingRates[] };
-  console.log(parkingRates);
   const [selectedParkingRate, setSelectedParkingRate] =
     React.useState<IParkingRates | null>(null);
 

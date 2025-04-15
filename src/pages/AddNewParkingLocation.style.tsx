@@ -717,6 +717,7 @@ export const ParkingRateSelectInput = styled(Select)(() => ({
 })).withComponent(
   (
     props: React.ComponentProps<typeof Grid> & {
+      userControlParkingRateId?: string;
       label?: string;
       parkingRates?: IParkingRates[];
       handleParkingRateChange?: (rate: string | null) => void;
@@ -737,6 +738,7 @@ export const ParkingRateSelectInput = styled(Select)(() => ({
       parkingRates,
       errorEle,
       handleParkingRateChange,
+      userControlParkingRateId,
       ...rest
     } = props;
     const labelId = input?.inputLabel?.id || "parking-rate-label";
@@ -767,7 +769,7 @@ export const ParkingRateSelectInput = styled(Select)(() => ({
             labelId={labelId}
             id="parking-rate-id"
             name="parking-rate-id"
-            value={parkingRateId}
+            value={userControlParkingRateId ?? parkingRateId}
             onChange={handleChange}
             displayEmpty
             required
