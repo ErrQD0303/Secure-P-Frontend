@@ -25,7 +25,7 @@ import {
 } from "react-router-dom";
 import { IAddNewParkingLocationResponse } from "../services/parkingLocationService";
 import { useSelector } from "react-redux";
-import { getUserPermissions } from "../store/userSlice";
+import { isPermissionGranted } from "../store/userSlice";
 import { AppPolicy } from "../types/enum";
 import { IParkingRates } from "../types/parking";
 
@@ -35,8 +35,8 @@ function AddNewParkingLocation() {
     | undefined
     | null;
   const showError = Boolean(response && !response?.success);
-  const havePermission = useSelector(getUserPermissions).includes(
-    AppPolicy.CreateParkingLocation
+  const havePermission = useSelector(
+    isPermissionGranted(AppPolicy.CreateParkingLocation)
   );
   const currentIndex = React.useRef(0);
   const [parkingZones, setParkingZones] = React.useState<

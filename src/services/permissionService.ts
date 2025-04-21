@@ -2,7 +2,7 @@ import { getAccessTokenFromCookie } from "./userService";
 
 import { jwtDecode } from "jwt-decode";
 
-export const getUserPermissions = () => {
+export const getUserPermissionsFromToken = () => {
   const accessToken = getAccessTokenFromCookie()?.slice("Bearer ".length);
   if (!accessToken) {
     return [];

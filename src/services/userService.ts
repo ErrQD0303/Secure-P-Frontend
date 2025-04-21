@@ -1,6 +1,7 @@
 import axios from "axios";
 import { IRegisterUser, IUser } from "../types/user";
 import CookieName from "../shared/constants/cookieName";
+import { Country } from "../types/enum";
 
 export const register = async (
   user: IRegisterUser

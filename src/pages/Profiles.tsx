@@ -6,7 +6,7 @@ import {
   getAvatar,
   getAvatarKey,
   getProfilesPersonalInfo,
-  getUserPermissions,
+  isPermissionGranted,
 } from "../store/userSlice";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -63,22 +63,31 @@ function Profiles() {
   const isLoading =
     fetcher.state === "submitting" || fetcher.state === "loading";
 
-  const userPermissions = useSelector(getUserPermissions);
-  const showChangeProfileImageButton = React.useMemo(() => {
-    return userPermissions.some(
-      (permission) => permission === AppPolicy.ChangeAvatar
-    );
-  }, [userPermissions]);
-  const showChangeProfileInfo = React.useMemo(() => {
-    return userPermissions.some(
-      (permission) => permission === AppPolicy.UpdateProfile
-    );
-  }, [userPermissions]);
-  const showChangePassword = React.useMemo(() => {
-    return userPermissions.some(
-      (permission) => permission === AppPolicy.ChangePassword
-    );
-  }, [userPermissions]);
+  // const userPermissions = useSelector(getUserPermissions);
+  // const showChangeProfileImageButton = React.useMemo(() => {
+  //   return userPermissions.some(
+  //     (permission) => permission === AppPolicy.ChangeAvatar
+  //   );
+  // }, [userPermissions]);
+  // const showChangeProfileInfo = React.useMemo(() => {
+  //   return userPermissions.some(
+  //     (permission) => permission === AppPolicy.UpdateProfile
+  //   );
+  // }, [userPermissions]);
+  // const showChangePassword = React.useMemo(() => {
+  //   return userPermissions.some(
+  //     (permission) => permission === AppPolicy.ChangePassword
+  //   );
+  // }, [userPermissions]);
+  const showChangeProfileImageButton = useSelector(
+    isPermissionGranted(AppPolicy.ChangeAvatar)
+  );
+  const showChangeProfileInfo = useSelector(
+    isPermissionGranted(AppPolicy.UpdateProfile)
+  );
+  const showChangePassword = useSelector(
+    isPermissionGranted(AppPolicy.ChangePassword)
+  );
 
   const handleProfileImageClick = React.useCallback(() => {
     if (!showChangeProfileImageButton) return;

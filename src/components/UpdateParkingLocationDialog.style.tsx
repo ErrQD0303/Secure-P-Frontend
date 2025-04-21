@@ -210,6 +210,28 @@ export const HiddenConcurrencyStampTextField = styled("input")(
   return <input type="hidden" name="concurrency_stamp" {...props} />;
 });
 
+export const ErrorStyledGrid = styled(StyledGrid)(() => ({
+  color: theme.palette.error.main,
+  fontWeight: "bold",
+  textAlign: "center",
+  padding: "0.5rem",
+  borderRadius: "8px",
+})).withComponent(
+  (
+    props: React.ComponentProps<typeof StyledGrid> & {
+      errorMessage?: string;
+    }
+  ) => {
+    const { errorMessage, children, ...rest } = props;
+    console.log(errorMessage);
+    return (
+      <StyledGrid {...rest}>
+        {errorMessage ?? children ?? "Some errors have occured"}
+      </StyledGrid>
+    );
+  }
+);
+
 export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
   () => ({
     width: "100%",
@@ -224,7 +246,8 @@ export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
       zoneId?: string;
       zone?: {
         capacity?: number;
-        availableSpaces?: number;
+        available_spaces?: number;
+        name?: string;
       };
       error?: IUpdateParkingLocationRequestParkingZoneError;
       handleRemoveZone?: (id: string) => void;
@@ -239,12 +262,12 @@ export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
   ) => {
     const { zoneId, zone, handleZoneChange, handleRemoveZone, error, ...rest } =
       props;
-    const { capacity } = zone || {};
+    const { capacity, available_spaces, name } = zone || {};
     const [currentCapacity, setCurrentCapacity] = React.useState<number>(
       capacity || 0
     );
     const [currentAvailableSpaces, setCurrentAvailableSpaces] =
-      React.useState<number>(capacity || 0);
+      React.useState<number>(available_spaces || 0);
 
     const HandleCapacityChange = React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -278,7 +301,10 @@ export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
     }, [zoneId, handleRemoveZone]);
 
     React.useEffect(() => {
-      if (currentCapacity !== zone?.capacity) {
+      if (
+        currentCapacity !== zone?.capacity ||
+        currentAvailableSpaces !== zone?.available_spaces
+      ) {
         if (zoneId === undefined) {
           throw new TypeError("zoneId is undefined");
         }
@@ -288,8 +314,8 @@ export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
             value: currentCapacity,
           },
           {
-            field: "availableSpaces",
-            value: currentCapacity,
+            field: "available_spaces",
+            value: currentAvailableSpaces,
           },
         ]);
       }
@@ -305,32 +331,64 @@ export const UpdateParkingLocationParkingZoneGridRecord = styled(StyledGrid)(
         }}
         size={{ base: 1, md: 5 }}
         spacing={2}
+        sx={{
+          gap: "1rem",
+          padding: "1rem",
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: "8px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        }}
       >
-        <RemoveParkingZoneIcon onClick={HandleRemoveZone} />
+        {error?.summary && <ErrorStyledGrid errorMessage={error?.summary} />}
+        <RemoveParkingZoneIcon
+          onClick={HandleRemoveZone}
+          sx={{
+            cursor: "pointer",
+            color: theme.palette.error.main,
+            "&:hover": {
+              color: theme.palette.error.dark,
+            },
+          }}
+        />
         <NameTextField
           id={`parking_zones[${zoneId}].name`}
-          label="Parking Zone Name"
+          label={(zoneId?.startsWith("new-") ? "New " : " ") + "Parking Zone"}
           icon={<PersonIcon />}
-          defaultValue="New Parking Zone"
+          defaultValue={name}
           gridElement={ParkingZoneNameGrid}
           error={!!error?.name}
           helperText={error?.name}
+          sx={{
+            "& .MuiInputBase-root": {
+              borderRadius: "8px",
+            },
+          }}
         />
         <CapacityField
           id={`parking_zones[${zoneId}].capacity`}
-          value={currentCapacity}
+          value={currentCapacity.toString()}
           onChange={HandleCapacityChange}
           gridElement={ParkingZoneCapacityGrid}
           error={!!error?.capacity}
           helperText={error?.capacity}
+          sx={{
+            "& .MuiInputBase-root": {
+              borderRadius: "8px",
+            },
+          }}
         />
         <EnableAvailableSpacesTextField
           id={`parking_zones[${zoneId}].available-spaces`}
-          value={currentAvailableSpaces}
+          value={currentAvailableSpaces.toString()}
           onChange={HandleAvailableSpacesChange}
           gridElement={ParkingZoneAvailableSpacesGrid}
           error={!!error?.available_spaces}
           helperText={error?.available_spaces}
+          sx={{
+            "& .MuiInputBase-root": {
+              borderRadius: "8px",
+            },
+          }}
         />
       </StyledGrid>
     );

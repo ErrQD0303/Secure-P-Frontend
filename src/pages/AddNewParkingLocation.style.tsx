@@ -613,7 +613,7 @@ export const ParkingZoneGridRecord = styled(StyledGrid)(() => ({
         />
         <CapacityField
           id={`parking_zones[${index}].capacity`}
-          value={currentCapacity}
+          value={currentCapacity.toString()}
           onChange={HandleCapacityChange}
           gridElement={ParkingZoneCapacityGrid}
           error={!!error?.capacity}
@@ -621,7 +621,7 @@ export const ParkingZoneGridRecord = styled(StyledGrid)(() => ({
         />
         <AvailableSpacesField
           id={`parking_zones[${index}].available-spaces`}
-          value={currentCapacity}
+          value={currentCapacity.toString()}
           gridElement={ParkingZoneAvailableSpacesGrid}
           error={!!error?.available_spaces}
           helperText={error?.available_spaces}

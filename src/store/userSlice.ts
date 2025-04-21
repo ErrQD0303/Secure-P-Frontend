@@ -1,12 +1,11 @@
 import { IUser } from "../types/user";
-import { Country } from "../types/enum";
+import { AppPolicy, Country } from "../types/enum";
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { toPersonalInfo } from "../shared/mappers/users";
 
 const initialState: IUser & {
   avatarKey?: string | null;
-  permission?: string[];
 } = {
   id: "",
   username: undefined,
@@ -23,7 +22,8 @@ const initialState: IUser & {
   licensePlateNumber: [],
   avatar: null,
   avatarKey: null,
-  permission: [],
+  permissions: [],
+  roles: [],
 };
 
 const userSlice = createSlice({
@@ -79,4 +79,13 @@ export const isAuthenticated = (state: RootState) => !!state.user.id;
 export const isEmailConfirmed = (state: RootState) => state.user.emailConfirmed;
 
 export const getUserPermissions = (state: RootState) =>
-  state.user.permission || [];
+  state.user.permissions || [];
+
+export const getUserRoles = (state: RootState) => state.user.roles || [];
+
+export const isPermissionGranted = (permission: AppPolicy) => {
+  return (state: RootState) => {
+    const permissions = state.user.permissions || [];
+    return permissions.includes(permission);
+  };
+};

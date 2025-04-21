@@ -17,6 +17,8 @@ export interface IUser {
   postCode: string;
   licensePlateNumber: string[];
   avatar: string | null;
+  roles: string[];
+  permissions: string[];
 }
 
 export interface IRegisterUser {

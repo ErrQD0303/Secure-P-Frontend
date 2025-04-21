@@ -15,6 +15,7 @@ import {
 import {
   getParkingLocationById,
   IGetParkingLocationDto,
+  IGetParkingLocationParkingZoneDto,
   IUpdateParkingLocationRequestParkingZoneError,
   IUpdateParkingLocationResponse,
 } from "../services/parkingLocationService";
@@ -64,10 +65,9 @@ function UpdateParkingLocationDialog({
   const currentIndex = React.useRef(parkingLocation?.parking_zones.length ?? 0);
   const [parkingRates, setParkingRates] = React.useState<IParkingRates[]>([]);
 
-  const parkingZones = React.useMemo(
-    () => parkingLocation?.parking_zones ?? [],
-    [parkingLocation]
-  );
+  const [parkingZones, setParkingZones] = React.useState<
+    IGetParkingLocationParkingZoneDto[]
+  >(parkingLocation?.parking_zones ?? []);
   const [selectedParkingRate, setSelectedParkingRate] =
     React.useState<IParkingRates | null>(null);
 
@@ -90,28 +90,40 @@ function UpdateParkingLocationDialog({
   }, [parkingZones]);
 
   const handleAddZone = () => {
-    setParkingLocation((prev) => ({
-      ...prev!,
-      parking_zones: [
-        ...(prev?.parking_zones ?? []), // Ensure parking_zones is always an array
-        {
-          id: `new-${currentIndex.current++}`,
-          name: `New Parking Zone`,
-          capacity: 0,
-          available_spaces: 0,
-        },
-      ],
-    }));
+    // setParkingLocation((prev) => ({
+    //   ...prev!,
+    //   parking_zones: [
+    //     ...(prev?.parking_zones ?? []), // Ensure parking_zones is always an array
+    //     {
+    //       id: `new-${currentIndex.current++}`,
+    //       name: `New Parking Zone`,
+    //       capacity: 0,
+    //       available_spaces: 0,
+    //     },
+    //   ],
+    // }));
+    setParkingZones((prev) => [
+      ...prev,
+      {
+        id: `new-${currentIndex.current}`,
+        name: `New Parking Zone`,
+        capacity: 0,
+        available_spaces: 0,
+      },
+    ]);
   };
 
   const handleRemoveZone = (removeId: string) => {
-    setParkingLocation((prev) => {
-      return {
-        ...prev!,
-        parking_zones: (prev?.parking_zones ?? []).filter(
-          ({ id }) => removeId !== id
-        ), // Ensure parking_zones is always an array
-      };
+    // setParkingLocation((prev) => {
+    //   return {
+    //     ...prev!,
+    //     parking_zones: (prev?.parking_zones ?? []).filter(
+    //       ({ id }) => removeId !== id
+    //     ), // Ensure parking_zones is always an array
+    //   };
+    // });
+    setParkingZones((prev) => {
+      return prev.filter(({ id }) => removeId !== id);
     });
   };
 
@@ -122,16 +134,34 @@ function UpdateParkingLocationDialog({
       value: number | string;
     }[]
   ) => {
-    setParkingLocation((prev) => ({
-      ...prev!,
-      parking_zones: (prev?.parking_zones ?? []).map((zone) => {
+    // setParkingLocation((prev) => ({
+    //   ...prev!,
+    //   parking_zones: (prev?.parking_zones ?? []).map((zone) => {
+    //     if (zone.id !== changeId) return zone;
+
+    //     const newZone = { ...zone };
+    //     newFieldValue.forEach(({ field, value }) => {
+    //       if (field === "capacity") {
+    //         newZone.capacity = Number(value);
+    //       } else if (field === "available_spaces") {
+    //         newZone.available_spaces = Number(value);
+    //       } else if (field === "name") {
+    //         newZone.name = value as string;
+    //       }
+    //     });
+
+    //     return newZone;
+    //   }),
+    // }));
+    setParkingZones((prev) => {
+      return prev.map((zone) => {
         if (zone.id !== changeId) return zone;
 
         const newZone = { ...zone };
         newFieldValue.forEach(({ field, value }) => {
           if (field === "capacity") {
             newZone.capacity = Number(value);
-          } else if (field === "availableSpaces") {
+          } else if (field === "available_spaces") {
             newZone.available_spaces = Number(value);
           } else if (field === "name") {
             newZone.name = value as string;
@@ -139,8 +169,8 @@ function UpdateParkingLocationDialog({
         });
 
         return newZone;
-      }),
-    }));
+      });
+    });
   };
 
   const { logAlert } = useOutletContext<{
@@ -206,7 +236,9 @@ function UpdateParkingLocationDialog({
 
   const fetchParkingLocationById = React.useCallback(
     async (id: string) => {
-      setParkingLocation(await getParkingLocationByIdFromDb(id));
+      const data = await getParkingLocationByIdFromDb(id);
+      setParkingLocation(data);
+      setParkingZones(data?.parking_zones ?? []); // Ensure parking_zones is always an array
     },
     [getParkingLocationByIdFromDb]
   );
@@ -233,6 +265,7 @@ function UpdateParkingLocationDialog({
       logAlert("Refetching new data", "info");
 
       if (!data) return;
+
       setParkingLocation((prev) => ({
         ...prev!,
         parking_zones: prev?.parking_zones ?? [], // Ensure parking_zones is always an array
@@ -294,6 +327,17 @@ function UpdateParkingLocationDialog({
           }
         });
 
+        const existedParkingZones = parkingZones.map((zone) => zone.id);
+        const dbNewUpdatedParkingZones = data.parking_zones.filter(
+          (zone) => !existedParkingZones.includes(zone.id)
+        );
+
+        dbNewUpdatedParkingZones.forEach((zone) => {
+          parkingZonesErrors[zone.id] = {
+            summary: `New parking zone added: ${zone.name}`,
+          };
+        });
+
         newResponse.errors.parking_zones = Object.fromEntries(
           Object.entries(parkingZonesErrors).filter(
             ([, error]) => error !== null
@@ -302,6 +346,31 @@ function UpdateParkingLocationDialog({
 
         return newResponse;
       });
+
+      setParkingZones((prev) => {
+        const existedParkingZones = prev.map((zone) => zone.id);
+        const dbNewUpdatedParkingZones = data.parking_zones.filter(
+          (zone) => !existedParkingZones.includes(zone.id)
+        );
+        const deletedParkingZones = prev.filter(
+          (zone) =>
+            !zone.id.startsWith("new-") &&
+            !data.parking_zones.map((z) => z.id).includes(zone.id)
+        );
+
+        return [...prev, ...dbNewUpdatedParkingZones].filter(
+          (zone) => !deletedParkingZones.map((z) => z.id).includes(zone.id)
+        );
+      });
+      // (prev) => {
+      //   const existedParkingZones = prev.map((zone) => zone.id);
+      //   const dbNewUpdatedParkingZones = data.parking_zones
+      //     .map((zone) => zone.id)
+      //     .filter((zone) => !existedParkingZones.includes(zone));
+      //   console.log(existedParkingZones, dbNewUpdatedParkingZones);
+
+      //   return [...prev, ...dbNewUpdatedParkingZones];
+      // });
     };
 
     if (fetcher.state === "submitting" || fetcher.state === "loading") {
@@ -329,7 +398,12 @@ function UpdateParkingLocationDialog({
             logAlert(response?.message, "success");
             handleClose?.(true);
           } else {
-            logAlert(response.message ?? response.errors.summary, "error");
+            logAlert(
+              response.message ??
+                response.errors.summary ??
+                "Un expected error occurs",
+              "error"
+            );
             if (response.errors?.concurrency_stamp) {
               logAlert(
                 "Someone else has updated this parking location",
@@ -341,7 +415,12 @@ function UpdateParkingLocationDialog({
         }
       }
     }
+
+    return () => {
+      fetcher.data = null;
+    };
   }, [
+    fetcher,
     fetcher.data,
     fetcher.state,
     getParkingLocationByIdFromDb,
@@ -355,6 +434,7 @@ function UpdateParkingLocationDialog({
     parkingLocation?.parking_rate.monthly_rate,
     parkingLocation?.parking_zones,
     parkingLocationId,
+    parkingZones,
   ]);
 
   const cancelWithoutRefetch = React.useCallback(() => {

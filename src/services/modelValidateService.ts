@@ -6,6 +6,7 @@ import {
   IAddNewParkingLocationRequest,
   IAddNewParkingLocationRequestError,
   IAddNewParkingLocationRequestParkingZoneError,
+  IUpdateParkingLocationParkingZoneDto,
   IUpdateParkingLocationRequestBody,
   IUpdateParkingLocationRequestError,
 } from "./parkingLocationService";
@@ -284,14 +285,35 @@ export const validateParkingLocationModel = ({
     [key: string]: IAddNewParkingLocationRequestParkingZoneError;
   } = {};
   parking_zones.forEach((zone, index) => {
+    const id =
+      (zone as unknown as IUpdateParkingLocationParkingZoneDto).id ??
+      String(index);
     if (!zone.name || zone.name.trim() === "") {
-      zoneErrors[String(index)].name = "Name is required";
+      zoneErrors[id] = {};
+      zoneErrors[id].name = "Name is required";
     } else if (zone.name.length < 2) {
-      zoneErrors[String(index)].name =
-        "Name must be at least 2 characters long";
+      zoneErrors[id] = zoneErrors[id] ?? {};
+      zoneErrors[id].name = "Name must be at least 2 characters long";
     }
     if (isNaN(zone.capacity) || zone.capacity <= 0) {
-      zoneErrors[String(index)].capacity = "Capacity must be a positive number";
+      zoneErrors[id] = zoneErrors[id] ?? {};
+      zoneErrors[id].capacity =
+        "Capacity must be a positive number greater than 0";
+    }
+
+    if (
+      zone.available_spaces &&
+      (isNaN(zone.available_spaces) || zone.available_spaces < 0)
+    ) {
+      zoneErrors[id] = zoneErrors[id] ?? {};
+      zoneErrors[id].available_spaces =
+        "Available spaces must be a positive number";
+    }
+
+    if (zone.available_spaces && zone.available_spaces > zone.capacity) {
+      zoneErrors[id] = zoneErrors[id] ?? {};
+      zoneErrors[id].available_spaces =
+        "Available spaces cannot be greater than capacity";
     }
   });
 

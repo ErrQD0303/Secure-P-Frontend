@@ -20,9 +20,13 @@ import useViewPort from "../hooks/useViewPort";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import logoImage from "/logo.png";
 import { useSelector } from "react-redux";
-import { getAvatar, getAvatarKey, getFullName } from "../store/userSlice";
+import {
+  getAvatar,
+  getAvatarKey,
+  getFullName,
+  isPermissionGranted,
+} from "../store/userSlice";
 import { StaticFileUrl } from "../shared/constants/staticFileUrl";
-import { getUserPermissions } from "../services/permissionService";
 import { AppPolicy } from "../types/enum";
 
 type Props = {
@@ -53,28 +57,62 @@ function TopNavigationBar({ routeName }: Props) {
   const avatar = userAvatar
     ? import.meta.env.VITE_BACKEND_URL + "/" + userAvatar
     : StaticFileUrl.DEFAULT_AVATAR;
-  const userPermissions = useSelector(getUserPermissions);
-  const showProfileSettings =
-    userPermissions.some(
-      (permission) => permission === AppPolicy.ChangePassword
-    ) ||
-    userPermissions.some(
-      (permission) => permission === AppPolicy.UpdateProfile
-    ) ||
-    userPermissions.some((permission) => permission === AppPolicy.ChangeAvatar);
-  const showParkingLocations =
-    userPermissions.some(
-      (permission) => permission === AppPolicy.ReadParkingLocation
-    ) ||
-    userPermissions.some(
-      (permission) => permission === AppPolicy.CreateParkingLocation
-    ) ||
-    userPermissions.some(
-      (permission) => permission === AppPolicy.UpdateParkingLocation
-    ) ||
-    userPermissions.some(
-      (permission) => permission === AppPolicy.DeleteParkingLocation
+  // const userPermissions = useSelector(getUserPermissions);
+  const hasChangePasswordPermission = useSelector(
+    isPermissionGranted(AppPolicy.ChangePassword)
+  );
+  const hasUpdateProfilePermission = useSelector(
+    isPermissionGranted(AppPolicy.UpdateProfile)
+  );
+  const hasChangeAvatarPermission = useSelector(
+    isPermissionGranted(AppPolicy.ChangeAvatar)
+  );
+  const hasReadParkingLocationPermission = useSelector(
+    isPermissionGranted(AppPolicy.ReadParkingLocation)
+  );
+  const hasCreateParkingLocationPermission = useSelector(
+    isPermissionGranted(AppPolicy.CreateParkingLocation)
+  );
+  const hasUpdateParkingLocationPermission = useSelector(
+    isPermissionGranted(AppPolicy.UpdateParkingLocation)
+  );
+  const hasDeleteParkingLocationPermission = useSelector(
+    isPermissionGranted(AppPolicy.DeleteParkingLocation)
+  );
+
+  const showProfileSettings = React.useMemo(() => {
+    return (
+      hasChangeAvatarPermission ||
+      hasChangePasswordPermission ||
+      hasUpdateProfilePermission ||
+      hasReadParkingLocationPermission ||
+      hasCreateParkingLocationPermission ||
+      hasUpdateParkingLocationPermission ||
+      hasDeleteParkingLocationPermission
     );
+  }, [
+    hasChangeAvatarPermission,
+    hasChangePasswordPermission,
+    hasCreateParkingLocationPermission,
+    hasDeleteParkingLocationPermission,
+    hasReadParkingLocationPermission,
+    hasUpdateParkingLocationPermission,
+    hasUpdateProfilePermission,
+  ]);
+
+  const showParkingLocations = React.useMemo(() => {
+    return (
+      hasReadParkingLocationPermission ||
+      hasCreateParkingLocationPermission ||
+      hasUpdateParkingLocationPermission ||
+      hasDeleteParkingLocationPermission
+    );
+  }, [
+    hasCreateParkingLocationPermission,
+    hasDeleteParkingLocationPermission,
+    hasReadParkingLocationPermission,
+    hasUpdateParkingLocationPermission,
+  ]);
 
   const handleGoBack = React.useCallback(() => {
     navigate(-1);

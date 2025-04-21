@@ -281,6 +281,7 @@ export interface IUpdateParkingLocationRequestError {
 }
 
 export interface IUpdateParkingLocationRequestParkingZoneError {
+  summary?: string;
   name?: string;
   capacity?: string;
   available_spaces?: string;

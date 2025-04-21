@@ -25,7 +25,7 @@ import { getRouteName } from "../services/routeService";
 import ButtonLink from "../components/ButtonLink";
 import AddNewIcon from "../components/svg-icons/AddNew";
 import { useSelector } from "react-redux";
-import { getUserPermissions, isEmailConfirmed } from "../store/userSlice";
+import { isEmailConfirmed, isPermissionGranted } from "../store/userSlice";
 import EmailConfirmNotificationBar from "./EmailConfirmNotificationBar";
 import { AppPolicy } from "../types/enum";
 
@@ -86,7 +86,10 @@ function AppLayout() {
   const location = useLocation();
   const [routeUrl, actionUrl] = location.pathname.split("/").slice(1);
   const showBodyRouteName = viewWidth >= theme.breakpoints.values.md;
-  const userPermissions = useSelector(getUserPermissions);
+  // const userPermissions = useSelector(getUserPermissions);
+  const isAddNewParkingLocationGranted = useSelector(
+    isPermissionGranted(AppPolicy.CreateParkingLocation)
+  );
   const showAddNewButtonRouteName = React.useMemo(
     () => ({
       subscriptions: {
@@ -102,10 +105,10 @@ function AppLayout() {
       "parking-locations": {
         to: "/parking-locations/add",
         text: "Add New Parking Location",
-        show: userPermissions?.includes(AppPolicy.CreateParkingLocation),
+        show: isAddNewParkingLocationGranted,
       },
     }),
-    [userPermissions]
+    [isAddNewParkingLocationGranted]
   ) as unknown as Record<string, { to: string; text: string; show: boolean }>;
   const showAddNewButton = React.useMemo(() => {
     const keys = Object.keys(showAddNewButtonRouteName);

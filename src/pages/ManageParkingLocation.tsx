@@ -19,7 +19,7 @@ import {
   OtherCell,
 } from "../components/AdminDataTable.style";
 import { useSelector } from "react-redux";
-import { getUserPermissions } from "../store/userSlice";
+import { isPermissionGranted } from "../store/userSlice";
 import UpdateParkingLocationDialog from "../components/UpdateParkingLocationDialog";
 import DeleteParkingLocationDialog from "../components/DeleteParkingLocationDialog";
 
@@ -27,7 +27,7 @@ function ManageParkingLocation() {
   const { logAlert } = useOutletContext<{
     logAlert: (message: string, severity: string) => void;
   }>();
-  const permissions = useSelector(getUserPermissions);
+  // const permissions = useSelector(getUserPermissions);
   const [openUpdateDialog, setOpenUpdateDialog] = React.useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [currentId, setCurrentId] = React.useState<string | null>(null);
@@ -169,16 +169,22 @@ function ManageParkingLocation() {
     setOpenDeleteDialog(false);
   }, [currentId, logAlert]);
 
-  const [canEdit, canDelete] = React.useMemo(() => {
-    const canEdit = permissions.some(
-      (permission) => permission === AppPolicy.UpdateParkingLocation
-    );
-    const canDelete = permissions.some(
-      (permission) => permission === AppPolicy.DeleteParkingLocation
-    );
+  // const [canEdit, canDelete] = React.useMemo(() => {
+  //   const canEdit = permissions.some(
+  //     (permission) => permission === AppPolicy.UpdateParkingLocation
+  //   );
+  //   const canDelete = permissions.some(
+  //     (permission) => permission === AppPolicy.DeleteParkingLocation
+  //   );
 
-    return [canEdit, canDelete];
-  }, [permissions]);
+  //   return [canEdit, canDelete];
+  // }, [permissions]);
+  const canEdit = useSelector(
+    isPermissionGranted(AppPolicy.UpdateParkingLocation)
+  );
+  const canDelete = useSelector(
+    isPermissionGranted(AppPolicy.DeleteParkingLocation)
+  );
 
   const tableHeaders = React.useMemo(() => {
     const originalHeaders = [

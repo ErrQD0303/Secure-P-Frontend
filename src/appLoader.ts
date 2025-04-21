@@ -8,7 +8,6 @@ import { ISubscriptionDetail } from "./types/subscription";
 import { setUser } from "./store/userSlice";
 import { cleanRouteName } from "./shared/helpers/strings";
 import { getUserInfoFromDB } from "./services/userService";
-import { getUserPermissions } from "./services/permissionService";
 
 const loader = async ({ request }: LoaderFunctionArgs) => {
   const { subscriptionDetails: subscriptions } = (await getAllSubscriptions({
@@ -19,10 +18,10 @@ const loader = async ({ request }: LoaderFunctionArgs) => {
   };
   store.dispatch(setSubcription(subscriptions));
   const currentUser = await getUserInfoFromDB();
-  const userPermissions = getUserPermissions();
+  // const userPermissions = getUserPermissions();
 
   // currentUser.dayOfBirth = new Date(currentUser.dayOfBirth);
-  store.dispatch(setUser({ ...currentUser, permission: userPermissions }));
+  store.dispatch(setUser({ ...currentUser }));
 
   const notifications = await getNotifications();
   const routeName = await getRouteName(cleanRouteName(request.url));
